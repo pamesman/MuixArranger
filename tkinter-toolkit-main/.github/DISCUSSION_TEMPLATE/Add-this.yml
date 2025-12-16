@@ -1,0 +1,82 @@
+title: "Project Name"
+labels: ["Add new library"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please complete this form:
+  - type: input
+    id: url
+    attributes:
+      label: Repository URL
+    validations:
+      required: true
+  - type: textarea
+    id: desc
+    attributes:
+      label: Description
+      description: "Write a short but good description of your project!"
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: highlights
+    attributes:
+      label: Highlights 
+      description: "Write some useful features of your project"
+      value: |
+        1.
+        2.
+        3.
+        4.
+        5.
+        ...
+      render: bash
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author Name
+      description: "realname or username"
+    validations:
+      required: true
+  - type: input
+    id: preview
+    attributes:
+      label: Preview Image URL
+      description: "Upload the image to github and paste the link here"
+    validations:
+      required: false
+  - type: dropdown
+    id: pip
+    attributes:
+      label: Is the project uploaded to pypi/pip?
+      options:
+        - 'Yes'
+        - 'No'
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Project Type?
+      options:
+        - 'Tkinter based'
+        - 'CustomTkinter based'
+        - 'Tool/utility'
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: CheckList
+      options:
+        - label: The project has proper documentation
+          required: false
+        - label: The project is in working condition
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        ### That's it!
+        _This form will be checked soon..._

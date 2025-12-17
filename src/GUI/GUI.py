@@ -1,11 +1,11 @@
 from tkinter import PhotoImage
 import pandas as pd
 import customtkinter
-from customtkinter import CTkSegmentedButton, CTkImage
+
 from PIL import Image
 from CTkScrollableDropdown import *
 import CTkTable
-import CTkListbox
+
 
 import src.Figures as fig
 
@@ -64,10 +64,10 @@ def figure_press(figureid):
         working_set.update({fig.repertori[figureid].nom:croquis_in_use})
         print(working_set)
     return croquis_in_use
-    """
-    Falta funcionalitat: canviar també el contingut de croquis frame
-    """
-    #working_croquis =
+"""
+Falta funcionalitat: canviar també el contingut de croquis frame
+"""
+
 """
 A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertori", i s'asocia a el command definit per la funció de dalt
 """
@@ -95,7 +95,9 @@ frame_qv.place(relx = 0.45,rely=0.5,anchor="c",relheight=0.98, relwidth=.66)
 namer = customtkinter.CTkEntry(frame_qv, placeholder_text= "Nom de Figura-X", font=("Liberation Sans",24,"bold"),state="disabled")
 def actualitzar_nom_figura():
     croquis_in_use["Nom"] = namer.get()
-namer_button = customtkinter.CTkButton(frame_qv, text="Actualitzar nom",font=("Liberation Sans",18,"bold"),height= 34, command= actualitzar_nom_figura(), state="disabled")
+    taula.update_values(fig.croquis_to_table(croquis_in_use))
+    print(croquis_in_use)
+namer_button = customtkinter.CTkButton(frame_qv, text="Actualitzar nom",font=("Liberation Sans",18,"bold"),height= 34, command= actualitzar_nom_figura, state="disabled")
 namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 
 namer.place(relx=0.01, rely=0.01, relwidth=0.4)
@@ -104,29 +106,6 @@ namer.place(relx=0.01, rely=0.01, relwidth=0.4)
 button = customtkinter.CTkButton(frame_qv, text="Afegir",font=("Liberation Sans",18,"bold"),corner_radius=500, width=20,height=20, image=image)
 button.pack(side="bottom", anchor="se", padx=10, pady=10)
 
-
-
-
-def combobox_callback1(choice):
-    print("combobox1 dropdown clicked:", choice)
-
-combobox_var1 = customtkinter.StringVar(value="option 2")
-membres =list(((str(t["Nom"][i])+"aaa Holala")[:str(t["Nom"][i]).find(" ")+4]+" "+str(t["Muscle"][i])) for i in range(0,len(t["Nom"])))
-combobox1 = customtkinter.CTkComboBox(root, values="1",
-                                      variable=combobox_var1, width=200)
-CTkScrollableDropdown(attach=combobox1, values=membres,command=combobox_callback1)
-#listbox = listbox(root,values=membres)
-#listbox.place(relx=0.5,rely=0.5,anchor="s")
-combobox_var1.set("option 2")
-def combobox_callback2(choice):
-    print("esta vaina es", combobox_var1)
-
-combobox_var2 = customtkinter.StringVar(value="option 2")
-combobox2 = customtkinter.CTkComboBox(root, values=["option 1", "option 2"],
-                                     command=combobox_callback2, variable=combobox_var2)
-combobox1.place(relx = 0.5,rely = 0.5,anchor="s")
-combobox2.place(relx = 0.7,rely = 0.5,anchor="s")
-combobox_var2.set("option 2")
 
 
 

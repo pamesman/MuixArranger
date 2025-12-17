@@ -161,7 +161,7 @@ def fer_croquis(figura: Esquema,nom: str):
         else:
             for h in range (0,nombre[i]):
                 clau = str(posicions[i]).capitalize() + " " + str(h + 1)
-                producte.update({str(clau): "sense assignar"})
+                producte.update({str(clau): "N. A."})
                 stringoutput += str(clau) + ":" + str(producte[str(clau)]) + "\n"
             stringoutput += "\n\n"
     return producte
@@ -184,8 +184,9 @@ def visualitzar_croquis(croquis_generat: dict):
     print(stringoutput)
 
 def croquis_to_table(croquis_generat:dict):
+    listah = [["Posició", "Nom","Alçada"]]
     lista = [[key,value] for key,value in croquis_generat.items()]
-    return lista
+    return listah+lista[2:]
 
 def construir_croquis(croquis_generat):
     llista_escollits = list()

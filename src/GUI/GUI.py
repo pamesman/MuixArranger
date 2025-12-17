@@ -57,12 +57,17 @@ def figure_press(figureid):
     namer.configure(state="normal")
     namer_button.configure(state="normal")
     global croquis_in_use
-    croquis_in_use= fig.fer_croquis(fig.repertori[figureid],fig.repertori[figureid].nom)
+
+
+    if fig.repertori[figureid].nom not in working_set:
+        croquis_in_use = fig.fer_croquis(fig.repertori[figureid], fig.repertori[figureid].nom)
+        working_set.update({fig.repertori[figureid].nom:croquis_in_use})
+
+    else:
+        croquis_in_use = working_set[fig.repertori[figureid].nom]
     taula.update_values(fig.croquis_to_table(croquis_in_use))
     taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
     taula_name.configure(text="Id: " + croquis_in_use["Nom"])
-    if fig.repertori[figureid].nom not in working_set:
-        working_set.update({fig.repertori[figureid].nom:croquis_in_use})
     print(working_set)
     return croquis_in_use
 """

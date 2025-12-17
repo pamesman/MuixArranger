@@ -24,8 +24,7 @@ tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
 
 croquis = tabview.add("Croquis")  # add tab at the end
 assaig = tabview.add("Assaig")  # add tab at the end
-button22= customtkinter.CTkButton(assaig)
-button22.pack(padx=2,pady=8, side="top")
+
 
 #tabs = CTkSegmentedButton(root,values=["Croquis","Assaig/Actuació"],corner_radius=50, font=("Liberation Sans",24,"bold"),border_width=4)
 #tabs.place(relx=0.5,rely=0.025,anchor="n",relwidth=0.99, relheight=0.05)
@@ -60,9 +59,11 @@ def figure_press(figureid):
     global croquis_in_use
     croquis_in_use= fig.fer_croquis(fig.repertori[figureid],fig.repertori[figureid].nom)
     taula.update_values(fig.croquis_to_table(croquis_in_use))
+    taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
+    taula_name.configure(text="Id: " + croquis_in_use["Nom"])
     if fig.repertori[figureid].nom not in working_set:
         working_set.update({fig.repertori[figureid].nom:croquis_in_use})
-        print(working_set)
+    print(working_set)
     return croquis_in_use
 """
 Falta funcionalitat: canviar també el contingut de croquis frame
@@ -80,13 +81,18 @@ for i in fig.repertori.keys():
 
 
 
+
 #Frame per a taula croquis
 Croquis_frame = customtkinter.CTkScrollableFrame(frame)
 Croquis_frame.place(relx=.99,rely=.5,anchor="e",relheight=.98, relwidth=0.2)
 dictionario = [["Posició","Nom","Alçada"],["Base1","Oriol",137,4,5,6],["Base2","Lua",302,4,5,6],["Alçadora","Toni Ciscar",113,4,5,6],["Xicalla","Guillem Antich",140,4,5,6]]
 taula = CTkTable.CTkTable(Croquis_frame, column= 3,row=60,values=dictionario, header_color="#7393B3", font=("Liberation Sans",12), corner_radius=5)
-taula.pack(padx=20, pady=20, expand=True)
 
+taula_name = customtkinter.CTkLabel(Croquis_frame, text="Figura:")
+taula_name.pack()
+taula_namefig = customtkinter.CTkLabel(Croquis_frame, text="Id:")
+taula_namefig.pack()
+taula.pack(expand=True,  pady=20)
 #CROQUIS
 
 frame_qv = customtkinter.CTkFrame(frame)
@@ -97,6 +103,8 @@ def actualitzar_nom_figura():
     croquis_in_use["Nom"] = namer.get()
     taula.update_values(fig.croquis_to_table(croquis_in_use))
     print(croquis_in_use)
+    taula_namefig.configure(text="Figura: "+croquis_in_use["Figura"])
+    taula_name.configure(text="Id: " + namer.get())
 namer_button = customtkinter.CTkButton(frame_qv, text="Actualitzar nom",font=("Liberation Sans",18,"bold"),height= 34, command= actualitzar_nom_figura, state="disabled")
 namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 

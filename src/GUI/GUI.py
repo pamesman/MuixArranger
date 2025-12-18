@@ -1,20 +1,23 @@
 from tkinter import PhotoImage
-import pandas as pd
 import customtkinter
-
 from PIL import Image
 from CTkScrollableDropdown import *
 import CTkTable
 
-
+import src.Membre as membre
 import src.Figures as fig
+paleta = ["#C03530","#c15428","#60505B","#F5A980","#82898C"]
+paleta2 = ["#4D1514","#5B2F1D","#604232","#261F23","#36383A"]
+paleta3 = ["#3D2625","#4F3C34","#564A43","#252325","#252325"]
+rols = ['Base', 'Segona', 'Tercera', 'Quarta', 'Alsadora', 'Xicalla', 'Mans', 'Vents', 'Laterals', 'Agulla', 'Peu', 'Tap', 'Passadora', 'Recollidora', 'Genoll', 'Contrafort', 'Guia', 'Puntal', 'Crossa']
+coordenadesprova = [(4, 3), (10, 3), (12, 3), (11, 3.5), (11, 4.5), (2, 3), (6, 3), (1, 3), (7, 3), (0, 3), (8, 3), (4, 4), (4, 2), (4, 5), (4, 1), (4, 6), (4, 0), (3, 4), (5, 4), (5, 2), (3, 2), (2, 5), (6, 5), (6, 1), (2, 1), (11, 0), (3, 3), (5, 3)]
 
-t = pd.read_excel("/home/paco/Desktop/100personas.ods") #Guarda el excel, açò eu ha de fer el backend
 #estableix parent window
 image=customtkinter.CTkImage(light_image=Image.open("icon.png"))
 root = customtkinter.CTk()
 root.geometry("1280x720")
 root.iconphoto(False,PhotoImage(file="icon.png"))
+root.title("Crokiss")
 #set theme
 customtkinter.set_appearance_mode("dark")
 button = customtkinter.CTkButton(root)
@@ -41,17 +44,47 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 repertori_label = customtkinter.CTkLabel(frame, text= "Figures", fg_color="#36454F",corner_radius=5, font=("Liberation Sans",18, "bold"))
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
-
+def insertar_membre(membre):
+    croquis_in_use.update({posicio:membre})
 buttonlist1 = []
 working_set = {}
 croquis_in_use = {}
+"""
+Per dibuixar la figura
+"""
+def fer_dibuix(listadecoordenades:list, croquiss:dict):
+    counter = 0
+    for i in croquiss.keys():
+        if i == "Nom" or i == "Figura":
+            continue
+        ident = i
+        membre_seleccionat = "N.A."
+        combobox = customtkinter.CTkComboBox(frame_qv,
+                                             font=("Liberation Sans",11, "bold"),
+                                             #text_color="black",
+                                             border_color=paleta[rols.index(ident[:-2]) % 5],
+                                             button_color=paleta[rols.index(ident[:-2]) % 5],
+                                             #command=customtkinter.CTkToplevel()
 
-
+                                             #fg_color="#A3A3A3")#, fg_color=paleta[rols.index(i[:-2]) % 5]
+                                             )
+                                            #combobox._entry.configure(wraplength=50)
+        CTkScrollableDropdown(attach = combobox, values = membre.working_list["Nom"], width=200)
+        combobox.set(ident)
+        coord = listadecoordenades[counter]
+        combobox.place(relx=coord[0]/15+1/15,
+                       rely=1-(coord[1]/11)-3/11, anchor="w",
+                       relwidth=1/16,
+                       relheight = 1/25
+                       )
+        counter += 1
 """
 figure_press funciona per als side buttons amb les figures del repertori. Agafa el butto, forma el croquis per a displayearlo en la taula i l'afegeix a un 
 "working_Set", que guarda el progrés que s'haja fet en cada figura abans de commitearlos a Assaig.
 OJO!!! No guarda cap nom en particular, nom="nomdelafigura"
 """
+
+
 def figure_press(figureid):
     print("pressed",fig.repertori[figureid].nom)
     namer.configure(state="normal")
@@ -62,13 +95,19 @@ def figure_press(figureid):
     if fig.repertori[figureid].nom not in working_set:
         croquis_in_use = fig.fer_croquis(fig.repertori[figureid], fig.repertori[figureid].nom)
         working_set.update({fig.repertori[figureid].nom:croquis_in_use})
+        dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {fig.repertori[figureid].nom}?", title="Nomena la figura", )
+        croquis_in_use.update({"Nom":dialog_nom.get_input()})
 
     else:
         croquis_in_use = working_set[fig.repertori[figureid].nom]
+    namer.configure(placeholder_text=croquis_in_use["Nom"])
+
     taula.update_values(fig.croquis_to_table(croquis_in_use))
+
     taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
     taula_name.configure(text="Id: " + croquis_in_use["Nom"])
     print(working_set)
+    fer_dibuix(coordenadesprova, croquis_in_use)
     return croquis_in_use
 """
 Falta funcionalitat: canviar també el contingut de croquis frame
@@ -80,7 +119,8 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 for i in fig.repertori.keys():
     def button_pressed():
         print(buttonlist1)
-    button = customtkinter.CTkButton(repertori_frame,text = fig.repertori[i].nom, command=lambda iden=i: figure_press(iden))
+    button = customtkinter.CTkButton(repertori_frame,text = fig.repertori[i].nom, command=lambda iden=i: figure_press(iden),
+                                     fg_color=paleta[1],)
     button.pack(padx=2,pady=8,expand=True)
     buttonlist1.append(button)
 
@@ -91,7 +131,7 @@ for i in fig.repertori.keys():
 Croquis_frame = customtkinter.CTkScrollableFrame(frame)
 Croquis_frame.place(relx=.99,rely=.5,anchor="e",relheight=.98, relwidth=0.2)
 dictionario = [["Posició","Nom","Alçada"],["Base1","Oriol",137,4,5,6],["Base2","Lua",302,4,5,6],["Alçadora","Toni Ciscar",113,4,5,6],["Xicalla","Guillem Antich",140,4,5,6]]
-taula = CTkTable.CTkTable(Croquis_frame, column= 3,row=60,values=dictionario, header_color="#7393B3", font=("Liberation Sans",12), corner_radius=5)
+taula = CTkTable.CTkTable(Croquis_frame, column= 3,row=2,values=dictionario, header_color="#7393B3", font=("Liberation Sans",12), corner_radius=5)
 
 taula_name = customtkinter.CTkLabel(Croquis_frame, text="Figura:")
 taula_name.pack()
@@ -116,10 +156,20 @@ namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 namer.place(relx=0.01, rely=0.01, relwidth=0.4)
 
 #Butó confirmar figura per al assaig
-button = customtkinter.CTkButton(frame_qv, text="Afegir",font=("Liberation Sans",18,"bold"),corner_radius=500, width=20,height=20, image=image)
-button.pack(side="bottom", anchor="se", padx=10, pady=10)
+button_confirm = customtkinter.CTkButton(frame_qv, text="Afegir",font=("Liberation Sans",18,"bold"),corner_radius=500, width=20,height=20, image=image)
+button_confirm.pack(side="bottom", anchor="se", padx=10, pady=10)
+
+#botó per expandir croquis zone
+button_expand = customtkinter.CTkButton(frame_qv,
+                                        text = "<",
+                                        height = 100,
+                                        width = 30)
+                                        #command = lambda: frame_qv.configure(relwidth = 1))
+                                        #repertori_frame._parent_frame.forget())
+button_expand.pack(side="left", anchor="w", padx=10, pady=10)
 
 
+print(repertori_frame.winfo_parent)
 
 
 

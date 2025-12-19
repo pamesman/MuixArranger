@@ -1,4 +1,5 @@
 from tkinter import PhotoImage
+import tkinter
 import customtkinter
 from PIL import Image
 from CTkScrollableDropdown import *
@@ -11,7 +12,7 @@ paleta2 = ["#4D1514","#5B2F1D","#604232","#261F23","#36383A"]
 paleta3 = ["#3D2625","#4F3C34","#564A43","#252325","#252325"]
 rols = ['Base', 'Segona', 'Tercera', 'Quarta', 'Alsadora', 'Xicalla', 'Mans', 'Vents', 'Laterals', 'Agulla', 'Peu', 'Tap', 'Passadora', 'Recollidora', 'Genoll', 'Contrafort', 'Guia', 'Puntal', 'Crossa']
 coordenadesprova = [(4, 3), (10, 3), (12, 3), (11, 3.5), (11, 4.5), (2, 3), (6, 3), (1, 3), (7, 3), (0, 3), (8, 3), (4, 4), (4, 2), (4, 5), (4, 1), (4, 6), (4, 0), (3, 4), (5, 4), (5, 2), (3, 2), (2, 5), (6, 5), (6, 1), (2, 1), (11, 0), (3, 3), (5, 3)]
-
+llistadebutons = {}
 #estableix parent window
 image=customtkinter.CTkImage(light_image=Image.open("icon.png"))
 root = customtkinter.CTk()
@@ -45,7 +46,12 @@ repertori_label = customtkinter.CTkLabel(frame, text= "Figures", fg_color="#3645
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
 def insertar_membre(membre):
-    croquis_in_use.update({posicio:membre})
+    cutoff = membre.index(" ")
+    croquis_in_use.update({membre[:cutoff+2]:membre[cutoff+3:]})
+    print(croquis_in_use)
+    llistadebutons[membre[:cutoff+2]].set(membre[cutoff+2:])
+    taula.update_values(fig.croquis_to_table(croquis_in_use))
+
 buttonlist1 = []
 working_set = {}
 croquis_in_use = {}
@@ -60,21 +66,24 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
         ident = i
         membre_seleccionat = "N.A."
         combobox = customtkinter.CTkComboBox(frame_qv,
-                                             font=("Liberation Sans",11, "bold"),
+                                             font=("Liberation Sans",11),
                                              #text_color="black",
                                              border_color=paleta[rols.index(ident[:-2]) % 5],
                                              button_color=paleta[rols.index(ident[:-2]) % 5],
-                                             #command=customtkinter.CTkToplevel()
-
-                                             #fg_color="#A3A3A3")#, fg_color=paleta[rols.index(i[:-2]) % 5]
+                                             command=insertar_membre,
                                              )
+                                             #values=[ident + i for i in membre.working_list[0:25]])
+                                             #fg_color="#A3A3A3")#, fg_color=paleta[rols.index(i[:-2]) % 5]
+
                                             #combobox._entry.configure(wraplength=50)
-        CTkScrollableDropdown(attach = combobox, values = membre.working_list["Nom"], width=200)
+
         combobox.set(ident)
         coord = listadecoordenades[counter]
+        CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200, command=insertar_membre)
+        llistadebutons.update({i:combobox})
         combobox.place(relx=coord[0]/15+1/15,
                        rely=1-(coord[1]/11)-3/11, anchor="w",
-                       relwidth=1/16,
+                       relwidth=1/15.5,
                        relheight = 1/25
                        )
         counter += 1

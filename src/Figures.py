@@ -1,6 +1,5 @@
 from tabulate import tabulate
-import pandas as pd
-t = pd.read_excel("/home/paco/Desktop/100personas.ods")
+
 #Figura: Cada una de les diferents estructures muixarangueres, te un nom identificatiu i un nombre de participants, cadascun amb el seu rol. Quan parlem de termes com esquema i croquis, sera referit a la idea d'una Figura
 #esquema: Composició simplificada de una figura muixeranguera, el esquema de una figura presenta el numero de persones en cada posició. Es una classe amb cada posició siguent un atribut d'aquesta
 #Repertori: Un diccionari dels diferents Esquemes(Figures), de forma {n:esquema}

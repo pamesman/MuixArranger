@@ -43,12 +43,16 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 #repertori_frame2.place(relheight=0.09,relwidth=0.1,relx=.01,rely=.01,anchor="nw")
 repertori_label = customtkinter.CTkLabel(frame, text= "Figures", fg_color="#36454F",corner_radius=5, font=("Liberation Sans",18, "bold"))
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
+def butto_de_croquis(posicio):
+    CTkScrollableDropdown(attach=diccionari_debutons[posicio], values=membre.working_list["Nom"])
+    entrada = [posicio]
 
-def insertar_membre(membre):
-    croquis_in_use.update({posicio:membre})
+#def insertar_membre(membre):
+ #   croquis_in_use.update({posicio:membre})
 buttonlist1 = []
 working_set = {}
 croquis_in_use = {}
+diccionari_debutons = {}
 """
 Per dibuixar la figura
 """
@@ -59,19 +63,20 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
             continue
         ident = i
         membre_seleccionat = "N.A."
-        combobox = customtkinter.CTkComboBox(frame_qv,
+        combobox = customtkinter.CTkButton(frame_qv,
                                              font=("Liberation Sans",11, "bold"),
-                                             #text_color="black",
-                                             border_color=paleta[rols.index(ident[:-2]) % 5],
-                                             button_color=paleta[rols.index(ident[:-2]) % 5],
-                                             #command=customtkinter.CTkToplevel()
+                                             text = ident,
+                                             fg_color=paleta[rols.index(ident[:-2]) % 5],
+                                             #border_width= 3,
+                                             border_color = paleta2[rols.index(ident[:-2]) % 5])
 
                                              #fg_color="#A3A3A3")#, fg_color=paleta[rols.index(i[:-2]) % 5]
-                                             )
+
                                             #combobox._entry.configure(wraplength=50)
-        CTkScrollableDropdown(attach = combobox, values = membre.working_list["Nom"], width=200)
-        combobox.set(ident)
+        combobox.configure(command=lambda iden = i: butto_de_croquis(iden))
+        #CTkScrollableDropdown(attach = combobox, values = membre.working_list["Nom"], width=200)
         coord = listadecoordenades[counter]
+        diccionari_debutons.update({i:combobox})
         combobox.place(relx=coord[0]/15+1/15,
                        rely=1-(coord[1]/11)-3/11, anchor="w",
                        relwidth=1/16,

@@ -4,9 +4,11 @@ import customtkinter
 from PIL import Image
 from CTkScrollableDropdown import *
 import CTkTable
+from src.util.classes.labelcb import LabelCB
 
 import src.Membre as membre
 import src.Figures as fig
+
 paleta = ["#C03530","#c15428","#60505B","#F5A980","#82898C"]
 paleta2 = ["#4D1514","#5B2F1D","#604232","#261F23","#36383A"]
 paleta3 = ["#3D2625","#4F3C34","#564A43","#252325","#252325"]
@@ -45,12 +47,6 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 repertori_label = customtkinter.CTkLabel(frame, text= "Figures", fg_color="#36454F",corner_radius=5, font=("Liberation Sans",18, "bold"))
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
-def insertar_membre(membre):
-    cutoff = membre.index(" ")
-    croquis_in_use.update({membre[:cutoff+2]:membre[cutoff+3:]})
-    print(croquis_in_use)
-    llistadebutons[membre[:cutoff+2]].set(membre[cutoff+2:])
-    taula.update_values(fig.croquis_to_table(croquis_in_use))
 
 buttonlist1 = []
 working_set = {}
@@ -65,28 +61,27 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
             continue
         ident = i
         membre_seleccionat = "N.A."
-        combobox = customtkinter.CTkComboBox(frame_qv,
-                                             font=("Liberation Sans",11),
-                                             #text_color="black",
-                                             border_color=paleta[rols.index(ident[:-2]) % 5],
-                                             button_color=paleta[rols.index(ident[:-2]) % 5],
-                                             command=insertar_membre,
-                                             )
-                                             #values=[ident + i for i in membre.working_list[0:25]])
-                                             #fg_color="#A3A3A3")#, fg_color=paleta[rols.index(i[:-2]) % 5]
-
-                                            #combobox._entry.configure(wraplength=50)
-
-        combobox.set(ident)
+        combobox = LabelCB(frame_qv,
+                           i,
+                           membre.working_list,
+                           taula,
+                           croquis_in_use,
+                           color=paleta[rols.index(i[:-2]) % 5])
         coord = listadecoordenades[counter]
-        CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200, command=insertar_membre)
+        #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
         llistadebutons.update({i:combobox})
         combobox.place(relx=coord[0]/15+1/15,
                        rely=1-(coord[1]/11)-3/11, anchor="w",
                        relwidth=1/15.5,
-                       relheight = 1/25
+                       relheight = 1/15
                        )
         counter += 1
+        print(frame_qv.winfo_children())
+        for child in frame_qv.winfo_children():
+            if type(child) == customtkinter.CTkButton or type(child) == customtkinter.CTkEntry:
+                continue
+            #child.place_forget()
+
 """
 figure_press funciona per als side buttons amb les figures del repertori. Agafa el butto, forma el croquis per a displayearlo en la taula i l'afegeix a un 
 "working_Set", que guarda el progrés que s'haja fet en cada figura abans de commitearlos a Assaig.

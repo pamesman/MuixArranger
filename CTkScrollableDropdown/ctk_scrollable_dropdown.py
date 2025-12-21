@@ -17,7 +17,7 @@ class CTkScrollableDropdown(customtkinter.CTkToplevel):
                  resize=True, frame_border_color=None, text_color=None, autocomplete=False, 
                  hover_color=None, **button_kwargs):
         
-        super().__init__(master=attach.winfo_toplevel(), takefocus=1)
+        super().__init__(attach.winfo_toplevel(), takefocus=1)
         
         self.focus()
         self.lift()

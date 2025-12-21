@@ -21,9 +21,11 @@ class LabelCB(customtkinter.CTkFrame):
 
         customtkinter.CTkLabel(self, text = text).grid(row=1,column=0,sticky="nsew")
         combobox = customtkinter.CTkPaComboBox(self,
+                                               text_color = "black",
                                              values = self.values,
                                              border_color= self.color,
                                              button_color= self.color,
+                                             button_hover_color= (self.color[1],self.color[0]),
                                              command = self.insertar_membre, fg_color = self.color,
                                              )
         combobox.grid(row=0,column=0,sticky="nsew")

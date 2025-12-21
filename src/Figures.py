@@ -81,8 +81,10 @@ torreta = Esquema("Torreta",4, 2, 0, 0, 1, 1, 10, 10, 16, 16, 0, 4, 0, 0, 0, 0, 
 volantinera = Esquema("Volantinera",6, 6, 3, 1, 0, 0, 24, 18, 0, 14, 3, 4, 0, 6, 0, 0, 0, 1, 0)
 xopera = Esquema("Xopera",4, 4, 2, 0, 1, 1, 16, 16, 16, 20, 2, 4, 0, 0, 0, 0, 0, 1, 0)
 dummy = Esquema("troubleshooting",0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
-paleta_oficial = Esquema("Paleta", "#EAD1DC","#FF9900","#F6B26B", "#F6B26B","#FCE5CD","#FFE59A","#FCE5CD","#E0EEDB","#E0EEDB","#EEEEEE","#EEEEEE","#EEEEEE","#FF9900","#D5A6BD","#C27BA0", "#B4A7D6","FFFFFF","FFFFFF","FFFFFF")
-
+paleta_oficial = Esquema("Paleta", "#EAD1DC","#FF9900","#F6B26B", "#F6B26B","#FCE5CD","#FFE59A","#e0ecf7","#E0EEDB","#E0EEDB","#EEEEEE","#EEEEEE","#EEEEEE","#FF9900","#D5A6BD","#C27BA0", "#B4A7D6","#FFFFFF","#FFFFFF","#FFFFFF")
+paleta_oficial_oscura = Esquema("PaletaD","#D09CB4","#C87800","#F39533","#F39533","#F39533","#F1B300","#81B2DE","#9DC98D","#BABABA","#959595","#959595","#959595","#9DC98D","#BF789B","#B55E8B","#8D79C1","#8D79C1","#8D79C1","#8D79C1")
+palette = list(vars(paleta_oficial).values())
+palette_d = list(vars(paleta_oficial_oscura).values())
 repertori = {1:alta_de_5,
              2:banc,
              3:branca_de_morera,
@@ -188,7 +190,7 @@ def croquis_to_table(croquis_generat:dict):
     lista = [[key,value] for key,value in croquis_generat.items()]
     return listah+lista[2:]
 
-def construir_croquis(croquis_generat):
+#def construir_croquis(croquis_generat):
     llista_escollits = list()
     for n in range(2,len(croquis_generat)):
         posicio = list(croquis_generat.keys())[n]

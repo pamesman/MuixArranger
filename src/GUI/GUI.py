@@ -2,6 +2,8 @@ from tkinter import PhotoImage
 import tkinter
 import customtkinter
 from PIL import Image
+from customtkinter import CTkButton
+
 from CTkScrollableDropdown import *
 import CTkTable
 from src.util.classes.labelcb import LabelCB
@@ -59,14 +61,12 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
     for i in croquiss.keys():
         if i == "Nom" or i == "Figura":
             continue
-        ident = i
-        membre_seleccionat = "N.A."
         combobox = LabelCB(frame_qv,
                            i,
-                           membre.working_list,
+                           membre.working_list[:25],
                            taula,
                            croquis_in_use,
-                           color=paleta[rols.index(i[:-2]) % 5])
+                           color= (fig.palette[rols.index(i[:-2])+1],fig.palette_d[rols.index(i[:-2])+1]))
         coord = listadecoordenades[counter]
         #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
         llistadebutons.update({i:combobox})
@@ -172,8 +172,17 @@ button_expand = customtkinter.CTkButton(frame_qv,
                                         #repertori_frame._parent_frame.forget())
 button_expand.pack(side="left", anchor="w", padx=10, pady=10)
 
+def canviar_apariencia():
+    if customtkinter.get_appearance_mode() == "Dark":
+        customtkinter.set_appearance_mode("light")
+    else:
+        customtkinter.set_appearance_mode("dark")
 
+
+
+CTkButton(frame,text = "Light/Dark", command=canviar_apariencia).place(x=0, y=0, anchor="center")
 print(repertori_frame.winfo_parent)
+print(customtkinter.get_appearance_mode())
 
 
 

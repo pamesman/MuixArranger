@@ -5,11 +5,13 @@ from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
 
+
 from CTkScrollableDropdown import *
 import CTkTable
 from src.util.classes.labelcb import LabelCB
 
 import src.Membre as membre
+from src.util import repertori as rep
 import src.Figures as fig
 
 paleta = ["#C03530","#c15428","#60505B","#F5A980","#82898C"]
@@ -17,6 +19,7 @@ paleta2 = ["#4D1514","#5B2F1D","#604232","#261F23","#36383A"]
 paleta3 = ["#3D2625","#4F3C34","#564A43","#252325","#252325"]
 rols = ['Base', 'Segona', 'Tercera', 'Quarta', 'Alsadora', 'Xicalla', 'Mans', 'Vents', 'Laterals', 'Agulla', 'Peu', 'Tap', 'Passadora', 'Recollidora', 'Genoll', 'Contrafort', 'Guia', 'Puntal', 'Crossa']
 coordenadesprova = [(4, 3), (10, 3), (12, 3), (11, 3.5), (11, 4.5), (2, 3), (6, 3), (1, 3), (7, 3), (0, 3), (8, 3), (4, 4), (4, 2), (4, 5), (4, 1), (4, 6), (4, 0), (3, 4), (5, 4), (5, 2), (3, 2), (2, 5), (6, 5), (6, 1), (2, 1), (11, 0), (3, 3), (5, 3)]
+coordenadesprova = [(-1,-1),(-1,1),(1,1),(1,-1),(0,-0.5),(-0.5,0.5),(0.5,0.5),(0,0),(-2,0),(0,2),(+2,0),(0,-2)]
 llistadebutons = {}
 #estableix parent window
 image=customtkinter.CTkImage(light_image=Image.open("icon.png"))
@@ -61,8 +64,9 @@ taula_namefig.pack()
 taula.pack(expand=True,  pady=20)
 
 
-global croquis_in_use
+
 croquis_in_use = {}
+registre_labels = []
 #def taula_update:
 #    if croquis_in_use["Nom"] == taula_namefig.cget("text")[3:]:
 
@@ -90,31 +94,43 @@ def figure_press(selected_fig):
         if alerta.get() == "Cancelar":
             pass
     #busca quin ESQUEMA conté el NOM selected_fig
-    for figura in fig.repertori.values():
+    for figura in rep.repertori.values():
+        global croquis_in_use
         if selected_fig == figura.nom:
             croquis_in_use = fig.fer_croquis(figura, answer)
             break
         else:
             pass
     assaig.update({croquis_in_use["Nom"]: croquis_in_use})
-    def assaig_button_press():
-
+    def assaig_button_press(nom):
+        print(len(registre_labels))
+        for i in registre_labels:
+            print(i[0][0])
+            if i[0][0] != nom:
+                for j in i[1]:
+                    j.destroy()
+                    print("poof",j)
+        print("pressed")
+        print(nom)
         pass
-    button = customtkinter.CTkButton(repertori_frame, text = croquis_in_use["Nom"], command = assaig_button_press)
-    button.pack(pady = 5)
-    print(assaig)
+
     namer.configure(placeholder_text=croquis_in_use["Nom"])
 
     taula.update_values(fig.croquis_to_table(croquis_in_use))
 
     taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
     taula_name.configure(text="Id: " + croquis_in_use["Nom"])
-    fer_dibuix(coordenadesprova, croquis_in_use)
+    global registre_labels
+    registre_labels = [fer_dibuix(coordenadesprova, croquis_in_use)]
+    button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
+                                     command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
+                                     fg_color="#C03530")
+    button.pack(pady=5)
     return croquis_in_use
 
 repertori_label = customtkinter.CTkComboBox(frame,
                                             fg_color="#36454F", button_color="#36454F",corner_radius=5, font=("Liberation Sans",16, "bold"), border_width= 0,
-                                            values = [i.nom for i in fig.repertori.values()],
+                                            values = [i.nom for i in rep.repertori.values()],
                                             command = figure_press)
 repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
@@ -127,8 +143,12 @@ Per dibuixar la figura
 """
 def fer_dibuix(listadecoordenades:list, croquiss:dict):
     counter = 0
+    netejadora = [[],[]]
     for i in croquiss.keys():
-        if i == "Nom" or i == "Figura":
+        if i == "Nom" :
+            netejadora[0].append(croquiss[i])
+            continue
+        if i == "Figura":
             continue
         combobox = LabelCB(frame_qv,
                            i,
@@ -138,9 +158,13 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
                            color= (fig.palette[rols.index(i[:-2])+1],fig.palette_d[rols.index(i[:-2])+1]))
         coord = listadecoordenades[counter]
         #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
-        llistadebutons.update({i:combobox})
-        combobox.place(relx=coord[0]/15+1/15,
-                       rely=1-(coord[1]/11)-3/11, anchor="w",
+        llistadebutons.update({i:combobox}) #no se si açò es util
+        netejadora[1].append(combobox)
+        combobox.place(relx =0.5+ (coord[0]/8) ,
+                       rely = 0.5 - (coord[1]/8) ,
+
+                        #relx=coord[0]/15+1/15,
+                       #rely=1-(coord[1]/11)-3/11, anchor="w",
                        relwidth=1/15.5,
                        relheight = 1/15
                        )
@@ -149,6 +173,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
             if type(child) == customtkinter.CTkButton or type(child) == customtkinter.CTkEntry:
                 continue
             #child.place_forget()
+    return netejadora
 
 """
 figure_press funciona per als side buttons amb les figures del repertori. Agafa el butto, forma el croquis per a displayearlo en la taula i l'afegeix a un 
@@ -165,10 +190,10 @@ Falta funcionalitat: canviar també el contingut de croquis frame
 """
 A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertori", i s'asocia a el command definit per la funció de dalt
 """
-#for i in fig.repertori.keys():
+#for i in rep.repertori.keys():
 #    def button_pressed():
 #        print(buttonlist1)
-#    button = customtkinter.CTkButton(repertori_frame,text = fig.repertori[i].nom, command=lambda iden=i: figure_press(iden),
+#    button = customtkinter.CTkButton(repertori_frame,text = rep.repertori[i].nom, command=lambda iden=i: figure_press(iden),
 #                                     fg_color=paleta[1],)
 #    button.pack(padx=2,pady=8,expand=True)
 #    buttonlist1.append(button)

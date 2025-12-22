@@ -18,10 +18,10 @@ class LabelCB(customtkinter.CTkFrame):
         self.color = color
 
 
-
+        print(croquis_en_us)
         customtkinter.CTkLabel(self, text = text).grid(row=1,column=0,sticky="nsew")
         combobox = customtkinter.CTkPaComboBox(self,
-                                               text_color = "black",
+                                               text_color = ("black","white"),
                                              values = self.values,
                                              border_color= self.color,
                                              button_color= self.color,
@@ -29,7 +29,7 @@ class LabelCB(customtkinter.CTkFrame):
                                              command = self.insertar_membre, fg_color = self.color,
                                              )
         combobox.grid(row=0,column=0,sticky="nsew")
-        combobox.set(self.text)
+        combobox.set(self.croquis_en_us[self.text])
 
     def insertar_membre(self, value):
         self.croquis_en_us.update({self.text: value})

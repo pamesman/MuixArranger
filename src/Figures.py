@@ -7,16 +7,9 @@ from tabulate import tabulate
 #Assaig: Un Assaig es un diccionari composat per croquis(dict), agafant com a clau el seu nom {nom:croquis}
 
 assaig = {}
-
-
-paleta_oficial = Esquema("Paleta", "#EAD1DC","#FF9900","#F6B26B", "#F6B26B","#FCE5CD","#FFE59A","#e0ecf7","#E0EEDB","#E0EEDB","#EEEEEE","#EEEEEE","#EEEEEE","#FF9900","#D5A6BD","#C27BA0", "#B4A7D6","#FFFFFF","#FFFFFF","#FFFFFF")
-paleta_oficial_oscura = Esquema("PaletaD","#D09CB4","#C87800","#F39533","#F39533","#F39533","#F1B300","#81B2DE","#9DC98D","#BABABA","#959595","#959595","#959595","#9DC98D","#BF789B","#B55E8B","#8D79C1","#8D79C1","#8D79C1","#8D79C1")
-palette = list(vars(paleta_oficial).values())
-palette_d = list(vars(paleta_oficial_oscura).values())
-
 repertori2 = {}
-for name in repertori.values():
-    repertori2.update({name.nom:name})
+#for name in repertori.values():
+#    repertori2.update({name.nom:name})
 
 
 def filter_dict(d, filterstring, exclude: bool):

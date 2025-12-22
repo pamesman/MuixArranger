@@ -1,11 +1,11 @@
 import customtkinter
-import src.Figures as fig
+
 from CTkScrollableDropdown import *
 
 
 
 class LabelCB(customtkinter.CTkFrame):
-    def __init__(self,parent,text, values,taula ,croquis_en_us, filtre = None, color = None):
+    def __init__(self,parent,text, values,taula ,croquis_en_us,dataframe, filtre = None, color = None):
         super().__init__(master=parent)
         self.text = text
         self.values = values
@@ -16,6 +16,7 @@ class LabelCB(customtkinter.CTkFrame):
         self.grid_rowconfigure(1,weight=0)
         self.columnconfigure(0,weight=1)
         self.color = color
+        self.dataframe = dataframe
 
 
         print(croquis_en_us)
@@ -33,4 +34,5 @@ class LabelCB(customtkinter.CTkFrame):
 
     def insertar_membre(self, value):
         self.croquis_en_us.update({self.text: value})
-        self.taula.insert(list(self.croquis_en_us).index(self.text),1,value)
+        self.taula.insert(list(self.croquis_en_us).index(self.text), 1, value)
+        self.taula.insert(list(self.croquis_en_us).index(self.text),2,int(self.dataframe[self.dataframe["Nom"].str.contains(value) == True]["Muscle"]))

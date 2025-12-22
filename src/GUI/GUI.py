@@ -1,18 +1,19 @@
 from tkinter import PhotoImage
-import tkinter
+#import tkinter
 import customtkinter
 from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
 
 
-from CTkScrollableDropdown import *
+#from CTkScrollableDropdown import *
 import CTkTable
 from src.util.classes.labelcb import LabelCB
 
-import src.Membre as membre
+import src.membre as membre
 from src.util import repertori as rep
-import src.Figures as fig
+import src.util.funcs as f
+from src.util.funcs import croquis_to_table
 
 paleta = ["#C03530","#c15428","#60505B","#F5A980","#82898C"]
 paleta2 = ["#4D1514","#5B2F1D","#604232","#261F23","#36383A"]
@@ -29,8 +30,7 @@ root.iconphoto(False,PhotoImage(file="icon.png"))
 root.title("Crokiss")
 #set theme
 customtkinter.set_appearance_mode("dark")
-button = customtkinter.CTkButton(root)
-#button.place(relx=0.5,rely=0.5,anchor="center")
+
 tabview = customtkinter.CTkTabview(master=root)
 tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
 
@@ -57,20 +57,19 @@ Croquis_frame.place(relx=.99,rely=.5,anchor="e",relheight=.98, relwidth=0.2)
 dictionario = [["Posició","Nom","Alçada"],["Base1","Oriol",137,4,5,6],["Base2","Lua",302,4,5,6],["Alçadora","Toni Ciscar",113,4,5,6],["Xicalla","Guillem Antich",140,4,5,6]]
 taula = CTkTable.CTkTable(Croquis_frame, column= 3,row=2,values=dictionario, header_color="#7393B3", font=("Liberation Sans",12), corner_radius=5)
 
-taula_name = customtkinter.CTkLabel(Croquis_frame, text="Figura:")
+taula_name = customtkinter.CTkLabel(Croquis_frame, text="Figura: Les Formigues")
 taula_name.pack()
 taula_namefig = customtkinter.CTkLabel(Croquis_frame, text="Id:")
 taula_namefig.pack()
 taula.pack(expand=True,  pady=20)
 
-
-
+#def taula_update():
+#    f.croquis_to_table(croquis_in_use,membre.taula_mestra)
+#Posibilitat de estalviar memoria? Comprovar quant ha canviat el croquis d'abans a ara i input vs update
 croquis_in_use = {}
-registre_labels = []
-#def taula_update:
-#    if croquis_in_use["Nom"] == taula_namefig.cget("text")[3:]:
-
 #croquis_in_use.trace_add("write",taula_update)
+registre_labels = []
+
 def figure_press(selected_fig):
     repertori_label.set("Afegir figura")
     print("pressed",selected_fig)
@@ -96,19 +95,28 @@ def figure_press(selected_fig):
     #busca quin ESQUEMA conté el NOM selected_fig
     for figura in rep.repertori.values():
         global croquis_in_use
+        coordenades = []
+        corrector = ()
         if selected_fig == figura.nom:
-            croquis_in_use = fig.fer_croquis(figura, answer)
+            print("lool sii")
+            coordenades = figura.coordenades
+            corrector = figura.centraor()
+            print(corrector)
+
+            croquis_in_use = f.fer_croquis(figura, answer)
             break
         else:
+
             pass
     assaig.update({croquis_in_use["Nom"]: croquis_in_use})
+
     def assaig_button_press(nom):
         print(len(registre_labels))
         for i in registre_labels:
             print(i[0][0])
-            if i[0][0] != nom:
+            if i[0][0] != 92193:
                 for j in i[1]:
-                    j.destroy()
+                    #j.destroy()
                     print("poof",j)
         print("pressed")
         print(nom)
@@ -116,12 +124,12 @@ def figure_press(selected_fig):
 
     namer.configure(placeholder_text=croquis_in_use["Nom"])
 
-    taula.update_values(fig.croquis_to_table(croquis_in_use))
+    taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
 
     taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
     taula_name.configure(text="Id: " + croquis_in_use["Nom"])
     global registre_labels
-    registre_labels = [fer_dibuix(coordenadesprova, croquis_in_use)]
+    registre_labels = [fer_dibuix(coordenades, croquis_in_use, corrector)]
     button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
                                      command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
                                      fg_color="#C03530")
@@ -141,7 +149,7 @@ buttonlist1 = []
 """
 Per dibuixar la figura
 """
-def fer_dibuix(listadecoordenades:list, croquiss:dict):
+def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     counter = 0
     netejadora = [[],[]]
     for i in croquiss.keys():
@@ -155,13 +163,14 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict):
                            membre.working_list[:25],
                            taula,
                            croquis_in_use,
-                           color= (fig.palette[rols.index(i[:-2])+1],fig.palette_d[rols.index(i[:-2])+1]))
+                           membre.taula_mestra,
+                           color= (rep.palette[rols.index(i[:-2])+1],rep.palette_d[rols.index(i[:-2])+1]))
         coord = listadecoordenades[counter]
         #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
         llistadebutons.update({i:combobox}) #no se si açò es util
         netejadora[1].append(combobox)
-        combobox.place(relx =0.5+ (coord[0]/8) ,
-                       rely = 0.5 - (coord[1]/8) ,
+        combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2 ,
+                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2 ,
 
                         #relx=coord[0]/15+1/15,
                        #rely=1-(coord[1]/11)-3/11, anchor="w",
@@ -209,7 +218,7 @@ frame_qv.place(relx = 0.45,rely=0.5,anchor="c",relheight=0.98, relwidth=.66)
 namer = customtkinter.CTkEntry(frame_qv, placeholder_text= "Nom de Figura-X", font=("Liberation Sans",24,"bold"),state="disabled")
 def actualitzar_nom_figura():
     croquis_in_use["Nom"] = namer.get()
-    taula.update_values(fig.croquis_to_table(croquis_in_use))
+    taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
     print(croquis_in_use)
     taula_namefig.configure(text="Figura: "+croquis_in_use["Figura"])
     taula_name.configure(text="Id: " + namer.get())
@@ -217,10 +226,6 @@ namer_button = customtkinter.CTkButton(frame_qv, text="Actualitzar nom",font=("L
 namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 
 namer.place(relx=0.01, rely=0.01, relwidth=0.4)
-
-#Butó confirmar figura per al assaig
-button_confirm = customtkinter.CTkButton(frame_qv, text="Afegir",font=("Liberation Sans",18,"bold"),corner_radius=500, width=20,height=20, image=image)
-button_confirm.pack(side="bottom", anchor="se", padx=10, pady=10)
 
 #botó per expandir croquis zone
 button_expand = customtkinter.CTkButton(frame_qv,

@@ -1,8 +1,8 @@
 import customtkinter
 from customtkinter import CTkButton
 from CTkListbox import *
-import src.Membre
-from src.Membre import working_list
+import src.membre
+from src.membre import working_list
 a = ["Base1","Base2","Base3"]
 root = customtkinter.CTk()
 root.geometry("1280x720")

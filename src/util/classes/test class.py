@@ -2,7 +2,7 @@ from customtkinter import CTkScrollableFrame
 
 from labelcb import  LabelCB
 import customtkinter
-import src.Membre as mem
+import src.membre as mem
 import CTkTable
 import src.Figures as fig
 from src.util.classes import labelcb

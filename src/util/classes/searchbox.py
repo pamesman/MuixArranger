@@ -1,5 +1,5 @@
 from tkinter import *
-import src.Membre as mem
+import src.membre as mem
 import customtkinter
 import CTkScrollableDropdown as ctk
 ws = Tk()

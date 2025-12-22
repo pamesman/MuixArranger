@@ -26,7 +26,21 @@ class Esquema:
 
     def afegir_xicalla(self):   #TO-DO TRASLLADAR A CROQUIS
         self.xicalla += 1
-
+    def centraor(self):
+        maxy = 0
+        maxx = 0
+        miny = 0
+        minx = 0
+        for i in self.coordenades:
+            if i[1] > maxy:
+                maxy = i[1]
+            if i[1] < miny:
+                miny = i[1]
+            if i[0] > maxx:
+                maxx = i[0]
+            if i[0] < minx:
+                minx = i[0]
+        return (maxx,minx),(maxy,miny)
     def graella(self):          #TO-DO REMOVE :( SORRY FUNCTION YOU'RE GOING TO EUTHANASIA FACTORY
         print("bases:", self.base, " segones:", self.segona, " terceres:", self.tercera, " quartes:", self.quarta, " alsadores:", self.alsadora, " xiquetes:", self.xicalla, " mans:", self.mans, " vents:", self.vents, " laterals:", self.laterals, " taps:", self.tap, " agulles:", self.agulla, " peus:", self.peu, " puntals:",self.puntal," crosses:", self.crossa, " genolls:", self.genoll, " contraforts:", self.contrafort, " guies:", self.guia, " passadores:", self.passadora, " recollidores:",
               self.recollidora)

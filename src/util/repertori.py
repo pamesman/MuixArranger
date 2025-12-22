@@ -22,12 +22,12 @@ xopera = Esquema("Xopera",4, 4, 2, 0, 1, 1, 16, 16, 16, 20, 2, 4, 0, 0, 0, 0, 0,
 dummy = Esquema("troubleshooting",0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 
 #Definir coordenades
-alta_de_5.coordenades = 7
-banc.coordenades = 7
-branca_de_morera.coordenades = 7
-campana.coordenades = [(-1.5,-1.5),(-1.5,1.5),(1.5,1.5),(1.5,-1.5),(0,-0.5),(-0.5,0.5),(0.5,0.5),(0,0),(-2.5,0),(0,2.5),(-2.5,0),(0,-2.5)]
+alta_de_5.coordenades = None
+banc.coordenades = None
+branca_de_morera.coordenades = None
+campana.coordenades = [(-1.5,-1.5),(-1.5,1.5),(1.5,1.5),(1.5,-1.5),(0,-0.5),(-0.5,0.5),(0.5,0.5),(0,0),(-2.5,0),(0,2.5),(+2.5,0),(0,-2.5)]
 castell.coordenades = None
-cinc_en_un_peu.coordenades = None
+cinc_en_un_peu.coordenades = [(0,0),(6,0),(8,0),(7, 0.5),(7, 1.5),(-2,0),(2,0),(-3,0),(3,0),(-4,0),(4,0),(0,1),(0,-1),(0,2),(0,-2),(0,3),(0,-3),(-1,1),(1,1),(1,-1),(-1,-1),(-2,2),(2,2),(2,-2),(-2,-2),(7,-3),(-1,0),(1,0)]
 encontre.coordenades = None
 figuereta.coordenades = None
 marieta.coordenades = None
@@ -61,3 +61,9 @@ repertori = {1:alta_de_5,
              17:xopera,
              18:dummy}
 
+#colorinchis
+paleta_oficial = Esquema("Paleta", "#EAD1DC","#FF9900","#F6B26B", "#F6B26B","#FCE5CD","#FFE59A","#e0ecf7","#E0EEDB","#E0EEDB","#EEEEEE","#EEEEEE","#EEEEEE","#FF9900","#D5A6BD","#C27BA0", "#B4A7D6","#FFFFFF","#FFFFFF","#FFFFFF")
+paleta_oficial_oscura = Esquema("PaletaD","#D09CB4","#C87800","#F39533","#F39533","#F39533","#F1B300","#81B2DE","#9DC98D","#BABABA","#959595","#959595","#959595","#9DC98D","#BF789B","#B55E8B","#8D79C1","#8D79C1","#8D79C1","#8D79C1")
+
+palette = list(vars(paleta_oficial).values())
+palette_d = list(vars(paleta_oficial_oscura).values())

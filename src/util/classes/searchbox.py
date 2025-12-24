@@ -6,7 +6,7 @@ ws = Tk()
 ws.title("Python Guides")
 ws.geometry("200x200")
 
-def search_items(event):
+def search_items():
 
     search_value = combo._entry.get()
     combo._clicked()
@@ -28,10 +28,6 @@ combo.set("")
 #ctk.CTkScrollableDropdown(combo, values= item_names)
 combo.configure(values = item_names)
 combo.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-variable=StringVar()
-
-combo._entry.configure(textvariable = "abooga")
 combo._entry.bind("<KeyRelease>",search_items)
 
 

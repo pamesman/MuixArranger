@@ -14,3 +14,4 @@ working_list = taula_mestra[["Nom", "Muscle"]]
 lista = [[t["Nom"][i],int(t["Muscle"][i]),int(t["Alçada"][i])] for i in range(len(t["Nom"])) if "Z-" not in str(t["Nom"][i])] #fa una llista de llistes dels components, elimina els "Z-"
 
 working_list = list(working_list["Nom"])
+

@@ -18,7 +18,7 @@ senia_brasos = Esquema("Sènia (Braçps)",8, 4, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0,
 senia_p4 = Esquema("Sènia/P4",1, 1, 0, 0, 1, 1, 9, 8, 12, 16, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 torreta = Esquema("Torreta",4, 2, 0, 0, 1, 1, 10, 10, 16, 16, 0, 4, 0, 0, 0, 0, 0, 1, 0)
 volantinera = Esquema("Volantinera",6, 6, 3, 1, 0, 0, 24, 18, 0, 14, 3, 4, 0, 6, 0, 0, 0, 1, 0)
-xopera = Esquema("Xopera",4, 4, 2, 0, 1, 1, 16, 16, 16, 20, 2, 4, 0, 0, 0, 0, 0, 1, 0)
+xopera = Esquema("Xopera",4, 4, 2, 0, 1, 1, 16, 16, 16, 16, 2, 6, 0, 0, 0, 0, 0, 1, 0)
 dummy = Esquema("troubleshooting",0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 
 #Definir coordenades
@@ -38,7 +38,7 @@ senia_brasos.coordenades = None
 senia_p4.coordenades = None
 torreta.coordenades = None
 volantinera.coordenades = None
-xopera.coordenades = None
+xopera.coordenades = [(1, 1), (1, -1), (-1, -1), (-1, 1),   (10,1),(10,-1),(8,-1),(8,1),   (9.7,0),(8.3,0),   (9,0.5),   (9,1.5),   (2, 1), (2, -1), (-2, -1), (-2, 1), (3, 1.5), (3, -1.5), (-3, -1.5), (-3, 1.5), (4, 2), (4, -2), (-4, -2), (-4, 2), (5, 2.5), (5, -2.5), (-5, -2.5), (-5, 2.5),   (0, 2), (0, -2), (0, 3), (0, -3), (0, 4), (0, -4), (0, 5), (0, -5), (2.5, 0), (-2.5, 0), (3.5, 0), (-3.5, 0), (4.5, 0), (-4.5, 0), (5.5, 0), (-5.5, 0), (1.5, 2), (1.5, -2), (-1.5, -2), (-1.5, 2), (2, 3), (2, -3), (-2, -3), (-2, 3), (2.5, 4), (2.5, -4), (-2.5, -4), (-2.5, 4), (3, 5), (3, -5), (-3, -5), (-3, 5),   (0.5,0),(-0.5,0),   (1.5, 0), (-1.5, 0),(0.5, 1.5), (0.5, -1.5), (-0.5, -1.5), (-0.5, 1.5),    (1.5, 4.5), (1.5, -4.5), (-1.5, -4.5), (-1.5, 4.5), (2, 5.5), (2, -5.5), (-2, -5.5), (-2, 5.5), (3.5, 3.5), (3.5, -3.5), (-3.5, -3.5), (-3.5, 3.5), (4.5, 4), (4.5, -4), (-4.5, -4), (-4.5, 4),        (9,5)]
 dummy.coordenades = None
 
 
@@ -67,3 +67,6 @@ paleta_oficial_oscura = Esquema("PaletaD","#D09CB4","#C87800","#F39533","#F39533
 
 palette = list(vars(paleta_oficial).values())
 palette_d = list(vars(paleta_oficial_oscura).values())
+
+rols = ['Base', 'Segona', 'Tercera', 'Quarta', 'Alsadora', 'Xicalla', 'Mans', 'Vents', 'Laterals',  'Tap','Agulla', 'Peu', 'Puntal', 'Crossa','Genoll', 'Contrafort', 'Guia','Passadora', 'Recollidora' ]
+

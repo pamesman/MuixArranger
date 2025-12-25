@@ -27,8 +27,7 @@ class SearchBox(customtkinter.CTkComboBox):
         self._entry.bind("<FocusOut>", self.salir)
         #self._entry.bind("<space>",print("x"))
 
-        #self._dropdown_menu.bind("<Button-1>", self.select(self._entry.get()))
-
+        self.set(self.placeholder)
 
 
     def comando(self,value):

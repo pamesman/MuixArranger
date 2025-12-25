@@ -1,6 +1,7 @@
-a = [1,2,3,4,5]
+import tkinter as tk
+a = tk.StringVar("cavalo")
 def chivato():
     print("me han cambiado muaaaaaaa")
-len(a).trace_add("write",chivato)
+trace_add(a,"write",chivato)
 
-a.append(1)
+a = "aaa"

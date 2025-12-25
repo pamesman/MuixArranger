@@ -21,6 +21,10 @@ for i in a:
     button = customtkinter.CTkButton(root, text=i, command=popup).pack(pady=50)
 
 
+
+CTk.CTkDropd
+
+
 #print(button.cget("text"))
 
 

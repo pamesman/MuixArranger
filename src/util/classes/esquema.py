@@ -1,6 +1,6 @@
 class Esquema:
     figures_rep = 0
-    def __init__(self, nom, base, segona, tercera, quarta, alsadora, xicalla, mans, vents, laterals, tap, agulla, peu, puntal, crossa, genoll, contrafort, guia, passadora, recollidora, coordenades = None):
+    def __init__(self, nom, base, segona, tercera, quarta, alsadora, xicalla, mans, vents, laterals, tap, agulla, peu, puntal, crossa, genoll, contrafort, guia, passadora, recollidora, colze = 0,coordenades = None):
         self.nom = nom
         self.base = base
         self.segona = segona
@@ -21,6 +21,7 @@ class Esquema:
         self.guia = guia
         self.puntal = puntal
         self.crossa = crossa
+        self.colze = colze
         self.coordenades = coordenades
         type(self).figures_rep += 1
 

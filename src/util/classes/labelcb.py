@@ -17,16 +17,19 @@ class LabelCB(customtkinter.CTkFrame):
         self.columnconfigure(0,weight=1)
         self.color = color
         self.dataframe = dataframe
+        self._fg_color = ("#FFFFFF","#333333")
 
         #if text in ["Tap","Agulla","Tercera","Peu"]
         #customtkinter.CTkLabel(self, text = text).grid(row=1,column=0,sticky="nsew")
         self.combobox = SearchBox(self,
-                                             text_color = ("black","white"),
+                                             #text_color = ("black","white"),
+                                             text_color="black",
                                              values = self.values,
                                              border_color= self.color,
                                              button_color= self.color,
                                              button_hover_color= (self.color[1],self.color[0]),
-                                             command = self.insertar_membre, #fg_color = self.color,
+                                             command = self.insertar_membre, fg_color = self.color,
+                                             placeholder=self.text
                                              )
         self.combobox.grid(row=0,column=0,sticky="nsew")
         self.combobox._entry.insert(0,self.croquis_en_us[self.text])

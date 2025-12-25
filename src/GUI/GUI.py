@@ -1,5 +1,4 @@
 from tkinter import PhotoImage
-import tkinter
 import customtkinter
 from PIL import Image
 from customtkinter import CTkButton
@@ -7,7 +6,7 @@ import CTkMessagebox
 
 
 #from CTkScrollableDropdown import *
-import CTkTable
+from src.util.classes import CTkTable
 from src.util.classes.labelcb import LabelCB
 
 import src.membre as membre
@@ -99,7 +98,10 @@ def figure_press(selected_fig):
         if selected_fig == figura.nom:
             coordenades = figura.coordenades
             corrector = figura.centraor()
-            croquis_in_use = f.fer_croquis(figura, answer)
+            if answer != "" :
+                croquis_in_use = f.fer_croquis(figura, answer)
+            else:
+                croquis_in_use = f.fer_croquis(figura, str(selected_fig) +" "+ str(counter))
             break
         else:
 
@@ -129,7 +131,8 @@ def figure_press(selected_fig):
     registre_labels = [fer_dibuix(coordenades, croquis_in_use, corrector)]
     button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
                                      command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
-                                     fg_color="#C03530")
+                                     fg_color="#C03530", font = ("Arial", 12))
+    button._text_label.place(x=0, rely = 0.5, anchor = "w")
     button.pack(pady=5)
     return croquis_in_use
 
@@ -167,15 +170,15 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
         #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
         llistadebutons.update({i:combobox}) #no se si açò es util
         netejadora[1].append(combobox)
-        for i in ["Tap","Agulla","Peu"]:
-            if i in combobox.text:
+        for j in ["Tap","Agulla","Peu","Colze"]:
+            if j in combobox.text:
                 relwidth = 1/30
                 #combobox.configure(font)
                 break
             else:
-                relwidth = 1/15.5
-        combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2 ,
-                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.4 ,
+                relwidth = 1/20
+        combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100 ,
+                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+15)/200  ,
 
                         #relx=coord[0]/15+1/15,
                        #rely=1-(coord[1]/11)-3/11, anchor="w",
@@ -223,7 +226,7 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 
 #CROQUIS
 
-frame_qv = customtkinter.CTkFrame(frame)
+frame_qv = customtkinter.CTkFrame(frame, fg_color=("#FFFFFF","#333333"))
 frame_qv.place(relx = 0.12,rely=0.5,anchor="w",relheight=0.98, relwidth=.66)
 #NOM FIGURA
 namer = customtkinter.CTkEntry(frame_qv, placeholder_text= "Nom de Figura-X", font=("Liberation Sans",16,"bold"),state="disabled")
@@ -243,13 +246,13 @@ expand_is_on2 = False
 def minimizar2():
     global expand_is_on
     global expand_is_on2
-    if expand_is_on2 == False:
+    if not expand_is_on2:
         button_expand2.configure(text="<")
     else:
         button_expand2.configure(text=">")
 
-    if expand_is_on == False:
-        if expand_is_on2 == False:
+    if not expand_is_on:
+        if not expand_is_on2:
             croquis_frame.place(relx=.99, rely=.5, anchor="e", relheight=.98, relwidth=0.01)
             frame_qv.place(relx = 0.12,rely=0.5,anchor="w",relheight=0.98, relwidth=0.87)
             expand_is_on2 = True
@@ -258,7 +261,7 @@ def minimizar2():
             frame_qv.place(relx=0.12, rely=0.5, anchor="w", relheight=0.98, relwidth=.66)
             expand_is_on2 = False
     else:
-        if expand_is_on2 == False:
+        if not expand_is_on2:
             croquis_frame.place(relx=.99, rely=.5, anchor="e", relheight=.98, relwidth=0.01)
             frame_qv.place(relx = 0.07,rely=0.5,anchor="w",relheight=0.98, relwidth=0.92)
             expand_is_on2 = True
@@ -270,13 +273,13 @@ def minimizar2():
 def minimizar():
     global expand_is_on
     global expand_is_on2
-    if expand_is_on == False:
+    if not expand_is_on:
         button_expand.configure(text=">")
     else:
         button_expand.configure(text="<")
 
-    if expand_is_on2 == False:
-        if expand_is_on == False:
+    if not expand_is_on2:
+        if not expand_is_on:
             frame_qv.place(relx=0.07, rely=0.5, anchor="w", relheight=0.98, relwidth=.71)
             repertori_frame.place(relx=.01, rely=.07, relheight=0.92, relwidth=0.05, anchor="nw")
             repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.05*0.99)
@@ -290,7 +293,7 @@ def minimizar():
 
             expand_is_on = False
     else:
-        if expand_is_on == False:
+        if not expand_is_on:
             frame_qv.place(relx=0.07, rely=0.5, anchor="w", relheight=0.98, relwidth=0.92)
             repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.05,anchor="nw")
             repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.05*0.99)
@@ -304,21 +307,21 @@ def minimizar():
             expand_is_on = False
 button_expand = customtkinter.CTkButton(frame_qv,
                                         text = "<",
-                                        height = 30,
-                                        width = 30,
+                                        height = 10,
+                                        width = 10,
                                         corner_radius= 15,
                                         command = minimizar)
                                         #repertori_frame._parent_frame.forget())
 
 button_expand2 = customtkinter.CTkButton(frame_qv,
                                         text = ">",
-                                        height = 30,
-                                        width = 30,
+                                        height = 10,
+                                        width = 10,
                                         corner_radius= 15,
                                         command = minimizar2)
                                         #repertori_frame._parent_frame.forget())
-button_expand.place(rely = 0.5, relx = .02, anchor="w")
-button_expand2.place(rely = 0.5, relx = .99, anchor="e")
+button_expand.place(rely = 0.5, relx = .005, anchor="w")
+button_expand2.place(rely = 0.5, relx = .995, anchor="e")
 
 
 
@@ -327,9 +330,6 @@ def canviar_apariencia():
         customtkinter.set_appearance_mode("light")
     else:
         customtkinter.set_appearance_mode("dark")
-
-
-
 CTkButton(frame,text = "☀ / ☾",command=canviar_apariencia, width = 20).place(relx=1, rely=1, anchor="se")
 
 

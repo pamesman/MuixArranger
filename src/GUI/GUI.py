@@ -108,10 +108,12 @@ def figure_press(selected_fig):
             pass
     for i in registre_labels:
         for j in i[1]:
+
             j.destroy()
     assaig.update({croquis_in_use["Nom"]: croquis_in_use})
 
     def assaig_button_press(nom):
+        global croquis_in_use
         croquis_in_use = assaig[nom]
         taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
         for i in registre_labels:
@@ -160,7 +162,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             continue
         combobox = LabelCB(frame_qv,
                            i,
-                           membre.working_list[:25],
+                           membre.working_list[:30],
                            taula,
                            croquiss,
                            membre.taula_mestra,
@@ -178,7 +180,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             else:
                 relwidth = 1/20
         combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100 ,
-                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+15)/200  ,
+                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+15)/150  ,
 
                         #relx=coord[0]/15+1/15,
                        #rely=1-(coord[1]/11)-3/11, anchor="w",

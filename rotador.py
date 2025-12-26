@@ -7,7 +7,7 @@ def rotator (list_of_tuples):
         a.append((-point[0],point[1]))
     return a
 
-print(rotator([(1,1.5)]))
+print(rotator([(6,3)]))
 b = "Base 1"
 print(b.split("\n")[0])
 b.split("\n")[0]

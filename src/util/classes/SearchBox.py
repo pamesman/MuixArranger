@@ -1,7 +1,7 @@
-import customtkinter
-from time import sleep
+from customtkinter import CTkPaComboBox2
 
-class SearchBox(customtkinter.CTkComboBox):
+
+class SearchBox(CTkPaComboBox2):
     def __init__(self, parent,values, border_color = None, button_color = None, button_hover_color = None ,text_color = None, command = None, fg_color = None, placeholder = None):
         self.values = values
         self.border_color = border_color
@@ -53,6 +53,7 @@ class SearchBox(customtkinter.CTkComboBox):
 
     def click(self,*args):
         self._entry.delete(0, 'end')
+        #self.search_items(self._entry.get())
 
     def salir(self,*args):
         if self._entry == self.focus_get() or self._dropdown_menu == self.focus_get():

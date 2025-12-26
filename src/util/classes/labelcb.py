@@ -34,6 +34,7 @@ class LabelCB(customtkinter.CTkFrame):
         self.combobox.grid(row=0,column=0,sticky="nsew")
         self.combobox._entry.insert(0,self.croquis_en_us[self.text])
         self.combobox.set(self.text)
+        self.combobox.configure(corner_radius=3)
 
     def insertar_membre(self, value):
 

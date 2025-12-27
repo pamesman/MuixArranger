@@ -196,7 +196,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             continue
         combobox = LabelCB(frame_qv,
                            i,
-                           membre.working_list[:30],
+                           membre.working_list[:],
                            taula,
                            croquiss,
                            membre.taula_mestra,
@@ -227,12 +227,15 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             print("try",orientation)
         except:
             print("exception")
-            orientation = 0
+            if coord[0] > 0:
+                orientation = -90
+            if coord[0] < 0:
+                orientation = 90
+            if coord[0] == 0:
+                orientation = 0
         text_mes_bind(i, coord, orientation, corrector, canvas2,croquiss)
 
 
-
-        #txt.bind("<Enter>",txt.config(fill="red"))
 
         counter += 1
         for child in frame_qv.winfo_children():
@@ -273,7 +276,7 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 frame_qv = customtkinter.CTkFrame(frame, fg_color=("#FFFFFF","#333333"))
 frame_qv.place(relx = 0.12,rely=0.5,anchor="w",relheight=0.98, relwidth=.66)
 canvas = tkinter.Canvas(frame_qv, bg="#333333", highlightthickness=0)
-canvas.place(relx=.99, rely=0.99, relheight=.93, relwidth=.98, anchor="se")
+#canvas.place(relx=.99, rely=0.99, relheight=.93, relwidth=.98, anchor="se")
 #NOM FIGURA
 namer = customtkinter.CTkEntry(frame_qv, placeholder_text= "Nom de Figura-X", font=("Liberation Sans",16,"bold"),state="disabled")
 def actualitzar_nom_figura():

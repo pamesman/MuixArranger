@@ -1,5 +1,6 @@
 import tkinter
 import customtkinter
+from customtkinter.windows.widgets.core_widget_classes import dropdown_menu
 from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
@@ -147,7 +148,36 @@ repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
 buttonlist1 = []
+def text_mes_bind (i,coord, orientation,corrector, canvas2,croquiss):
+    x = 2 * int(canvas.config("width")[-1]) * (0.5 + (coord[0] - (corrector[0][0] + corrector[0][1]) / 2) / (corrector[0][0] - corrector[0][1]) / 1.2 * (len(croquiss.keys()) + 15) / 100)
+    y =  2 * int(canvas.config("height")[-1]) * (0.5 - (coord[1] - (corrector[1][0] + corrector[1][1]) / 2) / (corrector[1][0] - corrector[1][1]) / 1.2 * (len(croquiss.keys()) + 20) / 140)
+    txt = canvas2.create_text(x,y,
+                              text=i,
+                              angle=orientation,
+                              fill="white")
 
+    ddm = dropdown_menu.DropdownMenu(master=canvas2,
+                    values=membre.working_list,
+                    #command=self._dropdown_callback,
+                    #fg_color=dropdown_fg_color,
+                    #hover_color=dropdown_hover_color,
+                    #text_color=dropdown_text_color,
+                    #font=dropdown_font))
+                                         )
+
+    # print(type(txt))
+    entry = customtkinter.CTkEntry(master=canvas2)
+    def on_enter(event):
+        canvas2.itemconfig(txt, text="tocadoyhundido")
+        print("are you colorchanging?")
+        ddm.open(x = x, y = y)
+        entry.place(x = x, y = y, anchor = "center")
+        entry.focus_set()
+        def forget(event):
+            entry.place_forget()
+        entry.bind("<FocusOut>",forget)
+
+    canvas2.tag_bind(txt, "<Enter>", on_enter)
 """
 Per dibuixar la figura
 """
@@ -155,7 +185,7 @@ Per dibuixar la figura
 def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     counter = 0
     netejadora = [[],[]]
-    canvas2 = tkinter.Canvas(width=1000, height=1000, bg="white", borderwidth=0, relief="ridge")
+    canvas2 = tkinter.Canvas(width=1000, height=1000, bg="#333333", borderwidth=0, relief="ridge")
     canvas2.place(relx=0.5, rely=0.5, anchor="center")
 
     for i in croquiss.keys():
@@ -193,21 +223,14 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
                        anchor = "center"
                        )
         try:
-            orientation = math.degrees(math.tan(coord[1]/coord[0]))
+            orientation = -math.degrees(math.atan(coord[0]/coord[1]))
             print("try",orientation)
         except:
             print("exception")
-            orientation = -90
+            orientation = 0
+        text_mes_bind(i, coord, orientation, corrector, canvas2,croquiss)
 
-        txt = canvas2.create_text(2*int(canvas.config("width")[-1])*(0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100),
-                            2*int(canvas.config("height")[-1])*(0.5 - (coord[1] - (corrector[1][0] + corrector[1][1]) / 2) / (corrector[1][0] - corrector[1][1]) / 1.2 * (len(croquiss.keys()) + 20) / 140),
-                            text=i,
-                            angle = orientation+90)
-        #print(type(txt))
-        def on_enter(event):
-            canvas2.itemconfig(txt, fill="red")
-            print("are you colorchanging?")
-        canvas2.tag_bind(txt, "<Enter>",on_enter)
+
 
         #txt.bind("<Enter>",txt.config(fill="red"))
 
@@ -217,9 +240,6 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
                 continue
             #child.place_forget()
     registre_labels.append(netejadora)
-    #print(f"length registe = {len(registre_labels)}")
-    #for i in registre_labels:
-     #   print(i[0])
     return netejadora
 
 """

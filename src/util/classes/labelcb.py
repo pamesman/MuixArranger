@@ -1,5 +1,6 @@
 import customtkinter
 from src.util.classes.SearchBox import SearchBox
+import tkinter as tk
 
 #from CTkScrollableDropdown import *
 
@@ -36,6 +37,9 @@ class LabelCB(customtkinter.CTkFrame):
         self.combobox.set(self.text)
         self.combobox.configure(corner_radius=3)
 
+        #self.canvas = tk.Canvas(self,height = 100,width = 100, bg="#333333")
+        #self.canvas.place(x = 0,y = 0)
+
     def insertar_membre(self, value):
 
         self.combobox.comando(value)
@@ -47,3 +51,4 @@ class LabelCB(customtkinter.CTkFrame):
         self.taula.insert(list(self.croquis_en_us).index(self.text)-1,2,self.dataframe.loc[self.dataframe["Nom"]==value].iloc[0,1])
         if value != self.text:
             self.combobox.configure(fg_color="green")
+

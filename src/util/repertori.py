@@ -50,7 +50,7 @@ banc.coordenades = [(0, 0), (-5, -3), (-4, -3), (-4.5, -2.5), (-4.5, -3.5), (1, 
 branca_de_morera.coordenades = None
 campana.coordenades = [(-1.5,-1.5),(-1.5,1.5),(1.5,1.5),(1.5,-1.5),(0,-2/3),(-2/3,2/3),(2/3,2/3),(0,0),(-2.5,0),(0,2.5),(+2.5,0),(0,-2.5)]
 castell.coordenades = None
-cinc_en_un_peu.coordenades = [(0,0),(6,0),(8,0),(7, 0.5),(7, 1.5),(-2,0),(2,0),(-3,0),(3,0),(-4,0),(4,0),(0,1),(0,-1),(0,2),(0,-2),(0,3),(0,-3),(-2,1),(2,1),(2,-1),(-2,-1),(-3,2),(3,2),(3,-2),(-3,-2),(7,-3),(-1,0),(1,0)]
+cinc_en_un_peu.coordenades = [(0,0),(6,0),(8,0),(7, 1),(7,2),(-2,0),(2,0),(-3,0),(3,0),(-4,0),(4,0),(0,1),(0,-1),(0,2),(0,-2),(0,3),(0,-3),(-2,1),(2,1),(2,-1),(-2,-1),(-3,2),(3,2),(3,-2),(-3,-2),(7,-3),(-1,0),(1,0)]
 encontre.coordenades = None
 figuereta.coordenades = None
 marieta.coordenades = [(1,0.5),(1,-0.5),(-1,-0.5),(-1, 0.5),   (2, 0.5),(2, -0.5),(-2, -0.5),(-2, 0.5),   (-3,-3),(-3,-2),   (3, 0.5),   (3, -0.5), (-3, -0.5), (-3, 0.5),   (0,1.5),(0,-1.5),   (-1,2),   (0,0),(1,-2)]
@@ -92,4 +92,4 @@ palette = list(vars(paleta_oficial).values())
 palette_d = list(vars(paleta_oficial_oscura).values())
 
 rols = ['Base', 'Segona', 'Tercera', 'Quarta', 'Alsadora', 'Xicalla', 'Mans', 'Vents', 'Laterals',  'Tap','Agulla', 'Peu', 'Puntal', 'Crossa','Genoll', 'Contrafort', 'Guia','Passadora', 'Recollidora', "Colze" ]
-print(len(torreta.coordenades))
+

@@ -1,8 +1,9 @@
-from tkinter import PhotoImage
+import tkinter
 import customtkinter
 from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
+import math
 
 
 #from CTkScrollableDropdown import *
@@ -21,7 +22,7 @@ llistadebutons = {}
 image=customtkinter.CTkImage(light_image=Image.open("icon.png"))
 root = customtkinter.CTk()
 root.geometry("1280x720")
-root.iconphoto(False,PhotoImage(file="icon.png"))
+root.iconphoto(False,tkinter.PhotoImage(file="icon.png"))
 root.title("Crokiss")
 customtkinter.set_appearance_mode("dark") #set theme
 
@@ -154,6 +155,9 @@ Per dibuixar la figura
 def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     counter = 0
     netejadora = [[],[]]
+    canvas2 = tkinter.Canvas(width=1000, height=1000, bg="white", borderwidth=0, relief="ridge")
+    canvas2.place(relx=0.5, rely=0.5, anchor="center")
+
     for i in croquiss.keys():
         if i == "Nom" :
             netejadora[0].append(croquiss[i])
@@ -180,7 +184,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             else:
                 relwidth = 1/20
         combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100 ,
-                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+15)/150  ,
+                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+20)/140  ,
 
                         #relx=coord[0]/15+1/15,
                        #rely=1-(coord[1]/11)-3/11, anchor="w",
@@ -188,6 +192,24 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
                        relheight = 2/45/2,
                        anchor = "center"
                        )
+        try:
+            orientation = math.degrees(math.tan(coord[1]/coord[0]))
+            print("try",orientation)
+        except:
+            print("exception")
+            orientation = -90
+
+        txt = canvas2.create_text(2*int(canvas.config("width")[-1])*(0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100),
+                            2*int(canvas.config("height")[-1])*(0.5 - (coord[1] - (corrector[1][0] + corrector[1][1]) / 2) / (corrector[1][0] - corrector[1][1]) / 1.2 * (len(croquiss.keys()) + 20) / 140),
+                            text=i,
+                            angle = orientation+90)
+        #print(type(txt))
+        def on_enter(event):
+            canvas2.itemconfig(txt, fill="red")
+            print("are you colorchanging?")
+        canvas2.tag_bind(txt, "<Enter>",on_enter)
+
+        #txt.bind("<Enter>",txt.config(fill="red"))
 
         counter += 1
         for child in frame_qv.winfo_children():
@@ -230,6 +252,8 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 
 frame_qv = customtkinter.CTkFrame(frame, fg_color=("#FFFFFF","#333333"))
 frame_qv.place(relx = 0.12,rely=0.5,anchor="w",relheight=0.98, relwidth=.66)
+canvas = tkinter.Canvas(frame_qv, bg="#333333", highlightthickness=0)
+canvas.place(relx=.99, rely=0.99, relheight=.93, relwidth=.98, anchor="se")
 #NOM FIGURA
 namer = customtkinter.CTkEntry(frame_qv, placeholder_text= "Nom de Figura-X", font=("Liberation Sans",16,"bold"),state="disabled")
 def actualitzar_nom_figura():

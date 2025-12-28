@@ -5,6 +5,7 @@ from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
 import math
+from src.util.classes.canvastextclass import CanvasText
 
 
 #from CTkScrollableDropdown import *
@@ -149,8 +150,8 @@ repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=
 
 buttonlist1 = []
 def text_mes_bind (i,coord, orientation,corrector, canvas2,croquiss):
-    x = 2 * int(canvas.config("width")[-1]) * (0.5 + (coord[0] - (corrector[0][0] + corrector[0][1]) / 2) / (corrector[0][0] - corrector[0][1]) / 1.2 * (len(croquiss.keys()) + 15) / 100)
-    y =  2 * int(canvas.config("height")[-1]) * (0.5 - (coord[1] - (corrector[1][0] + corrector[1][1]) / 2) / (corrector[1][0] - corrector[1][1]) / 1.2 * (len(croquiss.keys()) + 20) / 140)
+    x = 2.5 * int(canvas.config("width")[-1]) * (0.5 + (coord[0] - (corrector[0][0] + corrector[0][1]) / 2) / (corrector[0][0] - corrector[0][1]) / 1.2 * (len(croquiss.keys()) + 15) / 100)
+    y = 2.5 * int(canvas.config("height")[-1]) * (0.5 - (coord[1] - (corrector[1][0] + corrector[1][1]) / 2) / (corrector[1][0] - corrector[1][1]) / 1.2 * (len(croquiss.keys()) + 20) / 140)
     txt = canvas2.create_text(x,y,
                               text=i,
                               angle=orientation,
@@ -165,19 +166,28 @@ def text_mes_bind (i,coord, orientation,corrector, canvas2,croquiss):
                     #font=dropdown_font))
                                          )
 
-    # print(type(txt))
+
     entry = customtkinter.CTkEntry(master=canvas2)
     def on_enter(event):
         canvas2.itemconfig(txt, text="tocadoyhundido")
-        print("are you colorchanging?")
         ddm.open(x = x, y = y)
         entry.place(x = x, y = y, anchor = "center")
         entry.focus_set()
         def forget(event):
             entry.place_forget()
         entry.bind("<FocusOut>",forget)
+    def on_focus(event):
+        canvas2.itemconfig(txt, fill="#C6E8AC", font = ("Arial",16))
+    def on_defocus(event):
+        canvas2.itemconfig(txt, fill="white", font = ("Arial",12))
 
-    canvas2.tag_bind(txt, "<Enter>", on_enter)
+
+
+    canvas2.tag_bind(txt, "<Enter>", on_focus )
+    canvas2.tag_bind(txt, "<Leave>", on_defocus)
+    canvas2.tag_bind(txt, "<Button-1>", on_enter)
+
+
 """
 Per dibuixar la figura
 """
@@ -185,8 +195,28 @@ Per dibuixar la figura
 def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     counter = 0
     netejadora = [[],[]]
-    canvas2 = tkinter.Canvas(width=1000, height=1000, bg="#333333", borderwidth=0, relief="ridge")
+    frame_qv.update()
+    height = frame_qv.winfo_height()-frame_qv.cget("corner_radius")*2
+    width = frame_qv.winfo_width()-frame_qv.cget("corner_radius")*2
+    print(width, height)
+
+    def resize(event):
+        canvas2.config(width=event.width-frame_qv.cget("corner_radius")*2, height=event.height-frame_qv.cget("corner_radius")*2)
+        global old_width
+        global old_height
+        w1= old_width
+        w2= event.width-frame_qv.cget("corner_radius")*2
+        h1 = old_height
+        h2 = event.height-frame_qv.cget("corner_radius")*2
+        for i in canvas2.find_withtag("etiqueta"):
+            x = canvas2.coords(i)[0]
+            y = canvas2.coords(i)[1]
+            canvas2.coords(i,x*w2/w1,y*h2/h1)
+            old_height = event.height-frame_qv.cget("corner_radius")*2
+            old_width = event.width-frame_qv.cget("corner_radius")*2
+    canvas2 = tkinter.Canvas(frame_qv,width=width, height=height, bg="#333333", highlightthickness=1)
     canvas2.place(relx=0.5, rely=0.5, anchor="center")
+    frame_qv.bind("<Configure>",resize)
 
     for i in croquiss.keys():
         if i == "Nom" :
@@ -194,13 +224,37 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             continue
         if i == "Figura":
             continue
-        combobox = LabelCB(frame_qv,
-                           i,
-                           membre.working_list[:],
-                           taula,
-                           croquiss,
-                           membre.taula_mestra,
-                           color= (rep.palette[rep.rols.index(i.split(" ")[0])+1],rep.palette_d[rep.rols.index(i.split(" ")[0])+1]))
+        # combobox = LabelCB(frame_qv,
+        #                    i,
+        #                    membre.working_list[:],
+        #                    taula,
+        #                    croquiss,
+        #                    membre.taula_mestra,
+        #                    color= (rep.palette[rep.rols.index(i.split(" ")[0])+1],rep.palette_d[rep.rols.index(i.split(" ")[0])+1]))
+        coord = listadecoordenades[counter]
+        if i.split(" ")[0] not in ["Segona", "Tercera","Quarta","Xicalla", "Alsadora", "Passadora", "Recollidora"]:
+            sc = 0.5
+            try:
+                if coord[1] >= sc:
+                    orientation = -math.degrees(math.atan(coord[0] / (coord[1]-sc)))
+                elif coord[1] <= -sc:
+                    orientation = -math.degrees(math.atan(coord[0] / (coord[1]+sc)))
+                else:
+                    orientation = -math.degrees(math.atan(coord[0] / (coord[1])))
+            except:
+                if coord[0] > 0:
+                    orientation = -90
+                if coord[0] < 0:
+                    orientation = 90
+                if coord[0] == 0:
+                    orientation = 0
+        else:
+            orientation = 0
+        combobox = CanvasText(root, canvas2,
+                              i, listadecoordenades[counter],
+                              membre.working_list, taula, croquiss, membre.taula_mestra,
+                              orientation = -orientation,
+                              color =(rep.palette_d[rep.rols.index(i.split(" ")[0])+1]),list_len=10)
 
         coord = listadecoordenades[counter]
         #CTkScrollableDropdown(attach=combobox, values=[ident +" "+ i for i in membre.working_list[0:25+int(coord[1])]], width=200)
@@ -213,27 +267,18 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
                 break
             else:
                 relwidth = 1/20
-        combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100 ,
-                       rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+20)/140  ,
+        # combobox.place(relx =0.5+ (coord[0]-(corrector[0][0]+corrector[0][1])/2)/(corrector[0][0]-corrector[0][1])/1.2*(len(croquiss.keys())+15)/100 ,
+        #                rely = 0.5 - (coord[1]-(corrector[1][0]+corrector[1][1])/2)/(corrector[1][0]-corrector[1][1])/1.2*(len(croquiss.keys())+20)/140  ,
+        #
+        #                 #relx=coord[0]/15+1/15,
+        #                #rely=1-(coord[1]/11)-3/11, anchor="w",
+        #                relwidth=relwidth,
+        #                relheight = 2/45/2,
+        #                anchor = "center"
+        #                )
+        # sc = 0.5
 
-                        #relx=coord[0]/15+1/15,
-                       #rely=1-(coord[1]/11)-3/11, anchor="w",
-                       relwidth=relwidth,
-                       relheight = 2/45/2,
-                       anchor = "center"
-                       )
-        try:
-            orientation = -math.degrees(math.atan(coord[0]/coord[1]))
-            print("try",orientation)
-        except:
-            print("exception")
-            if coord[0] > 0:
-                orientation = -90
-            if coord[0] < 0:
-                orientation = 90
-            if coord[0] == 0:
-                orientation = 0
-        text_mes_bind(i, coord, orientation, corrector, canvas2,croquiss)
+        # text_mes_bind(i, coord, orientation, corrector, canvas2,croquiss)
 
 
 
@@ -262,7 +307,6 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 """
 #for i in rep.repertori.keys():
 #    def button_pressed():
-#        print(buttonlist1)
 #    button = customtkinter.CTkButton(repertori_frame,text = rep.repertori[i].nom, command=lambda iden=i: figure_press(iden),
 #                                     fg_color=paleta[1],)
 #    button.pack(padx=2,pady=8,expand=True)
@@ -275,6 +319,9 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 
 frame_qv = customtkinter.CTkFrame(frame, fg_color=("#FFFFFF","#333333"))
 frame_qv.place(relx = 0.12,rely=0.5,anchor="w",relheight=0.98, relwidth=.66)
+frame_qv.update()
+old_width = frame_qv.winfo_width()
+old_height = frame_qv.winfo_height()
 canvas = tkinter.Canvas(frame_qv, bg="#333333", highlightthickness=0)
 #canvas.place(relx=.99, rely=0.99, relheight=.93, relwidth=.98, anchor="se")
 #NOM FIGURA

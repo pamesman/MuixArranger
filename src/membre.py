@@ -1,17 +1,29 @@
-from calendar import error
-
 import pandas as pd
-t = pd.read_excel("/home/paco/Desktop/100personas.ods")
 
-taula_mestra = t.sort_values(by=["Muscle"], ascending=False)
+
+database = pd.read_excel("/home/paco/Desktop/100personas.ods")
+assistents= pd.read_excel("/home/paco/Desktop/asistentes.ods")
+
+taula_mestra = pd.DataFrame([],columns=["Nom","Muscle","Alçada","Braç","Posició"])
+for i in assistents["Nom"]:
+    if i in list(database["Nom"]):
+        entrada = database.loc[database["Nom"] == i]
+    else:
+        entrada = pd.DataFrame([[i,0,0,0,"Nou"]],columns=["Nom","Muscle","Alçada","Braç","Posició"])
+    taula_mestra = pd.concat([taula_mestra,entrada])
+print(taula_mestra)
+
+taula_mestra = taula_mestra.sort_values(by=["Muscle"], ascending=False)
 
 taula_mestra = taula_mestra[taula_mestra["Nom"].str.contains("Z-") == False]
 
 working_list = taula_mestra[["Nom", "Muscle"]]
 
-#print(t[["Nom","Muscle"]])
 
-lista = [[t["Nom"][i],int(t["Muscle"][i]),int(t["Alçada"][i])] for i in range(len(t["Nom"])) if "Z-" not in str(t["Nom"][i])] #fa una llista de llistes dels components, elimina els "Z-"
+list_nom = list(working_list["Nom"])
+list_muscle = list(working_list["Muscle"])
 
-working_list = list(working_list["Nom"])
+#working_list = [str((list_nom[i]+" "+str(list_muscle[i]))) for i in range(len(list_nom))]
+working_list = list_nom
+
 

@@ -135,7 +135,7 @@ def figure_press(selected_fig):
         else:
 
             pass
-        canvas2.delete("all")
+    canvas2.delete("all")
     assaig.update({croquis_in_use["Nom"]: croquis_in_use})
 
     def assaig_button_press(nom):

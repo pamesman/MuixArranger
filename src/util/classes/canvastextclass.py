@@ -65,7 +65,7 @@ class CanvasText(CTkBaseClass):
         self.parent.tag_bind(self.txt, "<Button-1>", self.on_click)
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self._apply_appearance_mode(self.color), border_width=0, tags=("rectangle", self.text, self.text.split(" ")[0]),radius=10)[0]
-        print(self._get_appearance_mode())
+
         #print(self.callback_list)
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])

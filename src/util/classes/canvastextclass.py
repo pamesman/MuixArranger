@@ -7,6 +7,7 @@ from customtkinter.windows.widgets.core_widget_classes import DropdownMenu, CTkB
 
 from src.util.round_rectangle import round_rectangle_AA
 import math
+from time import sleep
 
 
 class CanvasText(CTkBaseClass):
@@ -56,6 +57,7 @@ class CanvasText(CTkBaseClass):
 
         self.rectangle_fix = [(self.tag_width ** 2 + 20 ** 2) ** 0.5 * i * 0.5 for i in [math.cos(math.atan(20 / self.tag_width) - math.radians(self.orientation)),math.sin(math.atan(20 / self.tag_width) - math.radians(self.orientation))]]
 
+        self.scroll_count = 0
 
 
 
@@ -101,6 +103,20 @@ class CanvasText(CTkBaseClass):
 
             self.ddm = DropdownMenu(master=self.parent, values=self.working_values[:self.list_len], command=self.insertar_membre)
 
+            def scroll_up( _event):
+                self.entry.focus_force()
+                self.scroll_count -= 1
+                self.ddm.configure(values=self.working_values[self.scroll_count:self.list_len + self.scroll_count])
+                print("hey")
+
+            def scroll_down( _event):
+                self.entry.focus_force()
+                self.scroll_count += 1
+                self.ddm.configure(values=self.working_values[self.scroll_count:self.list_len + self.scroll_count])
+                print("hey")
+
+            self.entry.bind("<Button-5>", scroll_down)
+            self.entry.bind("<Button-4>", scroll_up)
             self.parent.update()
             self.window.update()
 

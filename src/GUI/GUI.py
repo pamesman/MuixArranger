@@ -105,9 +105,9 @@ CTkButton(frame,text = "☀ / ☾",command=canviar_apariencia, width = 20,fg_col
 
 
 buttonlist1 = {}
-registre_labels = []
+
 def crear_figura(selected_fig):
-    global registre_labels
+
     global buttonlist1
     repertori_label.set("Afegir figura")    #Restaura combobox
         #Activa "namer"
@@ -151,7 +151,7 @@ def crear_figura(selected_fig):
     # try:
 
 
-    drive.sheet.batch_update()
+
     drive.sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
     drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
         # drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name = "A1:"+A, values =list(map(list, zip(*[croquis_in_use.keys(),croquis_in_use.values()]))) )
@@ -174,14 +174,8 @@ def crear_figura(selected_fig):
         taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
         taula_name.configure(text="Id: " + croquis_in_use["Nom"])
         pass
-    namer.configure(placeholder_text=croquis_in_use["Nom"])
+    assaig_button_press(croquis_in_use["Nom"])
 
-
-    taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
-
-    taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
-    taula_name.configure(text="Id: " + croquis_in_use["Nom"])
-    registre_labels = [fer_dibuix(coordenades, croquis_in_use, corrector)]
     button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
                                      command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
                                      fg_color = rep.main_color,hover_color=rep.inv_color, font = ("Arial", 14,"bold"))
@@ -267,7 +261,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     except:
         pass
     canvas2.tag_lower("rectangle", "etiqueta")
-    registre_labels.append(netejadora)
+
     return netejadora
 
 
@@ -401,6 +395,15 @@ def carregar_figura(croquis):
         Interval(5, up_to_date).start()
         croquis_in_use = assaig[nom]
         taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
+        print(taula.get_column(1)[1:])
+        for i in taula.get_column(1)[1:]:
+            if i == "N. A.":
+                continue
+            try:
+                taula.insert(list(croquis_in_use.values()).index(i) - 1, 2,
+                              membre.taula_mestra.loc[membre.taula_mestra["Nom"] == i].iloc[0, 1])
+            except:
+                pass
         canvas2.delete("all")
 
         fer_dibuix(coordenades, croquis_in_use, corrector)
@@ -416,7 +419,7 @@ def carregar_figura(croquis):
     taula_name.configure(text="Id: " + croquis_in_use["Nom"])
     coordenades = rep.repertori2[croquis_in_use["Figura"]].coordenades
     corrector = rep.repertori2[croquis_in_use["Figura"]].centraor()
-    #registre_labels = [fer_dibuix(coordenades, croquis_in_use, corrector)]
+
 
     button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
                                      command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),

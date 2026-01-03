@@ -24,8 +24,8 @@ for i in rep.repertori:
     try:
         for j in rep.repertori[i].coordenades:
 
-            canvas.create_text(i*100, 400, text=rep.repertori[i].nom)
-            canvas.create_oval(10*j[0]+i*100, 10*(j[1])+500,10*(j[0])+i*100, (j[1])*10+500, fill="red")
+            canvas.create_text(i*110, 400, text=rep.repertori[i].nom)
+            canvas.create_oval(10*j[0]+i*110, -10*(j[1])+500,10*(j[0])+i*110, -(j[1])*10+500, fill="red")
     except:
         pass
 

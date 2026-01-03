@@ -121,10 +121,10 @@ P4_B = ttk.Label(P4, text="B").place(x=600, y=350)
 P4_S = ttk.Label(P4, text="S").place(x=50, y=500)
 P4_A = ttk.Label(P4, text="A").place(x=50, y=520)
 #Seleccionador de posició
-def P4_B_label_clicked(event):
+#def P4_B_label_clicked(event):
 
 
-P4_B.bind("<Button-1>", P4_B_label_clicked)
+# P4_B.bind("<Button-1>", P4_B_label_clicked)
 
 #Marieta
 MarietaCanvas = tk.Canvas(Marieta, width=280, height=20, bg="blue")

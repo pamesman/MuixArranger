@@ -4,8 +4,8 @@ from customtkinter.windows.widgets.core_widget_classes import DropdownMenu, CTkB
 
 from src.util.round_rectangle import round_rectangle_AA
 import math
-from API import credential_managing as drive
-from time import sleep
+from src.API import credential_managing as drive
+
 
 class CanvasText(CTkBaseClass):
 

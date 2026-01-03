@@ -65,6 +65,18 @@ def resize(event):
 frame = customtkinter.CTkFrame(master=tabview.tab("Croquis"))
 frame.place(relx=0.5,rely=0.5,anchor="c",relheight=1, relwidth=1)
 
+#Gestiona Connectivitat
+online = False
+connection = CTkMessagebox.CTkMessagebox(title="Connectivitat",
+                               message="Vols treballar en línia o desconectat?",
+                               option_1= "Online",
+                               option_2 = "Offline" )
+if connection.get() == "Online":
+    online = True
+if connection.get() == "Offline":
+    pass
+
+
 #FIGURES
 repertori_frame = customtkinter.CTkScrollableFrame(frame)
 repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw")
@@ -147,23 +159,16 @@ def crear_figura(selected_fig):
     canvas2.delete("all")
     assaig.update({croquis_in_use["Nom"]: croquis_in_use})
 
-    #ONLINE SYNCING
-    # try:
+    if online:
+        drive.sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
+        drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
 
-
-
-    drive.sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
-    drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
-        # drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name = "A1:"+A, values =list(map(list, zip(*[croquis_in_use.keys(),croquis_in_use.values()]))) )
-        #[[[i] for i in list(croquis_in_use.keys())],[[i] for i in list(croquis_in_use.values())]]
-    print("done")
-    # except:
-    print("not done")
 
     def assaig_button_press(nom):
         global croquis_in_use
         global canvas2
-        Interval(5, up_to_date).start()
+        if online:
+            Interval(5, up_to_date).start()
         croquis_in_use = assaig[nom]
         taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
         canvas2.delete("all")
@@ -428,12 +433,11 @@ def carregar_figura(croquis):
     button.pack(pady=5)
     buttonlist1.update({croquis_in_use["Nom"]: button})
 
-
-for i in range(len(drive.sheet.worksheets()[1:])):
-    croquis_in_use = drive.sheet.get_worksheet(i+1)
-    croquis_in_use = croquis_in_use.get_all_records()[0]
-    assaig.update({croquis_in_use["Nom"]:croquis_in_use})
-    carregar_figura(croquis_in_use)
+if online:
+    for i in range(len(drive.sheet.worksheets()[1:])):
+        croquis_in_use = drive.sheet.get_worksheet(i+1).get_all_records()[0]
+        assaig.update({croquis_in_use["Nom"]:croquis_in_use})
+        carregar_figura(croquis_in_use)
 
 
 def up_to_date():
@@ -470,10 +474,8 @@ def up_to_date():
                                       membre.taula_mestra.loc[membre.taula_mestra["Nom"] == target_data[1]].iloc[0, 1])
                 assaig.update({croquis_in_use["Nom"]: croquis_in_use})
 
-
-
-
-updater = Interval(5, up_to_date)
+if online:
+    updater = Interval(5, up_to_date)
 
 
 

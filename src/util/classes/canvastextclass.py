@@ -71,10 +71,11 @@ class CanvasText(CTkBaseClass):
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self._apply_appearance_mode(self.color), border_width=0, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
 
-        #print(self.callback_list)
+
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])
-        self.interval.stop()
+        if self.interval != None:
+            self.interval.stop()
         self.chosen = value
 
         for name in self.croquis_en_us.values():
@@ -98,8 +99,9 @@ class CanvasText(CTkBaseClass):
 
         self.parent.itemconfig(self.txt, text=value)
         counter = tkinter.StringVar()
-        self.interval.start()
-        counter.trace_add("unset", self.drive_callback)
+        if self.interval != None:
+            self.interval.start()
+            counter.trace_add("unset", self.drive_callback)
 
 
 
@@ -110,7 +112,7 @@ class CanvasText(CTkBaseClass):
     def drive_callback(self, var, index, mode):
         try:
             drive.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.text)+1,  value=self.chosen)
-            print("activated")
+
         except:
             print("mistake was sucedido")
     def search_items(self, _event):
@@ -157,12 +159,12 @@ class CanvasText(CTkBaseClass):
                          y=self.parent.coords(self.text)[1] + self.rectangle_fix[1], anchor="center")
 
         self.entry.focus_force()
-        print("down")
+
     def on_click(self, _event):
             self.working_values = list(set(self.values)^set(list(self.croquis_en_us.values())[2:]))
             self.working_values.remove("N. A.")
             self.working_values_heights = []
-            # print(self.location)
+
             try:
                 self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'] == x].iloc[0, 1])
             except:

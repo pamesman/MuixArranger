@@ -207,14 +207,11 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     global updater
     counter = 0
 
-    netejadora = [[],[]]
-    croquis_frame.update()
+
+    # croquis_frame.update()
 
     for i in croquiss.keys():
-        if i == "Nom" :
-            netejadora[0].append(croquiss[i])
-            continue
-        if i == "Figura":
+        if i == "Nom" or i == "Figura":
             continue
 
         coord = listadecoordenades[counter]
@@ -267,7 +264,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
         pass
     canvas2.tag_lower("rectangle", "etiqueta")
 
-    return netejadora
+
 
 
 """
@@ -394,13 +391,12 @@ button_expand2.place(rely = 0.5, relx = .995, anchor="e")
 def carregar_figura(croquis):
 
     def assaig_button_press(nom):
+        global updater
         updater.start()
         global croquis_in_use
         global canvas2
-        Interval(5, up_to_date).start()
         croquis_in_use = assaig[nom]
         taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
-        print(taula.get_column(1)[1:])
         for i in taula.get_column(1)[1:]:
             if i == "N. A.":
                 continue
@@ -410,7 +406,6 @@ def carregar_figura(croquis):
             except:
                 pass
         canvas2.delete("all")
-
         fer_dibuix(coordenades, croquis_in_use, corrector)
         namer.delete(0, "end")
         namer.configure(placeholder_text=croquis_in_use["Nom"])
@@ -418,10 +413,6 @@ def carregar_figura(croquis):
         taula_name.configure(text="Id: " + croquis_in_use["Nom"])
         pass
     namer.configure(placeholder_text=croquis_in_use["Nom"])
-    taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
-
-    taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
-    taula_name.configure(text="Id: " + croquis_in_use["Nom"])
     coordenades = rep.repertori2[croquis_in_use["Figura"]].coordenades
     corrector = rep.repertori2[croquis_in_use["Figura"]].centraor()
 
@@ -433,11 +424,6 @@ def carregar_figura(croquis):
     button.pack(pady=5)
     buttonlist1.update({croquis_in_use["Nom"]: button})
 
-if online:
-    for i in range(len(drive.sheet.worksheets()[1:])):
-        croquis_in_use = drive.sheet.get_worksheet(i+1).get_all_records()[0]
-        assaig.update({croquis_in_use["Nom"]:croquis_in_use})
-        carregar_figura(croquis_in_use)
 
 
 def up_to_date():
@@ -445,12 +431,22 @@ def up_to_date():
     global croquis_in_use
     worksheet_list = drive.sheet.worksheets()[1:]
     named_worksheet_list = [str(i).split("'")[1] for i in worksheet_list]
+    print(named_worksheet_list)
     if len(worksheet_list) != len(assaig):
         print("canvi en el numero de figuras")
+        for i in buttonlist1:
+            if i not in named_worksheet_list:
+                i.destroy()
+        for i in named_worksheet_list:
+            if i not in assaig:
+                croquis_cloud = drive.sheet.get_worksheet(named_worksheet_list.index(i) + 1).get_all_records()[0]
+                assaig.update({croquis_cloud["Nom"]: croquis_cloud})
+                croquis_in_use = croquis_cloud
+                carregar_figura(croquis_cloud)
+
+
     for i in range(len(named_worksheet_list)):
-        print(i)
-        print(named_worksheet_list[i])
-        print(worksheet_list[i])
+
         if croquis_in_use["Nom"] == named_worksheet_list[i]:
             croquis_cloud = drive.sheet.get_worksheet(i+1).get_all_records()[0]
             if croquis_in_use == croquis_cloud:
@@ -461,13 +457,9 @@ def up_to_date():
                 print(diferencia)
                 croquis_in_use = croquis_cloud
                 for change in diferencia:
-                    print(change)
                     target_ID = list(croquis_in_use.values()).index(change)
-                    print("targetID",target_ID)
                     target_data = [list(croquis_in_use.keys())[target_ID],list(croquis_in_use.values())[target_ID]]
-                    print("Target data",target_data)
                     target_drawing =canvas2.find_withtag(target_data[0])
-                    print("Target drawing",target_drawing)
                     canvas2.itemconfig(target_drawing[-1], text = target_data[1])
                     taula.insert(target_ID -1, 1, target_data[1])
                     taula.insert(target_ID -1, 2,
@@ -476,7 +468,13 @@ def up_to_date():
 
 if online:
     updater = Interval(5, up_to_date)
+    for i in range(len(drive.sheet.worksheets()[1:])):
+        croquis_in_use = drive.sheet.get_worksheet(i + 1).get_all_records()[0]
+        assaig.update({croquis_in_use["Nom"]: croquis_in_use})
+        carregar_figura(croquis_in_use)
 
+else:
+    updater = None
 
 
 

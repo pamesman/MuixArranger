@@ -29,9 +29,11 @@ def fer_croquis(figura: Esquema,nom: str):
 
 
 def croquis_to_table(croquis_generat:dict,dt = None):
-    listah = [["Posició", "Nom","Muscle"]] #header
+    listah = [["Posició", "Nom","Muscle"]]
+    print(croquis_generat)#header
     try:
         lista = [[key,value,int(dt[dt[value].str.contains(value) == True]["Muscle"])] for key,value in croquis_generat.items()]
+        print("proof2")
     except:
         lista = [[key,value] for key,value in croquis_generat.items()]  # posició,persona,empty
     return listah+lista[2:]

@@ -11,7 +11,6 @@ for i in assistents["Nom"]:
     else:
         entrada = pd.DataFrame([[i,0,0,0,"Nou"]],columns=["Nom","Muscle","Alçada","Braç","Posició"])
     taula_mestra = pd.concat([taula_mestra,entrada])
-print(taula_mestra)
 
 taula_mestra = taula_mestra.sort_values(by=["Muscle"], ascending=False)
 

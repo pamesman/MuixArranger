@@ -86,6 +86,10 @@ repertori = {1:alta_de_5,
              16:volantinera,
              17:xopera,
              18:dummy}
+repertori2={}
+for i in repertori:
+    repertori2.update({repertori[i].nom:repertori[i]})
+
 
 #colorinchis
 paleta_oficial = Esquema("Paleta", "#EAD1DC","#FF9900","#F6B26B", "#F6B26B","#FCE5CD","#FFE59A","#e0ecf7","#E0EEDB","#E0EEDB","#EEEEEE","#EEEEEE","#EEEEEE","#FF9900","#D5A6BD","#C27BA0", "#B4A7D6","#FFFFFF","#FFFFFF","#FFFFFF", colze = "#81B2DE")

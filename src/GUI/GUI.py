@@ -236,7 +236,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             if coord[0] == 0:
                 orientation = 0
 
-        if i.split(" ")[0] in ["Xicalla","Alsadora"] in i:
+        if i.split(" ")[0] in ["Xicalla","Alsadora"]:
             orientation = 0
 
 

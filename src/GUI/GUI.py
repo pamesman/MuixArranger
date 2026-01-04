@@ -7,7 +7,7 @@ import math
 from src.util.classes.canvastextclass import CanvasText
 from src.API import credential_managing as drive
 from src.util.classes.interval import Interval
-
+import numpy as np
 #from CTkScrollableDropdown import *
 from src.util.classes import CTkTable
 
@@ -167,6 +167,7 @@ def crear_figura(selected_fig):
     def assaig_button_press(nom):
         global croquis_in_use
         global canvas2
+
         if online:
             Interval(5, up_to_date).start()
         croquis_in_use = assaig[nom]
@@ -396,6 +397,7 @@ def carregar_figura(croquis):
         global croquis_in_use
         global canvas2
         croquis_in_use = assaig[nom]
+
         taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
         for i in taula.get_column(1)[1:]:
             if i == "N. A.":
@@ -427,8 +429,17 @@ def carregar_figura(croquis):
 
 
 def up_to_date():
+
+
     global assaig
     global croquis_in_use
+    # if previous_croquis != croquis_in_use:
+    #
+    #     print(delta)
+    #     try:
+    #         drive.sheet.worksheet(croquis_in_use["Nom"]).update_cell(2, list(croquis_in_use.values()).index(delta)+1,  value=delta)
+    #     except:
+    #         print("mistake was sucedido")
     worksheet_list = drive.sheet.worksheets()[1:]
     named_worksheet_list = [str(i).split("'")[1] for i in worksheet_list]
     print(named_worksheet_list)

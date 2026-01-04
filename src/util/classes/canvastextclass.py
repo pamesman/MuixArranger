@@ -77,7 +77,6 @@ class CanvasText(CTkBaseClass):
         if self.interval != None:
             self.interval.stop()
         self.chosen = value
-
         for name in self.croquis_en_us.values():
             if self.text in name:
                 self.text = name
@@ -85,8 +84,11 @@ class CanvasText(CTkBaseClass):
         if self.text not in self.croquis_en_us.keys():
             self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.values()).index(self.text)]: value})
             self.taula.insert((list(self.croquis_en_us.values()).index(value)) - 1, 1, value)
-            self.taula.insert(list(self.croquis_en_us.values()).index(value) - 1, 2,
+            try:
+                self.taula.insert(list(self.croquis_en_us.values()).index(value) - 1, 2,
                               self.dataframe.loc[self.dataframe["Nom"] == value].iloc[0, 1])
+            except:
+                pass
         else:
             self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.text)]: value})
             self.taula.insert((list(self.croquis_en_us.keys()).index(self.text)) - 1, 1, value)

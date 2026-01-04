@@ -216,24 +216,30 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             continue
 
         coord = listadecoordenades[counter]
-        if i.split(" ")[0] not in ["Segona", "Tercera","Quarta","Xicalla", "Alsadora", "Passadora", "Recollidora"]:
-            sc = -0
-            try:
-                if coord[1] >= sc:
-                    orientation = math.degrees(math.atan(coord[0] / (coord[1]-sc)))
-                elif coord[1] <= -sc:
-                    orientation = math.degrees(math.atan(coord[0] / (coord[1]+sc)))
-                else:
-                    orientation = math.degrees(math.atan(coord[0] / (coord[1])))
-            except:
-                if coord[0] > 0:
-                    orientation = 90
-                if coord[0] < 0:
-                    orientation = -90
-                if coord[0] == 0:
-                    orientation = 0
-        else:
+
+        sc = -0
+        if croquiss["Figura"] == "Marieta":
+            sc = 0.5
+
+        try:
+            if coord[1] >= sc:
+                orientation = math.degrees(math.atan(coord[0] / (coord[1]-sc)))
+            elif coord[1] <= -sc:
+                orientation = math.degrees(math.atan(coord[0] / (coord[1]+sc)))
+            else:
+                orientation = math.degrees(math.atan(coord[0] / (coord[1])))
+        except:
+            if coord[0] > 0:
+                orientation = 90
+            if coord[0] < 0:
+                orientation = -90
+            if coord[0] == 0:
+                orientation = 0
+
+        if i.split(" ")[0] in ["Xicalla","Alsadora"] in i:
             orientation = 0
+
+
 
         CanvasText(root, canvas2,
                               i, listadecoordenades[counter],corrector,
@@ -447,7 +453,8 @@ def up_to_date():
         print("canvi en el numero de figuras")
         for i in buttonlist1:
             if i not in named_worksheet_list:
-                i.destroy()
+                buttonlist1[i].destroy()
+                del assaig[i]
         for i in named_worksheet_list:
             if i not in assaig:
                 croquis_cloud = drive.sheet.get_worksheet(named_worksheet_list.index(i) + 1).get_all_records()[0]

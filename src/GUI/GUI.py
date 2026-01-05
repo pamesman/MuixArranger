@@ -7,7 +7,6 @@ import math
 from src.util.classes.canvastextclass import CanvasText
 from src.API import credential_managing as drive
 from src.util.classes.interval import Interval
-import numpy as np
 #from CTkScrollableDropdown import *
 from src.util.classes import CTkTable
 
@@ -36,6 +35,7 @@ croquis = tabview.add("Croquis")  # add tab at the end
 #INICIALITZACIÓ DE VARIABLES
 assaig = {}
 croquis_in_use = {}
+updater = None
 
 #assaig = {Nom: [croquis, figura, botó]}
 
@@ -130,8 +130,7 @@ def assaig_button_press(nom):
     global croquis_in_use
     global canvas2
 
-    if online:
-       updater.start()
+
     croquis_in_use = assaig[nom]["Croquis"]
     figura = assaig[nom]["Figura"]
     taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
@@ -245,20 +244,18 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
         coord = listadecoordenades[counter]
 
         sc = -0
-        if croquiss["Figura"] in ["Marieta"]:
-            sc = 0.5
-        if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó"]:
+        if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó","Marieta", "Volantinera", "Figuereta"]:
             sc = 1
 
         try:
             if coord[1] > sc:
                 # orientation = math.degrees(math.atan(coord[0] / (coord[1]-sc)))
                 orientation = math.degrees(math.atan(coord[0] / (coord[1])))
-                coord = [coord[0],coord[1]+sc]
+                coord = [coord[0],coord[1]+sc/1.5]
             elif coord[1] < -sc:
                 # orientation = math.degrees(math.atan(coord[0] / (coord[1]+sc)))
                 orientation = math.degrees(math.atan(coord[0] / (coord[1])))
-                coord = [coord[0], coord[1] - sc]
+                coord = [coord[0], coord[1] - sc/1.5]
 
             elif sc >= coord[1] >= -sc:
                 if coord[0] > 0:
@@ -276,6 +273,22 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
                 orientation = -90
             if coord[0] == 0:
                 orientation = 0
+        if i.split(" ")[0] in ["Segona"]:
+            if assaig[croquiss["Nom"]]["Figura"].segona == 6 or assaig[croquiss["Nom"]]["Figura"].segona == 4:
+                x = int(i.split(" ")[1])
+                orientation = 3 * x ** 5 - 63.75 * x ** 4 + 502.5 * x ** 3 - 1781.25 * x ** 2 + 2689.5 * x - 1260
+
+            if assaig[croquiss["Nom"]]["Figura"].segona == 3 or assaig[croquiss["Nom"]]["Figura"].segona == 2:
+                x = int(i.split(" ")[1])
+                orientation = 135 * x ** 2 - 585 * x + 540
+            if assaig[croquiss["Nom"]]["Figura"].segona == 1:
+                orientation = 0
+        if i.split(" ")[0] in ["Tercera"]:
+            if assaig[croquiss["Nom"]]["Figura"].tercera == 3 or assaig[croquiss["Nom"]]["Figura"].tercera == 2:
+                x = int(i.split(" ")[1])
+                orientation = 135 * x ** 2 - 585 * x + 540
+            if assaig[croquiss["Nom"]]["Figura"].tercera == 1:
+                orientation = 0
 
         if i.split(" ")[0] in ["Xicalla","Alsadora"]:
             orientation = 0
@@ -284,7 +297,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
 
 
 
-        xivato = CanvasText(root, canvas2,
+        CanvasText(root, canvas2,
                               i, coord,corrector,
                               membre.working_list, taula, croquiss, membre.taula_mestra,
                               interval = updater,
@@ -315,23 +328,6 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
     canvas2.tag_lower("rectangle", "etiqueta")
 
 
-
-
-"""
-figure_press funciona per als side buttons amb les figures del repertori. Agafa el butto, forma el croquis per a displayearlo en la taula i l'afegeix a un 
-"working_Set", que guarda el progrés que s'haja fet en cada figura abans de commitearlos a Assaig.
-OJO!!! No guarda cap nom en particular, nom="nomdelafigura"
-"""
-
-
-
-"""
-Falta funcionalitat: canviar també el contingut de croquis frame
-"""
-
-"""
-A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertori", i s'asocia a el command definit per la funció de dalt
-"""
 
 #NOM FIGURA
 namer = customtkinter.CTkEntry(croquis_frame, placeholder_text="Nom de Figura-X", font=("Liberation Sans", 16, "bold"), state="disabled")
@@ -379,8 +375,6 @@ def minimizar2():
             expand_is_on2 = False
 
 def minimizar():
-    global xivato
-    print(xivato.croquis_en_us)
     global expand_is_on
     global expand_is_on2
     if not expand_is_on:
@@ -486,15 +480,13 @@ if online:
     for i in worksheet_list:
         try:
             croquis_loading = i.get_all_records()[0]
+            print("Descarregant",croquis_loading["Figura"],":",croquis_loading["Nom"])
             inicialitzar_figura(croquis_loading["Figura"], downloading = True)
 
         except:
              drive.sheet.del_worksheet(i)
 
-
-else:
-    updater = None
-
+    updater.start()
 
 
 

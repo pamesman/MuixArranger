@@ -17,20 +17,20 @@ class CanvasText(CTkBaseClass):
         self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
         if croquis_en_us[text].strip() == "N. A.":  # si no hi ha algu seleccionat
             self.text = text
-            self.text_color = "#AAAAAA"
+            self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
             self.color = ""
             self.outline = self._apply_appearance_mode(color)
         else:
             self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
             self.text_color = "black"
             self.color = self._apply_appearance_mode(color)
-            self.outline = ""
+            self.outline = self._apply_appearance_mode(("#333333","#000000"))
         self.color2 = color
         self.location = location
         self.corrector = corrector
         self.orientation = orientation
-        self.values = values
-        self.working_values = values
+        self.values = [i.upper() for i in values]
+        self.working_values = [i.upper() for i in values]
         self.working_values_heights = []
         self.taula = taula
         self.croquis_en_us = croquis_en_us
@@ -49,8 +49,9 @@ class CanvasText(CTkBaseClass):
         self.canvas_width = self.parent.winfo_screenwidth()
         self.canvas_height = self.parent.winfo_screenheight()
         self.tag_width = 70
-        if self.position.split(" ")[0] in ["Tap","Peu"]:
+        if self.position.split(" ")[0] in ["Tap","Peu", "Colze"]:
             self.tag_width = 45
+            self.text = self.text.split(" ")[0]
 
         self.span = (self.corrector[0][0]-self.corrector[0][1], self.corrector[1][0]-self.corrector[1][1])
         self.center = ((self.corrector[0][0]+self.corrector[0][1])/2,(self.corrector[1][0]+self.corrector[1][1])/2)
@@ -77,22 +78,22 @@ class CanvasText(CTkBaseClass):
         self.parent.tag_bind(self.txt, "<Button-3>", self.on_right_click)
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self.color, outline = self.outline, border_width=1, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
-
+        print(self.outline)
 
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])
         if self.interval != None:
             self.interval.stop()
-        self.text= value
+        self.text= value.title()
         for name in self.croquis_en_us.values():
             if self.text in name:
                 self.text = name
 
         if self.text not in self.croquis_en_us.keys():
-            self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.position)]: value})
-            self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, value)
+            self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.position)]: self.text})
+            self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, self.text)
             self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2,
-                              self.dataframe.loc[self.dataframe["Nom"] == value].iloc[0, 1])
+                              self.dataframe.loc[self.dataframe["Nom"] == self.text].iloc[0, 1])
 
 
 
@@ -100,9 +101,8 @@ class CanvasText(CTkBaseClass):
 
         self.parent.itemconfig(self.txt, text=value)
         counter = tkinter.StringVar()
-        self.parent.itemconfig(self.shape, outline = "", fill = "")
+        self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = "")
         self.parent.itemconfig(self.txt, fill = "black")
-        print(self.croquis_en_us)
         if self.interval != None:
             self.interval.start()
             counter.trace_add("unset", self.drive_callback)
@@ -112,6 +112,7 @@ class CanvasText(CTkBaseClass):
             drive.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
         except:
             print("mistake was sucedido")
+
     def search_items(self, _event):
         search_value = self.entry.get()
         self.entry.focus_force()
@@ -158,8 +159,10 @@ class CanvasText(CTkBaseClass):
         self.entry.focus_force()
 
     def on_click(self, _event):
+        print(self.location)
         if not self.toggle:
-            self.working_values = list(set(self.values)^set(list(self.croquis_en_us.values())[2:]))
+            self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
+            print(self.working_values)
             if "N. A." in list(self.working_values):
                 self.working_values.remove("N. A.")
             self.working_values_heights = []
@@ -169,6 +172,7 @@ class CanvasText(CTkBaseClass):
             except:
                 pass
             self.ddm = DropdownMenu(master=self.parent, values=self.working_values[:self.list_len], command=self.insertar_membre)
+
 
             self.parent.update()
             self.window.update()
@@ -190,7 +194,7 @@ class CanvasText(CTkBaseClass):
 
     def on_defocus(self, _event):
         if not self.toggle:
-            if self.text != self.position:
+            if self.text.split(" ")[0] != self.position.split(" ")[0]:
                 self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.color2))
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
             else:

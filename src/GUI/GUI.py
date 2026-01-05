@@ -36,6 +36,10 @@ croquis = tabview.add("Croquis")  # add tab at the end
 #INICIALITZACIÓ DE VARIABLES
 assaig = {}
 croquis_in_use = {}
+
+#assaig = {Nom: [croquis, figura, botó]}
+
+
 #FUNCIONS
 """
 GESTIONA REDIMENSIONS DEL CROQUIS
@@ -59,6 +63,17 @@ def resize(event):
         canvas2.move(i,  (w2 / w1-1)*x,  (h2 / h1-1)*y)
     old_height = event.height - croquis_frame.cget("corner_radius") * 2
     old_width = event.width - croquis_frame.cget("corner_radius") * 4
+
+"""
+Darkmode
+"""
+def canviar_apariencia():
+    if customtkinter.get_appearance_mode() == "Dark":
+        customtkinter.set_appearance_mode("light")
+
+    else:
+        customtkinter.set_appearance_mode("dark")
+    canvas2.config(bg=frame._apply_appearance_mode(("#FFFFFF","#333333")))
 
 ### CROQUIS TAB ###
 
@@ -104,96 +119,108 @@ croquis_frame.bind("<Configure>", resize)
 canvas2 = tkinter.Canvas(croquis_frame, width=old_width, height=old_height, bg=croquis_frame._apply_appearance_mode(("black", "#333333")), highlightthickness=0)
 canvas2.place(relx=0.5, rely=0.5, anchor="center")
 
-#Darkmode
-def canviar_apariencia():
-    if customtkinter.get_appearance_mode() == "Dark":
-        customtkinter.set_appearance_mode("light")
-
-    else:
-        customtkinter.set_appearance_mode("dark")
-    canvas2.config(bg=frame._apply_appearance_mode(("#FFFFFF","#333333")))
+#Darkmode Button
 CTkButton(frame,text = "☀ / ☾",command=canviar_apariencia, width = 20,fg_color =rep.main_color, hover_color=rep.inv_color).place(relx=1, rely=1, anchor="se")
 
 
 
-buttonlist1 = {}
 
-def crear_figura(selected_fig):
 
-    global buttonlist1
+def assaig_button_press(nom):
+    global croquis_in_use
+    global canvas2
+
+    if online:
+       updater.start()
+    croquis_in_use = assaig[nom]["Croquis"]
+    figura = assaig[nom]["Figura"]
+    taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
+    canvas2.delete("all")
+    fer_dibuix(figura.coordenades, croquis_in_use, figura.centraor())
+    namer.delete(0, "end")
+    namer.configure(placeholder_text=croquis_in_use["Nom"])
+    taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
+    taula_name.configure(text="Id: " + croquis_in_use["Nom"])
+    pass
+
+def inicialitzar_figura(selected_fig, downloading = False):
+
+
+    global assaig
+    global croquis_in_use
+    global croquis_loading
+    if online:
+        print("parant updater")
+        updater.stop()
     repertori_label.set("Afegir figura")    #Restaura combobox
         #Activa "namer"
     namer.configure(state="normal")
     namer_button.configure(state="normal")
     counter = 1    #contador per a numerar el nom genèric de la figura creada
     for figura in assaig.keys():
-        if selected_fig in assaig[figura]["Figura"]:
+        if selected_fig in assaig[figura]["Croquis"]["Figura"]:
             counter += 1
-        #Demana nom al user
-    dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura", placeholder_text = str(selected_fig) + str(counter))
-    answer = dialog_nom.get_input()
-        #Comprovació: noms repetits
-    if answer in assaig.keys():
-        alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
-                               message="Ja hi ha una figura en aquest nom, estàs segur que vols sobreescriure-la?",
-                               option_1= "Sobreescriu",
-                               option_2 = "Cancelar" )
-        if alerta.get() == "Sobreescriu":
-            buttonlist1[answer].destroy()
-        if alerta.get() == "Cancelar":
-            return
-    #busca quin ESQUEMA conté el NOM selected_fig
-    for figura in rep.repertori.values():
-        global croquis_in_use
-        coordenades = []
-        corrector = ()
-        if selected_fig == figura.nom:
-            coordenades = figura.coordenades
-            corrector = figura.centraor()
-            if answer != "" :
-                croquis_in_use = f.fer_croquis(figura, answer)
-            else:
-                croquis_in_use = f.fer_croquis(figura, str(selected_fig) +" "+ str(counter))
-            break
+    if not downloading:
+            #Demana nom al user
+        dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura", placeholder_text = str(selected_fig) + str(counter))
+        answer = dialog_nom.get_input()
+            #Comprovació: noms repetits
+        if answer in assaig.keys():
+            alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
+                                   message="Ja hi ha una figura en aquest nom, estàs segur que vols sobreescriure-la?",
+                                   option_1= "Sobreescriu",
+                                   option_2 = "Cancelar" )
+            if alerta.get() == "Sobreescriu":
+                assaig[answer]["Butó"].destroy()
+                del assaig[answer]
+            if alerta.get() == "Cancelar":
+                return
+        #busca quin ESQUEMA conté el NOM selected_fig
+        for figura in rep.repertori.values():
+            if selected_fig == figura.nom:
+                if answer != "" :
+                    croquis_in_use = f.fer_croquis(figura, answer)
+                else:
+                    croquis_in_use = f.fer_croquis(figura, str(selected_fig) +" "+ str(counter))
 
+                break
+    else:
+        croquis_in_use = croquis_loading
+    for figura in rep.repertori.values():
+        if selected_fig == figura.nom:
+            figura_in_use = figura
     canvas2.delete("all")
-    assaig.update({croquis_in_use["Nom"]: croquis_in_use})
 
     if online:
-        drive.sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
-        drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
+        updater.stop()
+        try:
+            drive.sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
+            drive.sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
+        except:
+            pass
+        updater.start()
 
 
-    def assaig_button_press(nom):
-        global croquis_in_use
-        global canvas2
 
-        if online:
-            Interval(5, up_to_date).start()
-        croquis_in_use = assaig[nom]
-        taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
-        canvas2.delete("all")
-
-        fer_dibuix(coordenades, croquis_in_use, corrector)
-        namer.delete(0, "end")
-        namer.configure(placeholder_text=croquis_in_use["Nom"])
-        taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
-        taula_name.configure(text="Id: " + croquis_in_use["Nom"])
-        pass
-    assaig_button_press(croquis_in_use["Nom"])
 
     button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
                                      command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
                                      fg_color = rep.main_color,hover_color=rep.inv_color, font = ("Arial", 14,"bold"))
     button._text_label.place(x=0, rely = 0.5, anchor = "w")
     button.pack(pady=5)
-    buttonlist1.update({croquis_in_use["Nom"]: button})
+    """"""
+    figura = rep.repertori2[croquis_in_use["Figura"]]
+    assaig.update({croquis_in_use["Nom"]: {"Figura":figura, "Croquis":croquis_in_use,"Butó":button} })
+    """"""
+    if not downloading:
+        assaig_button_press(croquis_in_use["Nom"])
+
     return croquis_in_use
 
 repertori_label = customtkinter.CTkComboBox(frame,
                                             fg_color=rep.main_color, button_color=rep.main_color, button_hover_color=rep.inv_color, corner_radius=5, font=("Liberation Sans",16, "bold"), border_width= 0,
                                             values = [i.nom for i in rep.repertori.values()],
-                                            command = crear_figura)
+                                            command = inicialitzar_figura)
 repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
@@ -224,12 +251,24 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
             sc = 1
 
         try:
-            if coord[1] >= sc:
-                orientation = math.degrees(math.atan(coord[0] / (coord[1]-sc)))
-            elif coord[1] <= -sc:
-                orientation = math.degrees(math.atan(coord[0] / (coord[1]+sc)))
-            else:
+            if coord[1] > sc:
+                # orientation = math.degrees(math.atan(coord[0] / (coord[1]-sc)))
                 orientation = math.degrees(math.atan(coord[0] / (coord[1])))
+                coord = [coord[0],coord[1]+sc]
+            elif coord[1] < -sc:
+                # orientation = math.degrees(math.atan(coord[0] / (coord[1]+sc)))
+                orientation = math.degrees(math.atan(coord[0] / (coord[1])))
+                coord = [coord[0], coord[1] - sc]
+
+            elif sc >= coord[1] >= -sc:
+                if coord[0] > 0:
+                    orientation = 90
+                if coord[0] < 0:
+                    orientation = -90
+                if coord[0] == 0:
+                    orientation = 0
+
+
         except:
             if coord[0] > 0:
                 orientation = 90
@@ -246,7 +285,7 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
 
 
         xivato = CanvasText(root, canvas2,
-                              i, listadecoordenades[counter],corrector,
+                              i, coord,corrector,
                               membre.working_list, taula, croquiss, membre.taula_mestra,
                               interval = updater,
                               orientation = -orientation,
@@ -297,9 +336,7 @@ A l'apartat repertori es genera 1 buttó per cada figura al diccionari "repertor
 #NOM FIGURA
 namer = customtkinter.CTkEntry(croquis_frame, placeholder_text="Nom de Figura-X", font=("Liberation Sans", 16, "bold"), state="disabled")
 def actualitzar_nom_figura():
-    buttonlist1[croquis_in_use["Nom"]].configure(text=namer.get())
-    buttonlist1.update({namer.get(): buttonlist1[croquis_in_use["Nom"]]})
-    del buttonlist1[croquis_in_use["Nom"]]
+    assaig[croquis_in_use["Nom"]]["Butó"].configure(text=namer.get())
     croquis_in_use["Nom"] = namer.get()
 
 
@@ -401,66 +438,24 @@ button_expand2.place(rely = 0.5, relx = .995, anchor="e")
 #Conexió on startup
 
 
-def carregar_figura(croquis):
-
-    def assaig_button_press(nom):
-        global updater
-        updater.start()
-        global croquis_in_use
-        global canvas2
-        croquis_in_use = assaig[nom]
-
-        taula.update_values(f.croquis_to_table(croquis_in_use, membre.taula_mestra))
-        for i in taula.get_column(1)[1:]:
-            if i == "N. A.":
-                continue
-            try:
-                taula.insert(list(croquis_in_use.values()).index(i) - 1, 2,
-                              membre.taula_mestra.loc[membre.taula_mestra["Nom"] == i].iloc[0, 1])
-            except:
-                pass
-        canvas2.delete("all")
-        fer_dibuix(coordenades, croquis_in_use, corrector)
-        namer.delete(0, "end")
-        namer.configure(placeholder_text=croquis_in_use["Nom"])
-        taula_namefig.configure(text="Figura: " + croquis_in_use["Figura"])
-        taula_name.configure(text="Id: " + croquis_in_use["Nom"])
-        pass
-    namer.configure(placeholder_text=croquis_in_use["Nom"])
-    coordenades = rep.repertori2[croquis_in_use["Figura"]].coordenades
-    corrector = rep.repertori2[croquis_in_use["Figura"]].centraor()
-
-
-    button = customtkinter.CTkButton(repertori_frame, text=croquis_in_use["Nom"],
-                                     command=lambda nom = croquis_in_use["Nom"]:assaig_button_press(nom),
-                                     fg_color = rep.main_color,hover_color=rep.inv_color, font = ("Arial", 14,"bold"))
-    button._text_label.place(x=0, rely = 0.5, anchor = "w")
-    button.pack(pady=5)
-    buttonlist1.update({croquis_in_use["Nom"]: button})
-
-
 
 def up_to_date():
-
     print("run")
     global assaig
     global croquis_in_use
-
     worksheet_list = drive.sheet.worksheets()[1:]
     named_worksheet_list = [str(i).split("'")[1] for i in worksheet_list]
-
     if len(worksheet_list) != len(assaig):
-        print("canvi en el numero de figuras")
-        for i in buttonlist1:
+        for i in assaig:
             if i not in named_worksheet_list:
-                buttonlist1[i].destroy()
+                assaig[i]["Butó"].destroy()
                 del assaig[i]
         for i in named_worksheet_list:
             if i not in assaig:
                 croquis_cloud = drive.sheet.get_worksheet(named_worksheet_list.index(i) + 1).get_all_records()[0]
-                assaig.update({croquis_cloud["Nom"]: croquis_cloud})
-                croquis_in_use = croquis_cloud
-                carregar_figura(croquis_cloud)
+                inicialitzar_figura(croquis_cloud["Figura"],downloading=True)
+
+
 
 
     for i in range(len(named_worksheet_list)):
@@ -482,17 +477,20 @@ def up_to_date():
                     taula.insert(target_ID -1, 1, target_data[1])
                     taula.insert(target_ID -1, 2,
                                       membre.taula_mestra.loc[membre.taula_mestra["Nom"] == target_data[1]].iloc[0, 1])
-                assaig.update({croquis_in_use["Nom"]: croquis_in_use})
+                assaig[croquis_in_use["Nom"]].update({"Croquis": croquis_in_use})
 
 if online:
     updater = Interval(5, up_to_date)
-    for i in range(len(drive.sheet.worksheets()[1:])):
+    worksheet_list = drive.sheet.worksheets()[1:]
+    named_worksheet_list = [str(i).split("'")[1] for i in worksheet_list]
+    for i in worksheet_list:
         try:
-            croquis_in_use = drive.sheet.get_worksheet(i + 1).get_all_records()[0]
+            croquis_loading = i.get_all_records()[0]
+            inicialitzar_figura(croquis_loading["Figura"], downloading = True)
+
         except:
-            drive.sheet.del_worksheet(drive.sheet.get_worksheet(i + 1))
-        assaig.update({croquis_in_use["Nom"]: croquis_in_use})
-        carregar_figura(croquis_in_use)
+             drive.sheet.del_worksheet(i)
+
 
 else:
     updater = None

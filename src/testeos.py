@@ -1,11 +1,4 @@
-a = [(0,0),(6,0),(8,0),(7, 0.5),(7, 1.5),(-2,0),(2,0),(-3,0),(3,0),(-4,0),(4,0),(0,1),(0,-1),(0,2),(0,-2),(0,3),(0,-3),(-1,1),(1,1),(1,-1),(-1,-1),(-2,2),(2,2),(2,-2),(-2,-2),(7,-3),(-1,0),(1,0)]
-b = []
-for i in a:
-    b.append((i[0]+4,i[1]+3))
-print(b)
-import Figures as fig
-
-posicions = [i.capitalize() for i in vars(fig.figuereta).keys()]
-print(posicions)
-
-a = [(-1,-1),(-1,1),(1,1),(1,-1)(0,-0.5),(-0.5,0.5),(0.5,0.5),(0,0)]
+a = {"hi":{"croquis":"im croquis","figura":"this figura","button":"this button"}}
+a.update({"HI":{"croquis":"IM CROQUIS","figura":"THIS FIGURA","button":"THIS BUTTON"}})
+for i in list(a.values()):
+    print(i["figura"])

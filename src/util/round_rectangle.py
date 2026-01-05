@@ -6,7 +6,7 @@ def round_rectangle_AA(parent, x,y,width=50,height=20,radius=5, angle = 0,outlin
     y1 = y-height/2
     y2 = y+height/2
     angle = math.radians(angle)
-    outline2 = "#222222"
+    outline2 = ""
     if border_width == 0:
         outline = ""
         outline2 = ""

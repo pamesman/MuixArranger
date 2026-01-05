@@ -218,8 +218,10 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
         coord = listadecoordenades[counter]
 
         sc = -0
-        if croquiss["Figura"] == "Marieta":
+        if croquiss["Figura"] in ["Marieta"]:
             sc = 0.5
+        if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó"]:
+            sc = 1
 
         try:
             if coord[1] >= sc:
@@ -238,10 +240,12 @@ def fer_dibuix(listadecoordenades:list, croquiss:dict, corrector: tuple):
 
         if i.split(" ")[0] in ["Xicalla","Alsadora"]:
             orientation = 0
+        if croquiss["Figura"] == "Encontre" and i.split(" ")[0] in "Base":
+            orientation = 0
 
 
 
-        CanvasText(root, canvas2,
+        xivato = CanvasText(root, canvas2,
                               i, listadecoordenades[counter],corrector,
                               membre.working_list, taula, croquiss, membre.taula_mestra,
                               interval = updater,
@@ -338,6 +342,8 @@ def minimizar2():
             expand_is_on2 = False
 
 def minimizar():
+    global xivato
+    print(xivato.croquis_en_us)
     global expand_is_on
     global expand_is_on2
     if not expand_is_on:
@@ -436,19 +442,13 @@ def carregar_figura(croquis):
 
 def up_to_date():
 
-
+    print("run")
     global assaig
     global croquis_in_use
-    # if previous_croquis != croquis_in_use:
-    #
-    #     print(delta)
-    #     try:
-    #         drive.sheet.worksheet(croquis_in_use["Nom"]).update_cell(2, list(croquis_in_use.values()).index(delta)+1,  value=delta)
-    #     except:
-    #         print("mistake was sucedido")
+
     worksheet_list = drive.sheet.worksheets()[1:]
     named_worksheet_list = [str(i).split("'")[1] for i in worksheet_list]
-    print(named_worksheet_list)
+
     if len(worksheet_list) != len(assaig):
         print("canvi en el numero de figuras")
         for i in buttonlist1:
@@ -487,7 +487,10 @@ def up_to_date():
 if online:
     updater = Interval(5, up_to_date)
     for i in range(len(drive.sheet.worksheets()[1:])):
-        croquis_in_use = drive.sheet.get_worksheet(i + 1).get_all_records()[0]
+        try:
+            croquis_in_use = drive.sheet.get_worksheet(i + 1).get_all_records()[0]
+        except:
+            drive.sheet.del_worksheet(drive.sheet.get_worksheet(i + 1))
         assaig.update({croquis_in_use["Nom"]: croquis_in_use})
         carregar_figura(croquis_in_use)
 

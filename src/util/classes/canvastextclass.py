@@ -9,13 +9,23 @@ from src.API import credential_managing as drive
 
 class CanvasText(CTkBaseClass):
 
-    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None ,orientation= 0,color = "White", text_size = 10, list_len = 10):
+    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None ,orientation= 0,color = "White", text_size = 11, list_len = 10):
         self.master = parent
         super().__init__(master = parent)
         self.window = window
         self.parent = parent
-        self.text = text
-
+        self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
+        if croquis_en_us[text].strip() == "N. A.":  # si no hi ha algu seleccionat
+            self.text = text
+            self.text_color = "#AAAAAA"
+            self.color = ""
+            self.outline = self._apply_appearance_mode(color)
+        else:
+            self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
+            self.text_color = "black"
+            self.color = self._apply_appearance_mode(color)
+            self.outline = ""
+        self.color2 = color
         self.location = location
         self.corrector = corrector
         self.orientation = orientation
@@ -25,18 +35,12 @@ class CanvasText(CTkBaseClass):
         self.taula = taula
         self.croquis_en_us = croquis_en_us
         self.dataframe = dataframe
+        self.position = text
         self.interval = interval
-        self.color = color
-        self.higlight_color = (color[1],color[0])
+        self.highlight_color = (color[1], color[0])
         self.text_size = text_size
         self.list_len = list_len
-        self.chosen = str
-        if self.croquis_en_us[text].strip() != "N. A.":
-            self.text = self.croquis_en_us[text][:len(self.croquis_en_us[text].split(" ")[0])+2]
-        if self.text in self.croquis_en_us.values():
-            self.position = list(self.croquis_en_us.keys())[list(self.croquis_en_us.values()).index(self.text)]
-        else:
-            self.position = self.text
+
         self.window_x = self.window.winfo_rootx()
         self.window_y = self.window.winfo_rooty()
         self.entry_width = 100
@@ -45,21 +49,23 @@ class CanvasText(CTkBaseClass):
         self.canvas_width = self.parent.winfo_screenwidth()
         self.canvas_height = self.parent.winfo_screenheight()
         self.tag_width = 70
-        if self.text.split(" ")[0] in ["Tap","Peu"]:
+        if self.position.split(" ")[0] in ["Tap","Peu"]:
             self.tag_width = 45
 
         self.span = (self.corrector[0][0]-self.corrector[0][1], self.corrector[1][0]-self.corrector[1][1])
         self.center = ((self.corrector[0][0]+self.corrector[0][1])/2,(self.corrector[1][0]+self.corrector[1][1])/2)
 
         self.x = self.parent.winfo_width()/2 + (self.location[0]-self.center[0])*self.parent.winfo_width()/20
-        self.y = self.parent.winfo_height()/2 - (self.location[1]-self.center[1])*self.parent.winfo_height()/20
+        self.y = self.parent.winfo_height()/2 - (self.location[1]-self.center[1])*self.parent.winfo_height()/18
+
+        self.toggle = False
 
 
-        self.txt = self.parent.create_text(self.x, self.y, angle = self.orientation,text=self.text, font=("Arial", self.text_size,"bold"), fill = "black", tags = (self.text.split(" ")[0], self.position, "etiqueta", self.croquis_en_us["Nom"]))
+        self.txt = self.parent.create_text(self.x, self.y, angle = self.orientation,text=self.text, font=("Arial", self.text_size,"bold"), fill = self.text_color, tags = (self.text.split(" ")[0], self.position, "etiqueta", self.croquis_en_us["Nom"]))
         self.entry = customtkinter.CTkEntry(self.parent, width=self.entry_width)
 
         self.rectangle_fix = [(self.tag_width ** 2 + 20 ** 2) ** 0.5 * i * 0.5 for i in [math.cos(math.atan(20 / self.tag_width) - math.radians(self.orientation)),math.sin(math.atan(20 / self.tag_width) - math.radians(self.orientation))]]
-
+        self.rectangle_fix = [0,0]
         self.scroll_count = 0
 
 
@@ -68,31 +74,24 @@ class CanvasText(CTkBaseClass):
         self.parent.tag_bind(self.txt, "<Enter>", self.on_focus)
         self.parent.tag_bind(self.txt, "<Leave>", self.on_defocus)
         self.parent.tag_bind(self.txt, "<Button-1>", self.on_click)
+        self.parent.tag_bind(self.txt, "<Button-3>", self.on_right_click)
 
-        self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self._apply_appearance_mode(self.color), border_width=0, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
+        self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self.color, outline = self.outline, border_width=1, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
 
 
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])
         if self.interval != None:
             self.interval.stop()
-        self.chosen = value
+        self.text= value
         for name in self.croquis_en_us.values():
             if self.text in name:
                 self.text = name
 
         if self.text not in self.croquis_en_us.keys():
-            self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.values()).index(self.text)]: value})
-            self.taula.insert((list(self.croquis_en_us.values()).index(value)) - 1, 1, value)
-            try:
-                self.taula.insert(list(self.croquis_en_us.values()).index(value) - 1, 2,
-                              self.dataframe.loc[self.dataframe["Nom"] == value].iloc[0, 1])
-            except:
-                pass
-        else:
-            self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.text)]: value})
-            self.taula.insert((list(self.croquis_en_us.keys()).index(self.text)) - 1, 1, value)
-            self.taula.insert(list(self.croquis_en_us.keys()).index(self.text) - 1, 2,
+            self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.position)]: value})
+            self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, value)
+            self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2,
                               self.dataframe.loc[self.dataframe["Nom"] == value].iloc[0, 1])
 
 
@@ -101,20 +100,16 @@ class CanvasText(CTkBaseClass):
 
         self.parent.itemconfig(self.txt, text=value)
         counter = tkinter.StringVar()
+        self.parent.itemconfig(self.shape, outline = "", fill = "")
+        self.parent.itemconfig(self.txt, fill = "black")
+        print(self.croquis_en_us)
         if self.interval != None:
             self.interval.start()
             counter.trace_add("unset", self.drive_callback)
 
-
-
-
-
-
-
     def drive_callback(self, var, index, mode):
         try:
-            drive.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.text)+1,  value=self.chosen)
-
+            drive.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
         except:
             print("mistake was sucedido")
     def search_items(self, _event):
@@ -138,12 +133,12 @@ class CanvasText(CTkBaseClass):
         self.scroll_count -= 1
         self.ddm.configure(values=self.working_values[self.scroll_count:self.list_len + self.scroll_count])
         self.ddm.open(
-            x=self.parent.winfo_rootx() + self.parent.coords(self.text)[0] - self.entry_width / 2 + 5 +
+            x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width / 2 + 5 +
               self.rectangle_fix[0],
-            y=self.parent.winfo_rooty() + self.parent.coords(self.text)[1] + self.entry_height +
+            y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1] + self.entry_height +
               self.rectangle_fix[1])
-        self.entry.place(x=self.parent.coords(self.text)[0] + self.rectangle_fix[0],
-                         y=self.parent.coords(self.text)[1] + self.rectangle_fix[1], anchor="center")
+        self.entry.place(x=self.parent.coords(self.txt)[0] + self.rectangle_fix[0],
+                         y=self.parent.coords(self.txt)[1] + self.rectangle_fix[1], anchor="center")
 
         self.entry.focus_force()
         print("up")
@@ -157,14 +152,16 @@ class CanvasText(CTkBaseClass):
               self.rectangle_fix[0],
             y=self.parent.winfo_rooty() + self.parent.coords(self.text)[1] + self.entry_height +
               self.rectangle_fix[1])
-        self.entry.place(x=self.parent.coords(self.text)[0] + self.rectangle_fix[0],
-                         y=self.parent.coords(self.text)[1] + self.rectangle_fix[1], anchor="center")
+        self.entry.place(x=self.parent.coords(self.txt)[0] + self.rectangle_fix[0],
+                         y=self.parent.coords(self.txt)[1] + self.rectangle_fix[1], anchor="center")
 
         self.entry.focus_force()
 
     def on_click(self, _event):
+        if not self.toggle:
             self.working_values = list(set(self.values)^set(list(self.croquis_en_us.values())[2:]))
-            self.working_values.remove("N. A.")
+            if "N. A." in list(self.working_values):
+                self.working_values.remove("N. A.")
             self.working_values_heights = []
 
             try:
@@ -173,17 +170,11 @@ class CanvasText(CTkBaseClass):
                 pass
             self.ddm = DropdownMenu(master=self.parent, values=self.working_values[:self.list_len], command=self.insertar_membre)
 
-
-
-
-
-            self.entry.bind("<Button-5>", self.scroll_down)
-            self.entry.bind("<Button-4>", self.scroll_up)
             self.parent.update()
             self.window.update()
 
-            self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.text)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.text)[1]+ self.entry_height+self.rectangle_fix[1])
-            self.entry.place(x=self.parent.coords(self.text)[0]+self.rectangle_fix[0], y=self.parent.coords(self.text)[1]+self.rectangle_fix[1], anchor="center")
+            self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1]+ self.entry_height+self.rectangle_fix[1])
+            self.entry.place(x=self.parent.coords(self.txt)[0]+self.rectangle_fix[0], y=self.parent.coords(self.txt)[1]+self.rectangle_fix[1], anchor="center")
 
             self.entry.focus_set()
 
@@ -194,14 +185,26 @@ class CanvasText(CTkBaseClass):
             self.entry.bind("<FocusOut>", forget)
 
     def on_focus(self, _event):
-            self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.higlight_color))
-
+        if not self.toggle:
+            self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.highlight_color))
 
     def on_defocus(self, _event):
+        if not self.toggle:
+            if self.text != self.position:
+                self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.color2))
+                self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
+            else:
+                self.parent.itemconfig(self.shape, fill="")
+                self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
 
-            self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.color))
-            self.parent.itemconfig(self.txt, fill="black", font=("Arial", self.text_size,"bold"))
-
-
-
-
+    def on_right_click(self, _event):
+        if self.position.split(" ")[0] not in ["Base", "Segona", "Tercera", "Alsadora", "Xicalla", "Quarta"]:
+            if not self.toggle:
+                self.toggle = True
+                self.parent.itemconfig(self.shape, fill = "", outline = "")
+                self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+")
+                self.text = self.position
+            else:
+                self.parent.itemconfig(self.shape, fill="", outline=self._apply_appearance_mode(self.color2))
+                self.parent.itemconfig(self.txt, font=("Arial", self.text_size), text=self.position, fill = "#AAAAAA")
+                self.toggle = False

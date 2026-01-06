@@ -185,9 +185,7 @@ def inicialitzar_figura(selected_fig, downloading = False):
                 break
     else:
         croquis_in_use = croquis_loading
-    for figura in rep.repertori.values():
-        if selected_fig == figura.nom:
-            figura_in_use = figura
+
     canvas2.delete("all")
 
     if online:
@@ -467,7 +465,8 @@ def up_to_date():
                     target_ID = list(croquis_in_use.values()).index(change)
                     target_data = [list(croquis_in_use.keys())[target_ID],list(croquis_in_use.values())[target_ID]]
                     target_drawing =canvas2.find_withtag(target_data[0])
-                    canvas2.itemconfig(target_drawing[-1], text = target_data[1])
+                    canvas2.itemconfig(target_drawing[-1], text = target_data[1].upper())
+                    canvas2.itemconfig(target_drawing[0], fill = frame._apply_appearance_mode(rep.palette[list(croquis_in_use.keys())[target_ID]])   )
                     taula.insert(target_ID -1, 1, target_data[1])
                     taula.insert(target_ID -1, 2,
                                       membre.taula_mestra.loc[membre.taula_mestra["Nom"] == target_data[1]].iloc[0, 1])

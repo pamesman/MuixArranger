@@ -1,15 +1,17 @@
 import customtkinter
 import tkinter
 from customtkinter.windows.widgets.core_widget_classes import DropdownMenu, CTkBaseClass
-
+import CTkScrollableDropdown as CTkScrollableDropdown
+from src.membre import working_list
 from src.util.round_rectangle import round_rectangle_AA
 import math
 from src.API import credential_managing as drive
+from time import sleep
 
 
 class CanvasText(CTkBaseClass):
 
-    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None ,orientation= 0,color = "White", text_size = 11, list_len = 10):
+    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None ,orientation= 0,color = "White", text_size = 10, list_len = 10):
         self.master = parent
         super().__init__(master = parent)
         self.window = window
@@ -64,6 +66,12 @@ class CanvasText(CTkBaseClass):
 
         self.txt = self.parent.create_text(self.x, self.y, angle = self.orientation,text=self.text, font=("Arial", self.text_size,"bold"), fill = self.text_color, tags = (self.text.split(" ")[0], self.position, "etiqueta", self.croquis_en_us["Nom"]))
         self.entry = customtkinter.CTkEntry(self.parent, width=self.entry_width)
+        # Creating a Listbox and
+        # attaching it to root window
+        self.lb = tkinter.Listbox(self.parent, width=16 ,background="#2B2B2B", fg="#FFFFFF", bd= 0, relief="flat", activestyle="none", highlightthickness=0, justify="left" )
+        self.lb.bind("<Button-1>", self.insertar_membre)
+
+
 
         self.rectangle_fix = [(self.tag_width ** 2 + 20 ** 2) ** 0.5 * i * 0.5 for i in [math.cos(math.atan(20 / self.tag_width) - math.radians(self.orientation)),math.sin(math.atan(20 / self.tag_width) - math.radians(self.orientation))]]
         self.rectangle_fix = [0,0]
@@ -78,10 +86,13 @@ class CanvasText(CTkBaseClass):
         self.parent.tag_bind(self.txt, "<Button-3>", self.on_right_click)
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self.color, outline = self.outline, border_width=1, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
-        print(self.outline)
+
 
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])
+
+        value = self.lb.get(self.lb.nearest(value.y))
+
         if self.interval != None:
             self.interval.stop()
         self.text= value.title()
@@ -101,11 +112,12 @@ class CanvasText(CTkBaseClass):
 
         self.parent.itemconfig(self.txt, text=value)
         counter = tkinter.StringVar()
-        self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = "")
+        self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
         self.parent.itemconfig(self.txt, fill = "black")
         if self.interval != None:
             self.interval.start()
             counter.trace_add("unset", self.drive_callback)
+        self.forget()
 
     def drive_callback(self, var, index, mode):
         try:
@@ -118,6 +130,9 @@ class CanvasText(CTkBaseClass):
         self.entry.focus_force()
         if search_value == "" or search_value == " ":
             self.ddm.configure(values=self.working_values[:self.list_len])
+            self.lb.delete(0, "end")
+            for i in working_list:
+                self.lb.insert(0,i)
         else:
             value_to_display = []
             for value in self.working_values:
@@ -128,6 +143,9 @@ class CanvasText(CTkBaseClass):
             except:
                 pass
             self.ddm.configure(values=value_to_display[:self.list_len])
+            self.lb.delete(0, "end")
+            for i in value_to_display:
+                self.lb.insert(0,i)
 
     def scroll_up(self, _event):
         self.entry.focus_force()
@@ -159,10 +177,8 @@ class CanvasText(CTkBaseClass):
         self.entry.focus_force()
 
     def on_click(self, _event):
-        print(self.location)
         if not self.toggle:
             self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
-            print(self.working_values)
             if "N. A." in list(self.working_values):
                 self.working_values.remove("N. A.")
             self.working_values_heights = []
@@ -171,19 +187,50 @@ class CanvasText(CTkBaseClass):
                 self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'] == x].iloc[0, 1])
             except:
                 pass
-            self.ddm = DropdownMenu(master=self.parent, values=self.working_values[:self.list_len], command=self.insertar_membre)
 
+
+                # Adding Listbox to the left
+                # side of root window
+            self.lb.place(x=self.parent.coords(self.txt)[0]- self.entry_width/2, y=self.parent.coords(self.txt)[1]+ self.entry_height)
+
+            # Creating a Scrollbar and
+            # attaching it to root window
+            self.sb = tkinter.Scrollbar(self.parent)
+
+            # Adding Scrollbar to the right
+            # side of root window
+            #self.sb.place(x=self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 , y=self.parent.coords(self.txt)[1]+ self.entry_height)
+
+            # Insert elements into the listbox
+            for i in self.working_values:
+                self.lb.insert(0, i)
+
+            # Attaching Listbox to Scrollbar
+            # Since we need to have a vertical
+            # scroll we use yscrollcommand
+            self.lb.config(yscrollcommand=self.sb.set)
+
+            # setting scrollbar command parameter
+            # to listbox.yview method its yview because
+            # we need to have a vertical view
+
+
+
+            self.ddm = DropdownMenu(master=self.parent, values=self.working_values[:self.list_len], command=self.insertar_membre)
+            self.sb.config(command=self.lb.yview)
 
             self.parent.update()
             self.window.update()
 
-            self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1]+ self.entry_height+self.rectangle_fix[1])
+            #self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1]+ self.entry_height+self.rectangle_fix[1])
             self.entry.place(x=self.parent.coords(self.txt)[0]+self.rectangle_fix[0], y=self.parent.coords(self.txt)[1]+self.rectangle_fix[1], anchor="center")
 
             self.entry.focus_set()
 
             def forget(_event):
+                self.focus_get()
                 self.entry.place_forget()
+                self.lb.place_forget()
 
 
             self.entry.bind("<FocusOut>", forget)

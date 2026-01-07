@@ -1,21 +1,38 @@
+import os
+import sys
+
 import tkinter
 
 import customtkinter
 from PIL import Image
 from customtkinter import CTkButton
 import CTkMessagebox
+from screeninfo import get_monitors
 from src.util.classes import CTkTable
 
 
 from src.util import repertori as rep
 import src.util.funcs as f
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 #estableix parent window
-image=customtkinter.CTkImage(light_image=Image.open("icon.png"))
+image=customtkinter.CTkImage(light_image=Image.open(resource_path("icon.png")))
 root = customtkinter.CTk()
-root.geometry("1280x720")
-root.iconphoto(False,tkinter.PhotoImage(file="icon.png"))
-root.title("Crokiss")
+for monitor in get_monitors():
+   m = monitor
+root.geometry(str(m.width) + "x" + str(m.height))
+
+root.wm_attributes("-fullscreen",False)
+
+root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.png")))
+root.title("MuixArranger")
 customtkinter.set_appearance_mode("dark") #set theme
 
 tabview = customtkinter.CTkTabview(master=root)

@@ -1,18 +1,26 @@
 import io
+import os
+import sys
 
 import pandas as pd
 
 from src.API.drive import download_file
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
 
+    return os.path.join(base_path, relative_path)
 
 def carregar_assistencia(id_membres, id_assistents):
     try:
         database = pd.read_excel(io.BytesIO(download_file(real_file_id=id_membres)))
         assistents = pd.read_excel(io.BytesIO(download_file(id_assistents)))
     except:
-        id_membres = "/home/paco/Desktop/100personas.ods"
-        id_assistents = "/home/paco/Desktop/asistentes.ods"
+        id_membres = resource_path("100personas.ods")
+        id_assistents = resource_path("asistentes.ods")
         database = pd.read_excel(id_membres)
         assistents= pd.read_excel(id_assistents)
     taula_mestra = pd.DataFrame([],columns=["Nom","Muscle","Alçada","Braç","Posició"])

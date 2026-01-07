@@ -15,6 +15,9 @@ from src.API.credential_managing import spreadsheet_connection
 import config_reader
 
 
+
+
+
 assaig = {}
 croquis_in_use = {}
 croquis_loading = {}

@@ -1,7 +1,7 @@
 import customtkinter
 from customtkinter.windows.widgets.core_widget_classes import CTkBaseClass
 import tkinter
-from src.util.round_rectangle import round_rectangle_AA
+from src.util.classes.round_rectangle import round_rectangle_AA
 import math
 
 

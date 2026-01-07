@@ -1,14 +1,24 @@
+import os
+import sys
+
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import gspread
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 scopes = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
-creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+creds = Credentials.from_service_account_file(resource_path("credentials.json"), scopes=scopes)
 client = gspread.authorize(creds)
 
 

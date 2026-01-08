@@ -23,15 +23,16 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 #estableix parent window
-image=customtkinter.CTkImage(light_image=Image.open(resource_path("icon.png")))
+# image=customtkinter.CTkImage(light_image=Image.open(resource_path("icon.ico")))
 root = customtkinter.CTk()
 for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
 
-root.wm_attributes("-fullscreen",False)
+root.wm_attributes("-fullscreen",True)
 
-root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.png")))
+# root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.ico")))
+root.after(201, lambda :root.iconbitmap(resource_path('icon.ico')))
 root.title("MuixArranger")
 customtkinter.set_appearance_mode("dark") #set theme
 

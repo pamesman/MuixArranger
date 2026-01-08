@@ -28,6 +28,8 @@ taula_pack = []
 expand_is_on = False
 expand_is_on2 = False
 online = False
+updater = None
+sheet = None
 
 assistents_id, membres_id, sheet_id  = config_reader.get_config()
 working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
@@ -220,7 +222,7 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
             counter += 1
     if not downloading:
             #Demana nom al user
-        dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura", placeholder_text = str(selected_fig) + str(counter))
+        dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura")
         answer = dialog_nom.get_input()
         if answer == None:
             return

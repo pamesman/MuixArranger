@@ -29,8 +29,6 @@ for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
 
-root.wm_attributes("-fullscreen",True)
-
 # root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.ico")))
 root.after(201, lambda :root.iconbitmap(resource_path('icon.ico')))
 root.title("MuixArranger")

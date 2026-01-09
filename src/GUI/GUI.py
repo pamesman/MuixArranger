@@ -2,9 +2,9 @@ import os
 import sys
 
 import tkinter
-
+from time import sleep
 import customtkinter
-from PIL import Image
+from PIL import Image, ImageTk
 from customtkinter import CTkButton
 import CTkMessagebox
 from screeninfo import get_monitors
@@ -24,18 +24,33 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+
+
 #estableix parent window
-image=customtkinter.CTkImage(light_image=Image.open(resource_path("icon.png")))
 root = customtkinter.CTk()
 for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
-
-root.wm_attributes("-fullscreen",False)
-
 root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.png")))
 root.title("MuixArranger")
 customtkinter.set_appearance_mode("dark") #set theme
+
+#splash screen
+splash = tkinter.Toplevel()
+# splash.overrideredirect(True)   #borra titlebar
+# splash.geometry('%dx%d+%d+%d' % (858,300,m.width/2-411.5,m.height/3-150))
+# splash.attributes('-alpha', 0)
+# pic = Image.open(resource_path("banner.png"))
+# pic = pic.resize((858,300))
+# pic = ImageTk.PhotoImage(pic)
+# banner = tkinter.Label(splash, image = pic)
+# banner.pack()
+#
+
+
+root.wm_attributes("-fullscreen",False)
+
+
 
 tabview = customtkinter.CTkTabview(master=root)
 tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
@@ -72,6 +87,9 @@ namer_button = customtkinter.CTkButton(croquis_frame, text="Actualitzar nom", fo
 namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 namer.place(relx=0.01, rely=0.01, relwidth=0.4)
 
+deleter = customtkinter.CTkButton(croquis_frame, text="Eliminar figura", font=("Liberation Sans", 14, "bold"), height= 28, command= lambda x=canvas2 : f.eliminar_figura(x), state="disabled", fg_color = rep.main_color, hover_color=rep.inv_color)
+deleter.place(relx = 0.88,rely = 0.01,  anchor= "nw")
+
 #TAULA
 taula_frame = customtkinter.CTkScrollableFrame(frame)
 taula_frame.place(relx = .79, rely = .5, anchor = "w", relheight = .98, relwidth = 0.2)
@@ -81,7 +99,7 @@ taula_namefig = customtkinter.CTkLabel(taula_frame, text = "")
 taula_name.pack()
 taula_namefig.pack()
 taula.pack(expand = True,  pady = 20)
-taula_pack = [taula, taula_name, taula_namefig, namer, namer_button]
+taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter]
 f.pass_variable(taula_pack)
 
 #Darkmode Button
@@ -96,8 +114,9 @@ connection = CTkMessagebox.CTkMessagebox(title="Connectivitat",
                                option_2 = "Offline" )
 if connection.get() == "Online":
     online = True
-    f.connect(repertori_label, repertori_frame, canvas2)
-
+    f.connect(repertori_label, repertori_frame, canvas2, splash)
+else:
+    splash.after(3000, splash.destroy)
 #botó per expandir croquis zone
 button_expand = customtkinter.CTkButton(croquis_frame,
                                         text = "<",
@@ -118,5 +137,6 @@ button_expand2 = customtkinter.CTkButton(croquis_frame,
 button_expand2.configure(command = lambda x = button_expand2: f.minimizar2(x, croquis_frame, taula_frame))
 button_expand.place(rely = 0.5, relx = .005, anchor="w")
 button_expand2.place(rely = 0.5, relx = .995, anchor="e")
-
 root.mainloop()
+
+

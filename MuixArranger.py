@@ -1,1 +1,2 @@
-import src.GUI.GUI
+import src.GUI.GUI as GUI
+

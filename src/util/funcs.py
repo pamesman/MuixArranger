@@ -32,18 +32,31 @@ updater = None
 sheet = None
 
 assistents_id, membres_id, sheet_id  = config_reader.get_config()
+config_changed = True
+unchanged_nagger = []
 working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
 
 
-
+if assistents_id == "1nMrNL_sKmcuHPmbOImELO9qfEAAmiFVmukd3PQ3xjNg":
+    config_changed = False
+    unchanged_nagger.append("id_assistents")
+if membres_id == "1aGMczw57F5TkF5QNUm-LzcHNTOnLS3F0KY9R4pQk_SE":
+    config_changed = False
+    unchanged_nagger.append("id_membres")
+if sheet_id == "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs":
+    config_changed = False
+    unchanged_nagger.append("id_assaig")
+if sheet_id == "1KJrjm34obf6L2BtFBC8WsB2rVpQMFcusIDVeTMu5MmU":
+    config_changed = False
+    unchanged_nagger.append("id_assaig")
 
 def pass_variable (anything):
     global taula_pack
     taula_pack = anything
 
 
-def connect(combobox, button_frame, canvas):
+def connect(combobox, button_frame, canvas, splash):
     global updater
     global croquis_loading
     global sheet
@@ -65,7 +78,14 @@ def connect(combobox, button_frame, canvas):
         except:
             sheet.del_worksheet(i)
     updater = Interval(1, lambda x=combobox: up_to_date(combobox, button_frame, canvas))
-    # updater.start()
+    splash.destroy()
+    if not config_changed:
+        nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
+                                             message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
+                                             option_1="Ok",
+                                             option_2="Ok, pesat")
+
+    updater.start()
 
 def fer_croquis(figura: Esquema,nom: str):
     """
@@ -99,7 +119,7 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
     canvas.delete("all")
 
 
-    taula_pack[0].update_values(croquis_to_table(croquis_in_use, taula_mestra))
+
     taula_pack[3].delete(0, "end")
     taula_pack[3].configure(placeholder_text=croquis_in_use["Nom"])
     taula_pack[2].configure(text="Figura: " + croquis_in_use["Figura"])
@@ -197,10 +217,15 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
 def assaig_button_press(nom, canvas, assaig):
     global croquis_in_use
     global taula_pack
+
     croquis_in_use = assaig[nom]["Croquis"]
     figura = assaig[nom]["Figura"]
     fer_dibuix(canvas, figura.coordenades, croquis_in_use, figura.centraor())
-
+    taula_pack[0].update_values(croquis_to_table(croquis_in_use, taula_mestra))
+    #Activa "namer"
+    taula_pack[3].configure(state="normal")
+    taula_pack[4].configure(state="normal")
+    taula_pack[5].configure(state="normal")
 
 def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, online = False, downloading = False):
     global assaig
@@ -213,9 +238,6 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
         except:
             pass
     combobox_to_reset.set("Afegir figura")    #Restaura combobox
-        #Activa "namer"
-    taula_pack[3].configure(state="normal")
-    taula_pack[4].configure(state="normal")
     counter = 1    #contador per a numerar el nom genèric de la figura creada
     for figura in assaig.keys():
         if selected_fig in assaig[figura]["Croquis"]["Figura"]:
@@ -271,6 +293,29 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
         assaig_button_press(croquis_in_use["Nom"], canvas= canvas, assaig= assaig)
 
     return croquis_in_use
+
+def eliminar_figura(canvas):
+    global assaig
+    global croquis_in_use
+    global sheet
+    global taula_pack
+    alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
+                                         message="Estas segur que vols borrar la figura?",
+                                         option_1="Eliminar",
+                                         option_2="Cancelar")
+
+    if alerta.get() == "Cancelar":
+        return
+    if alerta.get() == "Sobreescriu":
+        assaig[croquis_in_use["Nom"]]["Butó"].destroy()
+        del assaig[croquis_in_use["Nom"]]
+
+        taula_pack[0].update_values([[0,0,0]])
+        taula_pack[2].configure(text="Figura: ")
+        taula_pack[1].configure(text="Id: ")
+        if online:
+            sheet.del_worksheet(sheet.worksheet(croquis_in_use["Nom"]))
+        canvas.delete("all")
 
 def actualitzar_nom_figura():
     global taula_pack

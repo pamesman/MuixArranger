@@ -31,6 +31,7 @@ root = customtkinter.CTk()
 for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
+root.geometry("+0+0")
 root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.png")))
 root.title("MuixArranger")
 customtkinter.set_appearance_mode("dark") #set theme
@@ -39,15 +40,11 @@ customtkinter.set_appearance_mode("dark") #set theme
 splash = tkinter.Toplevel()
 
 splash.overrideredirect(True)   #borra titlebar
-splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-411.5,m.height/3-150))
+splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-450,m.height/3-150))
 
 splash.wm_attributes("-topmost", True)
 splash.wm_attributes("-disabled", True)
 splash.wm_attributes("-transparentcolor", "white")
-
-pic = Image.open(resource_path("banner.png"))
-
-pic = pic.resize((858,300))
 
 pic = ImageTk.PhotoImage(file = resource_path("banner.png"))
 

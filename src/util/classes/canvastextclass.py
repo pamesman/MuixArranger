@@ -175,6 +175,9 @@ class CanvasText(CTkBaseClass):
             self.lb.config(yscrollcommand=self.sb.set)
             self.sb.config(command=self.lb.yview)
 
+            print(_event.x, ",", _event.y)
+            print(self.parent.coords(self.txt)[0], ",", self.parent.coords(self.txt)[1])
+            print(self.parent.coords(self.txt)[0]- self.entry_width/2+2, ",", self.parent.coords(self.txt)[1]+ self.entry_height-5)
 
             #self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1]+ self.entry_height+self.rectangle_fix[1])
             self.entry.place(x=self.parent.coords(self.txt)[0], y=self.parent.coords(self.txt)[1], anchor="center")

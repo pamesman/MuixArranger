@@ -2,7 +2,6 @@ import customtkinter
 from customtkinter.windows.widgets.core_widget_classes import CTkBaseClass
 import tkinter
 from src.util.classes.round_rectangle import round_rectangle_AA
-import math
 
 
 class CanvasText(CTkBaseClass):
@@ -13,17 +12,11 @@ class CanvasText(CTkBaseClass):
         self.parent = parent
         self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
         self.toggle = False
-        if croquis_en_us[text].strip() == "N. A.":  # si no hi ha algu seleccionat
+        if croquis_en_us[text].strip() == "N. A." or croquis_en_us[text].strip() == "+":  # si no hi ha algu seleccionat
             self.text = text
             self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
             self.color = ""
             self.outline = self._apply_appearance_mode(color)
-        elif croquis_en_us[text].strip() == "+":  # si s'ha amagat
-            self.text = text
-            self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
-            self.color = ""
-            self.outline = ""
-            self.toggle = True
         else:
             self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2].upper()
             self.text_color = "black"
@@ -58,6 +51,8 @@ class CanvasText(CTkBaseClass):
             self.tag_width = 45
             self.text = self.text.split(" ")[0]
 
+
+
         self.span = (self.corrector[0][0]-self.corrector[0][1], self.corrector[1][0]-self.corrector[1][1])
         self.center = ((self.corrector[0][0]+self.corrector[0][1])/2,(self.corrector[1][0]+self.corrector[1][1])/2)
 
@@ -89,6 +84,12 @@ class CanvasText(CTkBaseClass):
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self.color, outline = self.outline, border_width=1, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
 
+        if self.croquis_en_us[self.position] == "+":
+            self.toggle = True
+            self.parent.itemconfig(self.shape, fill="", outline="")
+            self.parent.itemconfig(self.txt, font=("Arial", 14), text="+")
+            self.croquis_en_us[self.position] = "+"
+            self.text = self.position
 
     def insertar_membre(self, value):
         # value = " ".join(value.split(" ")[:-1])
@@ -117,6 +118,7 @@ class CanvasText(CTkBaseClass):
         counter = tkinter.StringVar()
         self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
         self.parent.itemconfig(self.txt, fill = "black")
+        print(self.croquis_en_us["Nom"], "\n", self.position, ": ", self.text)
         if self.interval != None:
             self.drive_callback()
             self.interval.start()
@@ -124,7 +126,6 @@ class CanvasText(CTkBaseClass):
 
     def drive_callback(self):
         try:
-            print("acutalitzant")
             self.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
         except:
             print("mistake was sucedido")
@@ -141,7 +142,6 @@ class CanvasText(CTkBaseClass):
                 pass
             for i in self.working_values:
                 self.lb.insert("end",i)
-            print(self.working_values)
             self.lb.insert("end", self.textvar.get())
         else:
             value_to_display = []
@@ -208,8 +208,11 @@ class CanvasText(CTkBaseClass):
                 self.toggle = True
                 self.parent.itemconfig(self.shape, fill = "", outline = "")
                 self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+")
+                self.croquis_en_us[self.position] = "+"
                 self.text = self.position
             else:
                 self.parent.itemconfig(self.shape, fill="", outline=self._apply_appearance_mode(self.color2))
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size), text=self.position, fill = "#AAAAAA")
+                self.croquis_en_us[self.position] = "N. A."
                 self.toggle = False
+

@@ -273,7 +273,7 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
 
     if online:
         try:
-            sheet.add_worksheet(title = croquis_in_use["Nom"], cols = len(croquis_in_use.keys()) ,rows=5)
+            sheet.add_worksheet(title = croquis_in_use["Nom"], cols = 150 ,rows=5)
             sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
         except:
             pass
@@ -392,8 +392,6 @@ def up_to_date(combobox_to_reset, button_frame, canvas):
     global taula_pack
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
     figures = list(result.keys())[1:]
-    print(figures)
-    print(assaig.keys())
     if len(figures) != len(assaig):
         print("ha canviat el nombre d figures")
         assaig_to_remove = []

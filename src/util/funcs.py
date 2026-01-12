@@ -393,16 +393,20 @@ def up_to_date(combobox_to_reset, button_frame, canvas):
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
     figures = list(result.keys())[1:]
     print(figures)
+    print(assaig.keys())
     if len(figures) != len(assaig):
+        print("ha canviat el nombre d figures")
         assaig_to_remove = []
         for i in assaig:
             if i not in figures:
-                assaig[i]["Butó"].destroy()
+                print(f"borrant {i}")
                 assaig_to_remove.append(i)
         for i in assaig_to_remove:
+            assaig[i]["Butó"].destroy()
             del assaig[i]
         for i in figures:
             if i not in assaig:
+                print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i) + 1).get_all_records()[0]
                 inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, button_frame, canvas, downloading=True, online = True)
 

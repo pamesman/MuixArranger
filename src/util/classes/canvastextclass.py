@@ -38,7 +38,7 @@ class CanvasText(CTkBaseClass):
         self.working_values_heights = []
         self.taula = taula
         self.croquis_en_us = croquis_en_us
-        self.dataframe = dataframe.fillna(value = 0)
+        self.dataframe = dataframe
         self.position = text
         self.interval = interval
         self.sheet = sheet

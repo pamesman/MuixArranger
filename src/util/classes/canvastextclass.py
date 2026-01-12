@@ -12,11 +12,18 @@ class CanvasText(CTkBaseClass):
         self.window = window
         self.parent = parent
         self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
+        self.toggle = False
         if croquis_en_us[text].strip() == "N. A.":  # si no hi ha algu seleccionat
             self.text = text
             self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
             self.color = ""
             self.outline = self._apply_appearance_mode(color)
+        elif croquis_en_us[text].strip() == "+":  # si s'ha amagat
+            self.text = text
+            self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
+            self.color = ""
+            self.outline = ""
+            self.toggle = True
         else:
             self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2].upper()
             self.text_color = "black"
@@ -31,7 +38,7 @@ class CanvasText(CTkBaseClass):
         self.working_values_heights = []
         self.taula = taula
         self.croquis_en_us = croquis_en_us
-        self.dataframe = dataframe
+        self.dataframe = dataframe.fillna(value = 0)
         self.position = text
         self.interval = interval
         self.sheet = sheet
@@ -57,11 +64,14 @@ class CanvasText(CTkBaseClass):
         self.x = self.parent.winfo_width()/2 + (self.location[0]-self.center[0])*self.parent.winfo_width()/20
         self.y = self.parent.winfo_height()/2 - (self.location[1]-self.center[1])*self.parent.winfo_height()/18
 
-        self.toggle = False
+
 
 
         self.txt = self.parent.create_text(self.x, self.y, angle = self.orientation,text=self.text, font=("Arial", self.text_size,"bold"), fill = self.text_color, tags = (self.text.split(" ")[0], self.position, "etiqueta", self.croquis_en_us["Nom"]))
         self.entry = customtkinter.CTkEntry(self.parent, width=self.entry_width)
+        # if self.position.split(" ")[0] in ["Xicalla"]:
+        self.textvar = tkinter.StringVar()
+        self.entry.configure(textvariable = self.textvar )
         # Creating a Listbox and
         # attaching it to root window
         self.lb = tkinter.Listbox(self.parent, width=16 ,background="#2B2B2B", fg="#FFFFFF", bd= 0, relief="flat", activestyle="none", highlightthickness=0, justify="left" )
@@ -126,22 +136,30 @@ class CanvasText(CTkBaseClass):
     def search_items(self, _event):
         search_value = self.entry.get()
         self.entry.focus_force()
+        self.working_values = list(set(self.values) ^ set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
         if search_value == "" or search_value == " ":
             self.lb.delete(0, "end")
-            for i in self.values:
-                self.lb.insert(0,i)
+            try:
+                self.working_values.sort(key = lambda x: self.dataframe.loc[self.dataframe["Nom"].str.upper() == x].iloc[0, 1], reverse=True)
+            except:
+                pass
+            for i in self.working_values:
+                self.lb.insert("end",i)
+            print(self.working_values)
+            self.lb.insert("end", self.textvar.get())
         else:
             value_to_display = []
             for value in self.working_values:
                 if search_value.lower() in value.lower():
                     value_to_display.append(value)
             try:
-                value_to_display.sort(key = lambda x: self.dataframe.loc[self.dataframe["Nom"] == x].iloc[0, 1], reverse=True)
+                value_to_display.sort(key = lambda x: self.dataframe.loc[self.dataframe["Nom"].str.upper() == x].iloc[0, 1], reverse=True)
             except:
                 pass
             self.lb.delete(0, "end")
             for i in value_to_display:
-                self.lb.insert(0,i)
+                self.lb.insert("end",i)
+            self.lb.insert("end", self.textvar.get())
 
 
     def on_click(self, _event):
@@ -150,15 +168,14 @@ class CanvasText(CTkBaseClass):
             if "N. A." in list(self.working_values):
                 self.working_values.remove("N. A.")
             self.working_values_heights = []
-
             try:
-                self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'] == x].iloc[0, 1])
+                self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'].str.upper() == x].iloc[0, 1])
             except:
                 pass
             self.lb.place(x=self.parent.coords(self.txt)[0]- self.entry_width/2, y=self.parent.coords(self.txt)[1]+ self.entry_height)
             self.sb = tkinter.Scrollbar(self.parent)
             for i in self.working_values:
-                self.lb.insert(0, i)
+                self.lb.insert("end", i)
             self.lb.config(yscrollcommand=self.sb.set)
             self.sb.config(command=self.lb.yview)
 

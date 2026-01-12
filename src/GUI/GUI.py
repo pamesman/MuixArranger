@@ -37,15 +37,23 @@ customtkinter.set_appearance_mode("dark") #set theme
 
 #splash screen
 splash = tkinter.Toplevel()
-# splash.overrideredirect(True)   #borra titlebar
-# splash.geometry('%dx%d+%d+%d' % (858,300,m.width/2-411.5,m.height/3-150))
-# splash.attributes('-alpha', 0)
-# pic = Image.open(resource_path("banner.png"))
-# pic = pic.resize((858,300))
-# pic = ImageTk.PhotoImage(pic)
-# banner = tkinter.Label(splash, image = pic)
-# banner.pack()
-#
+
+splash.overrideredirect(True)   #borra titlebar
+splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-411.5,m.height/3-150))
+
+splash.wm_attributes("-topmost", True)
+splash.wm_attributes("-disabled", True)
+splash.wm_attributes("-transparentcolor", "white")
+
+pic = Image.open(resource_path("banner.png"))
+
+pic = pic.resize((858,300))
+
+pic = ImageTk.PhotoImage(file = resource_path("banner.png"))
+
+banner = tkinter.Label(splash, bg = "white",image = pic, highlightthickness = 0)
+banner.pack()
+
 
 
 root.wm_attributes("-fullscreen",False)

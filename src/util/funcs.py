@@ -299,6 +299,8 @@ def eliminar_figura(canvas):
     global croquis_in_use
     global sheet
     global taula_pack
+    global updater
+    updater.stop()
     alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
                                          message="Estas segur que vols borrar la figura?",
                                          option_1="Eliminar",
@@ -306,7 +308,7 @@ def eliminar_figura(canvas):
 
     if alerta.get() == "Cancelar":
         return
-    if alerta.get() == "Sobreescriu":
+    if alerta.get() == "Eliminar":
         assaig[croquis_in_use["Nom"]]["Butó"].destroy()
         del assaig[croquis_in_use["Nom"]]
 
@@ -315,7 +317,10 @@ def eliminar_figura(canvas):
         taula_pack[1].configure(text="Id: ")
         if online:
             sheet.del_worksheet(sheet.worksheet(croquis_in_use["Nom"]))
+            updater.start()
         canvas.delete("all")
+
+
 
 def actualitzar_nom_figura():
     global taula_pack
@@ -387,6 +392,7 @@ def up_to_date(combobox_to_reset, button_frame, canvas):
     global taula_pack
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
     figures = list(result.keys())[1:]
+    print(figures)
     if len(figures) != len(assaig):
         assaig_to_remove = []
         for i in assaig:

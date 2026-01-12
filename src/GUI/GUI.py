@@ -124,7 +124,7 @@ if connection.get() == "Online":
     online = True
     f.connect(repertori_label, repertori_frame, canvas2, splash)
 else:
-    splash.after(3000, splash.destroy)
+    splash.after(1000, splash.destroy)
 #botó per expandir croquis zone
 button_expand = customtkinter.CTkButton(croquis_frame,
                                         text = "<",

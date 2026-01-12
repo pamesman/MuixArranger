@@ -79,10 +79,6 @@ class CanvasText(CTkBaseClass):
 
 
 
-        self.rectangle_fix = [(self.tag_width ** 2 + 20 ** 2) ** 0.5 * i * 0.5 for i in [math.cos(math.atan(20 / self.tag_width) - math.radians(self.orientation)),math.sin(math.atan(20 / self.tag_width) - math.radians(self.orientation))]]
-        self.rectangle_fix = [0,0]
-        self.scroll_count = 0
-
 
 
         self.entry.bind("<KeyRelease>", self.search_items)
@@ -172,18 +168,16 @@ class CanvasText(CTkBaseClass):
                 self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'].str.upper() == x].iloc[0, 1])
             except:
                 pass
-            self.lb.place(x=self.parent.coords(self.txt)[0]- self.entry_width/2, y=self.parent.coords(self.txt)[1]+ self.entry_height)
+            self.lb.place(x=self.parent.coords(self.txt)[0]- self.entry_width/2+2, y=self.parent.coords(self.txt)[1]+ self.entry_height-5)
             self.sb = tkinter.Scrollbar(self.parent)
             for i in self.working_values:
                 self.lb.insert("end", i)
             self.lb.config(yscrollcommand=self.sb.set)
             self.sb.config(command=self.lb.yview)
 
-            self.parent.update()
-            self.window.update()
 
             #self.ddm.open(x=self.parent.winfo_rootx() + self.parent.coords(self.txt)[0] - self.entry_width/2  + 5 +self.rectangle_fix[0], y=self.parent.winfo_rooty() + self.parent.coords(self.txt)[1]+ self.entry_height+self.rectangle_fix[1])
-            self.entry.place(x=self.parent.coords(self.txt)[0]+self.rectangle_fix[0], y=self.parent.coords(self.txt)[1]+self.rectangle_fix[1], anchor="center")
+            self.entry.place(x=self.parent.coords(self.txt)[0], y=self.parent.coords(self.txt)[1], anchor="center")
 
             self.entry.focus_set()
 

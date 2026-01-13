@@ -100,16 +100,14 @@ def fer_croquis(figura: Esquema,nom: str):
     nombre = list(vars(figura).values())
     producte.update({"Figura":nombre[0]})
     stringoutput = str()
-
     for i in range (1,len(posicions)-1):
         if nombre[i] == 0:
-            pass
-        else:
-            for h in range (0,nombre[i]):
-                clau = str(posicions[i]).capitalize() + " " + str(h + 1)
-                producte.update({str(clau): "N. A."})
-                stringoutput += str(clau) + ":" + str(producte[str(clau)]) + "\n"
-            stringoutput += "\n\n"
+            continue
+        for h in range (0,nombre[i]):
+            clau = str(posicions[i]).capitalize() + " " + str(h + 1)
+            producte.update({str(clau): "N. A."})
+            stringoutput += str(clau) + ":" + str(producte[str(clau)]) + "\n"
+        stringoutput += "\n\n"
     return producte
 
 def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple):
@@ -182,6 +180,9 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
 
         if "P3" in croquiss["Figura"]:
             orientation = 0
+        if "P2" in croquiss["Figura"]:
+            orientation = 0
+
 
 
         CanvasText(canvas.master.master.master, canvas,

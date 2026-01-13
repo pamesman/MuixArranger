@@ -144,6 +144,11 @@ button_expand2 = customtkinter.CTkButton(croquis_frame,
 button_expand2.configure(command = lambda x = button_expand2: f.minimizar2(x, croquis_frame, taula_frame))
 button_expand.place(rely = 0.5, relx = .005, anchor="w")
 button_expand2.place(rely = 0.5, relx = .995, anchor="e")
+
+buto_afegir = customtkinter.CTkButton(taula_frame, text="text",command=lambda x = 1: f.simultani(x, simulframe), width=50, height=50)
+buto_afegir.place(relx=0.5,rely=0.5 )
+simulframe = customtkinter.CTkScrollableFrame(croquis_frame, fg_color="white")
+simulframe.place(relx=1, rely=1, anchor="se")
 root.mainloop()
 
 

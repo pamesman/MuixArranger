@@ -493,3 +493,18 @@ def minimizar2(button_expand2, croquis_frame, taula_frame):
             taula_frame.place(relx=.99, rely=.5, anchor="e", relheight=.98, relwidth=0.2)
             croquis_frame.place(relx=0.07, rely=0.5, anchor="w", relheight=0.98, relwidth=0.71)
             expand_is_on2 = False
+counter = 1
+# def simultani(_event, parent):
+#     global croquis_in_use
+#     global counter
+#     counter += 1
+#     for i in range(len(list(croquis_in_use.values()))):
+#         #croquis referencia maybe
+#         croquis_in_use.update({str(list(croquis_in_use.keys())[i])+"'":"N. A."}) #expandir diccionari
+#     canvas0 = customtkinter.CTkCanvas(parent, bg="white", width=400, height=400)
+#     canvas0.pack(fill="both")
+#     print(croquis_in_use)
+def simultani(_event, parent):
+    for i in assaig:
+        label = customtkinter.CTkCheckBox(parent, text=i, text_color="black")
+        label.pack(pady=5)

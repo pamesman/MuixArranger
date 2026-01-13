@@ -40,13 +40,14 @@ customtkinter.set_appearance_mode("dark") #set theme
 
 #splash screen
 splash = tkinter.Toplevel()
+
 splash.overrideredirect(True)   #borra titlebar
 splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-411.5,m.height/3-150))
 splash.wm_attributes("-topmost", True)
 if "Win" in platform.system():
     splash.wm_attributes("-disabled", True)
-    splash.wm_attributes("-transparentcolor", "white")
-    pic = ImageTk.PhotoImage(file = resource_path("banner.png"))
+    splash.wm_attributes("-transparentcolor", "#333333")
+    pic = ImageTk.PhotoImage(file = resource_path("bannerunix.png"))
 else:
     splash.geometry('%dx%d+%d+%d' % (205,277,m.width/2-100,m.height/3-150))
     pic = ImageTk.PhotoImage(file=resource_path("bannerunix.png"))

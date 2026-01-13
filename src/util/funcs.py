@@ -248,6 +248,9 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
     if not downloading:
             #Demana nom al user
         dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura")
+        print(canvas.winfo_width(), canvas.winfo_height())
+        print(canvas.winfo_screenwidth(), canvas.winfo_height())
+        dialog_nom.geometry(f"+500+500")
         answer = dialog_nom.get_input()
         if answer == None:
             return

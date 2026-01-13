@@ -31,8 +31,10 @@ root = customtkinter.CTk()
 for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
-root.geometry("+0+0")
-root.iconphoto(False,tkinter.PhotoImage(file=resource_path("icon.png")))
+root.iconphoto(True,tkinter.PhotoImage(file=resource_path("icon.png")))
+root.iconpath = ImageTk.PhotoImage(file = resource_path("icon.png"))
+root.wm_iconbitmap()
+root.iconphoto(True,root.iconpath)
 root.title("MuixArranger")
 customtkinter.set_appearance_mode("dark") #set theme
 
@@ -40,16 +42,17 @@ customtkinter.set_appearance_mode("dark") #set theme
 splash = tkinter.Toplevel()
 
 splash.overrideredirect(True)   #borra titlebar
-splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-450,m.height/3-150))
-
+splash.geometry('%dx%d+%d+%d' % (858,620,m.width/2-411.5,m.height/3-150))
 splash.wm_attributes("-topmost", True)
-splash.wm_attributes("-disabled", True)
-splash.wm_attributes("-transparentcolor", "white")
-
-pic = ImageTk.PhotoImage(file = resource_path("banner.png"))
-
-banner = tkinter.Label(splash, bg = "white",image = pic, highlightthickness = 0)
-banner.pack()
+if "Win" in platform.system():
+    splash.wm_attributes("-disabled", True)
+    splash.wm_attributes("-transparentcolor", "white")
+    pic = ImageTk.PhotoImage(file = resource_path("banner.png"))
+else:
+    splash.geometry('%dx%d+%d+%d' % (205,277,m.width/2-100,m.height/3-150))
+    pic = ImageTk.PhotoImage(file=resource_path("bannerunix.png"))
+banner = tkinter.Label(splash,bg="#333333", image= pic,  highlightthickness = 0)
+banner.pack(fill="both", expand="yes")
 
 
 

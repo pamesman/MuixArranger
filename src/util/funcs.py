@@ -180,6 +180,8 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
         if croquiss["Figura"] == "Encontre" and i.split(" ")[0] in "Base":
             orientation = 0
 
+        if "P3" in croquiss["Figura"]:
+            orientation = 0
 
 
         CanvasText(canvas.master.master.master, canvas,

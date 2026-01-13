@@ -5,7 +5,7 @@ from src.util.classes.round_rectangle import round_rectangle_AA
 
 
 class CanvasText(CTkBaseClass):
-    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None, sheet = None ,orientation= 0,color = "White", text_size = 10, list_len = 10):
+    def __init__(self,window,parent, text, location,corrector,  values, taula, croquis_en_us, dataframe, interval = None, sheet = None ,orientation= 0,color = "White", text_size = 9, list_len = 10):
         self.master = parent
         super().__init__(master = parent)
         self.window = window
@@ -13,7 +13,7 @@ class CanvasText(CTkBaseClass):
         self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
         self.toggle = False
         if croquis_en_us[text].strip() == "N. A." or croquis_en_us[text].strip() == "+":  # si no hi ha algu seleccionat
-            self.text = text
+            self.text = text.split(" ")[0]
             self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
             self.color = ""
             self.outline = self._apply_appearance_mode(color)
@@ -48,6 +48,7 @@ class CanvasText(CTkBaseClass):
         self.canvas_height = self.parent.winfo_screenheight()
         self.tag_width = 70
         if self.position.split(" ")[0] in ["Tap","Peu", "Colze"]:
+            self.text_size = 8
             self.tag_width = 45
             self.text = self.text.split(" ")[0]
 

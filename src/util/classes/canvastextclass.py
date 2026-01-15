@@ -12,7 +12,7 @@ class CanvasText(CTkBaseClass):
         self.parent = parent
         self.text = croquis_en_us[text][:len(croquis_en_us[text].split(" ")[0]) + 2]
         self.toggle = False
-        if croquis_en_us[text].strip() == "N. A." or croquis_en_us[text].strip() == "+":  # si no hi ha algu seleccionat
+        if croquis_en_us[text].strip() == "N. A.":  # si no hi ha algu seleccionat
             self.text = text.split(" ")[0]
             self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
             self.color = ""
@@ -84,7 +84,6 @@ class CanvasText(CTkBaseClass):
         self.parent.tag_bind(self.txt, "<Button-3>", self.on_right_click)
 
         self.shape = round_rectangle_AA(self.parent, self.x, self.y, angle=orientation, width=self.tag_width, fill=self.color, outline = self.outline, border_width=1, tags=("rectangle", self.position, self.text.split(" ")[0]),radius=10)[0]
-
         if self.croquis_en_us[self.position] == "+":
             self.toggle = True
             self.parent.itemconfig(self.shape, fill="", outline="")
@@ -98,8 +97,9 @@ class CanvasText(CTkBaseClass):
         value = self.lb.get(self.lb.nearest(value.y))
 
         if self.interval != None:
+            print("we're online")
             self.interval.stop()
-        self.text= value.title()
+        self.text= value
         for name in self.croquis_en_us.values():
             if self.text in name:
                 self.text = name
@@ -108,7 +108,7 @@ class CanvasText(CTkBaseClass):
             self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.position)]: self.text})
             self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, self.text)
             try:
-                self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2, self.dataframe.loc[self.dataframe["Nom"] == self.text].iloc[0, 1])
+                self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2, self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2])
             except:
                 pass
 
@@ -126,8 +126,10 @@ class CanvasText(CTkBaseClass):
         self.forget()
 
     def drive_callback(self):
+        print(self.text)
         try:
             self.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
+            print("exito")
         except:
             print("mistake was sucedido")
 
@@ -138,7 +140,7 @@ class CanvasText(CTkBaseClass):
         if search_value == "" or search_value == " ":
             self.lb.delete(0, "end")
             try:
-                self.working_values.sort(key = lambda x: self.dataframe.loc[self.dataframe["Nom"].str.upper() == x].iloc[0, 1], reverse=True)
+                self.working_values.sort(key = lambda x: self.dataframe.loc[self.dataframe["Àlies"].str.upper() == x].iloc[0, 2], reverse=True)
             except:
                 pass
             for i in self.working_values:
@@ -150,7 +152,7 @@ class CanvasText(CTkBaseClass):
                 if search_value.lower() in value.lower():
                     value_to_display.append(value)
             try:
-                value_to_display.sort(key = lambda x: self.dataframe.loc[self.dataframe["Nom"].str.upper() == x].iloc[0, 1], reverse=True)
+                value_to_display.sort(key = lambda x: self.dataframe.loc[self.dataframe["Àlies"].str.upper() == x].iloc[0, 2], reverse=True)
             except:
                 pass
             self.lb.delete(0, "end")
@@ -160,17 +162,19 @@ class CanvasText(CTkBaseClass):
 
 
     def on_click(self, _event):
+        self.entry.delete(0, "end")
         if not self.toggle:
             self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
             if "N. A." in list(self.working_values):
                 self.working_values.remove("N. A.")
             self.working_values_heights = []
             try:
-                self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe['Nom'].str.upper() == x].iloc[0, 1])
+                self.working_values.sort(reverse=True,key = lambda x: self.dataframe.loc[self.dataframe["Àlies"].str.upper() == x].iloc[0, 2])
             except:
                 pass
             self.lb.place(x=self.parent.coords(self.txt)[0]- self.entry_width/2+2, y=self.parent.coords(self.txt)[1]+ self.entry_height-5)
             self.sb = tkinter.Scrollbar(self.parent)
+            self.lb.delete(0, "end")
             for i in self.working_values:
                 self.lb.insert("end", i)
             self.lb.config(yscrollcommand=self.sb.set)
@@ -210,10 +214,16 @@ class CanvasText(CTkBaseClass):
         if self.position.split(" ")[0] not in ["Base", "Segona", "Tercera", "Alsadora", "Xicalla", "Quarta"]:
             if not self.toggle:
                 self.toggle = True
+                self.text = "'+"
                 self.parent.itemconfig(self.shape, fill = "", outline = "")
                 self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+")
-                self.croquis_en_us[self.position] = "+"
-                self.text = self.position
+                self.croquis_en_us[self.position] = self.text
+                self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, "+")
+                if self.interval != None:
+                    print("i was involved")
+                    self.interval.stop()
+                    self.drive_callback()
+                    self.interval.start()
             else:
                 self.parent.itemconfig(self.shape, fill="", outline=self._apply_appearance_mode(self.color2))
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size), text=self.position, fill = "#AAAAAA")

@@ -1,6 +1,6 @@
 import io
 import math
-
+import tkinter
 import customtkinter
 import pandas as pd
 import CTkMessagebox
@@ -8,6 +8,7 @@ import CTkMessagebox
 from src.util.classes.esquema import Esquema
 from src.util.classes.canvastextclass import CanvasText
 from src.util.classes.interval import Interval
+from src.util.classes import CTkTable
 from src.util import repertori as rep
 import src.membre as mem
 from src.API.drive import download_file
@@ -27,7 +28,7 @@ croquis_loading = {}
 taula_pack = []
 expand_is_on = False
 expand_is_on2 = False
-online = False
+
 updater = None
 sheet = None
 
@@ -55,8 +56,7 @@ def pass_variable (anything):
     global taula_pack
     taula_pack = anything
 
-
-def connect(combobox, button_frame, canvas, splash):
+def connect(combobox, parents, splash):
     global updater
     global croquis_loading
     global sheet
@@ -64,6 +64,7 @@ def connect(combobox, button_frame, canvas, splash):
     global online
     online = True
     sheet, drive = spreadsheet_connection(sheet_id)
+    updater = Interval(1, lambda x=combobox: up_to_date(combobox, parents))
 
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
     figures = list(result.keys())[1:]
@@ -74,16 +75,15 @@ def connect(combobox, button_frame, canvas, splash):
             for j in precroquis:
                 croquis_loading.update({j:precroquis[j][0]})
             print("Descarregant",croquis_loading["Figura"],":",croquis_loading["Nom"])
-            inicialitzar_figura(croquis_loading["Figura"],combobox, button_frame, canvas, online = True,downloading = True)
+            inicialitzar_figura(croquis_loading["Figura"],combobox, parents, online = True,downloading = True)
         except:
             sheet.del_worksheet(i)
-    updater = Interval(1, lambda x=combobox: up_to_date(combobox, button_frame, canvas))
     splash.destroy()
-    if not config_changed:
-        nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
-                                             message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
-                                             option_1="Ok",
-                                             option_2="Ok, pesat")
+    # if not config_changed:
+    #     nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
+    #                                          message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
+    #                                          option_1="Ok",
+    #                                          option_2="Ok, pesat")
 
     updater.start()
 
@@ -110,25 +110,40 @@ def fer_croquis(figura: Esquema,nom: str):
         stringoutput += "\n\n"
     return producte
 
-def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple):
+def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple, skip = False):
     global sheet
     global updater
     global taula_pack
-    canvas.delete("all")
+    global taula_mestra
+    global assaig
+    canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#AAAAAA", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
+    canvas.place(relx = 0.5, rely = 0.5, anchor = "center")
+    taula_pack[3].lift()
+    taula_pack[4].lift()
+    taula_pack[5].lift()
+
+
+    parent[1].bind("<Configure>", lambda event: resize(event, canvas))
+    taula = CTkTable.CTkTable(parent[2], column=3, row=2, values= [[]], header_color="#7393B3",
+                              font=("Liberation Sans", 12), corner_radius=5)
+
+    assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":taula})
 
 
 
-    taula_pack[3].delete(0, "end")
-    taula_pack[3].configure(placeholder_text=croquis_in_use["Nom"])
-    taula_pack[2].configure(text="Figura: " + croquis_in_use["Figura"])
-    taula_pack[1].configure(text="Id: " + croquis_in_use["Nom"])
 
     counter = 0
     for i in croquiss.keys():
+
         if i == "Nom" or i == "Figura":
             continue
-
         coord = listadecoordenades[counter]
+        counter += 1
+        if croquiss[i] == "N. A." and skip == True:
+            continue
+        if croquiss[i] == "+" and skip == True:
+            continue
+
         sc = 0
         if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó","Marieta", "Volantinera", "Figuereta"]:
             sc = 1
@@ -187,15 +202,10 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
 
         CanvasText(canvas.master.master.master, canvas,
                               i, coord,corrector,
-                              working_list, taula_pack[0], croquiss, taula_mestra,
+                              working_list, assaig[croquiss["Nom"]]["Taula"], croquiss, taula_mestra,
                               interval = updater, sheet = sheet,
                               orientation = -orientation,
                               color =rep.palette[rep.rols.index(i.split(" ")[0])],list_len=10)
-
-        counter += 1
-        for child in canvas.master.winfo_children():
-            if type(child) == customtkinter.CTkButton or type(child) == customtkinter.CTkEntry:
-                continue
 
 
 
@@ -215,22 +225,38 @@ def fer_dibuix(canvas, listadecoordenades:list, croquiss:dict, corrector: tuple)
         canvas.tag_raise("Mans", "Vents")
     except:
         pass
-    canvas.tag_lower("rectangle", "etiqueta")
+    try:
+        canvas.tag_lower("rectangle", "etiqueta")
+    except:
+        pass
+    taula.update_values(croquis_to_table(croquiss, taula_mestra))
 
-def assaig_button_press(nom, canvas, assaig):
+def assaig_button_press(nom, assaig):
     global croquis_in_use
     global taula_pack
-
     croquis_in_use = assaig[nom]["Croquis"]
-    figura = assaig[nom]["Figura"]
-    fer_dibuix(canvas, figura.coordenades, croquis_in_use, figura.centraor())
-    taula_pack[0].update_values(croquis_to_table(croquis_in_use, taula_mestra))
+    for i in list(assaig.keys()):
+        assaig[i]["Canvas"].place_forget()   #Amaga tot
+        assaig[i]["Taula"].pack_forget()
+    assaig[nom]["Canvas"].place(relx = 0.5, rely = 0.5, anchor="center" ) #Mostra this one
+    assaig[nom]["Taula"].pack()
+
+    taula_pack[3].lift()
+    taula_pack[4].lift()
+    taula_pack[5].lift()
+
+
     #Activa "namer"
     taula_pack[3].configure(state="normal")
     taula_pack[4].configure(state="normal")
     taula_pack[5].configure(state="normal")
 
-def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, online = False, downloading = False):
+    taula_pack[3].delete(0, "end")
+    taula_pack[3].configure(placeholder_text=croquis_in_use["Nom"])
+    taula_pack[2].configure(text="Figura: " + croquis_in_use["Figura"])
+    taula_pack[1].configure(text="Id: " + croquis_in_use["Nom"])
+
+def inicialitzar_figura(selected_fig, combobox_to_reset, parents, online = False, downloading = False):
     global assaig
     global croquis_in_use
     global croquis_loading
@@ -246,10 +272,8 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
         if selected_fig in assaig[figura]["Croquis"]["Figura"]:
             counter += 1
     if not downloading:
-            #Demana nom al user
+            #Demana nom al user NOMES quan no ve la figura d'internet
         dialog_nom = customtkinter.CTkInputDialog(text=f"Com vols identificar aquest/a {selected_fig}?",title="Nomena la figura")
-        print(canvas.winfo_width(), canvas.winfo_height())
-        print(canvas.winfo_screenwidth(), canvas.winfo_height())
         dialog_nom.geometry(f"+500+500")
         answer = dialog_nom.get_input()
         if answer == None:
@@ -278,25 +302,22 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, button_frame, canvas, o
         croquis_in_use = croquis_loading
 
     if online:
-        try:
+        try: #crea nova pagina per a la figura nova
             sheet.add_worksheet(title = croquis_in_use["Nom"], cols = 150 ,rows=5)
             sheet.worksheet(croquis_in_use["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis_in_use.keys()))), values=[list(croquis_in_use.keys()),list(croquis_in_use.values())])
         except:
             pass
-        try:
-            updater.start()
-        except:
-            pass
-    button = customtkinter.CTkButton(button_frame, text=croquis_in_use["Nom"],
-                                     command=lambda nom=croquis_in_use["Nom"]: assaig_button_press(nom, canvas, assaig),
+    button = customtkinter.CTkButton(parents[0], text=croquis_in_use["Nom"],
+                                     command=lambda nom=croquis_in_use["Nom"]: assaig_button_press(nom, assaig),
                                      fg_color=rep.main_color, hover_color=rep.inv_color, font=("Arial", 14, "bold"))
     button.pack(pady=5)
     """"""
     figura = rep.repertori2[croquis_in_use["Figura"]]
     assaig.update({croquis_in_use["Nom"]: {"Figura": figura, "Croquis": croquis_in_use, "Butó": button}})
     """"""
+    fer_dibuix(parents, figura.coordenades, croquis_in_use, figura.centraor())
     if not downloading:
-        assaig_button_press(croquis_in_use["Nom"], canvas= canvas, assaig= assaig)
+        assaig_button_press(croquis_in_use["Nom"], assaig= assaig)
 
     return croquis_in_use
 
@@ -306,7 +327,8 @@ def eliminar_figura(canvas):
     global sheet
     global taula_pack
     global updater
-    updater.stop()
+    if online:
+        updater.stop()
     alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
                                          message="Estas segur que vols borrar la figura?",
                                          option_1="Eliminar",
@@ -318,15 +340,14 @@ def eliminar_figura(canvas):
         assaig[croquis_in_use["Nom"]]["Butó"].destroy()
         del assaig[croquis_in_use["Nom"]]
 
-        taula_pack[0].update_values([[0,0,0]])
+        assaig[croquis_in_use["Nom"]]["Canvas"].destroy()
+        assaig[croquis_in_use["Nom"]]["Taula"].destroy()
         taula_pack[2].configure(text="Figura: ")
         taula_pack[1].configure(text="Id: ")
         if online:
             sheet.del_worksheet(sheet.worksheet(croquis_in_use["Nom"]))
             updater.start()
         canvas.delete("all")
-
-
 
 def actualitzar_nom_figura():
     global taula_pack
@@ -337,11 +358,9 @@ def actualitzar_nom_figura():
     croquis_in_use["Nom"] = taula_pack[3].get()
 
 
-    taula_pack[0].update_values(croquis_to_table(croquis_in_use, taula_mestra))
+    # taula_pack[0].update_values(croquis_to_table(croquis_in_use, taula_mestra)) #cuarentena
     taula_pack[2].configure(text="Figura: "+croquis_in_use["Figura"])
     taula_pack[1].configure(text="Id: " + taula_pack[3].get())
-
-
 
 def croquis_to_table(croquis_generat:dict,dt = None):
     listah = [["Posició", "Nom","Muscle"]]
@@ -351,7 +370,7 @@ def croquis_to_table(croquis_generat:dict,dt = None):
     lista = []
     for key, value in croquis_intern.items():
         try:
-            lista.append([key, value, dt.loc[dt["Nom"] == value].iloc[0, 1]])
+            lista.append([key, value, dt.loc[dt["Àlies"] == value].iloc[0, 2]])
         except:
             lista.append([key, value, 0])
 
@@ -391,8 +410,7 @@ def canviar_apariencia(canvas):
 
     canvas.config(bg=canvas.master._apply_appearance_mode(("#FFFFFF","#333333")))
 
-def up_to_date(combobox_to_reset, button_frame, canvas):
-    print("run")
+def up_to_date(combobox_to_reset, parents):
     global assaig
     global croquis_in_use
     global taula_pack
@@ -412,16 +430,17 @@ def up_to_date(combobox_to_reset, button_frame, canvas):
             if i not in assaig:
                 print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i) + 1).get_all_records()[0]
-                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, button_frame, canvas, downloading=True, online = True)
+                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, parents, downloading=True, online = True)
 
     for i in range(len(figures)):
-
+        canvas = assaig[croquis_in_use["Nom"]]["Canvas"]
         if croquis_in_use["Nom"] == figures[i]:
             precroquis = result[figures[i]]
             croquis_cloud = {}
             for j in precroquis:
                 croquis_cloud.update({j:precroquis[j][0]})
             if croquis_in_use != croquis_cloud:
+                print(croquis_in_use, croquis_cloud)
                 print("canvió la figura")
                 diferencia = set(croquis_cloud.values()) - set(croquis_in_use.values())
                 print(diferencia)
@@ -430,12 +449,16 @@ def up_to_date(combobox_to_reset, button_frame, canvas):
                     target_ID = list(croquis_in_use.values()).index(change)
                     target_data = [list(croquis_in_use.keys())[target_ID],list(croquis_in_use.values())[target_ID]]
                     target_drawing =canvas.find_withtag(target_data[0])
+                    print(target_data)
                     canvas.itemconfig(target_drawing[-1], text = target_data[1].upper()[:len(target_data[1].upper().split(" ")[0])+2], fill = "black")
 
                     canvas.itemconfig(target_drawing[0], fill = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(list(croquis_in_use.keys())[target_ID].split(" ")[0])]) )
-                    taula_pack[0].insert(target_ID -1, 1, target_data[1])
-                    taula_pack[0].insert(target_ID -1, 2,
-                                      taula_mestra.loc[taula_mestra["Nom"] == target_data[1]].iloc[0, 1])
+                    assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 1, target_data[1])
+                    try:
+                        assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 2,
+                                      taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2])
+                    except:
+                        pass
                 assaig[croquis_in_use["Nom"]].update({"Croquis": croquis_in_use})
 
 def minimizar(button_expand, croquis_frame, repertori_frame, repertori_label):
@@ -499,3 +522,16 @@ def minimizar2(button_expand2, croquis_frame, taula_frame):
             taula_frame.place(relx=.99, rely=.5, anchor="e", relheight=.98, relwidth=0.2)
             croquis_frame.place(relx=0.07, rely=0.5, anchor="w", relheight=0.98, relwidth=0.71)
             expand_is_on2 = False
+
+def actualitzar_assaig_output(_event, frame):
+    global assaig
+    contador = 0
+    for i in frame.winfo_children():
+        if contador < 2:
+            contador = +1
+            continue
+        i.destroy()
+    for i in list(assaig.keys()):
+        canvas = customtkinter.CTkCanvas(frame, bg="white", width=frame.winfo_width(), height=frame.winfo_width())
+        canvas.pack(pady=10)
+        fer_dibuix(canvas,assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)

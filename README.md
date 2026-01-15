@@ -55,15 +55,23 @@ Planejats pero encara no implementat tenim els seguents ítems:
 
 ### 1. Localitzar (al drive):
 
-- Excel membres de la colla 
-- Excel assistents a l'assaig 
+- Excel membres de la colla:
+
+        Han de presentar les columnes `Àlies` i `Alçada espatlles`
+ - Excel assistents a l'assaig
+ 
+        Ha de presentar la columna `Àlies`
 - Excel d'assaig/actuació
+    
+        Ha de estar en blanc
+      
 
 
 ### 2. Compartir:
     
 Els arxius de l'apartat anterior han de compartir-se amb:
-`muixarranger-api@muixarranger.iam.gserviceaccount.com`
+            
+                        `muixarranger-api@muixarranger.iam.gserviceaccount.com`
     
   (en cas de reutilitzar cap dels excels, no és necessari tornar a compartir)
 
@@ -72,8 +80,8 @@ Els arxius de l'apartat anterior han de compartir-se amb:
     
 L'ID es troba al url del full de càlcul i sol tindre aquest aspecte: `1KJrjm34obf6L2BtFBC8WsB2rVpQMFcusIDVeTMu5MmU`
 
-    https://docs.google.com/spreadsheets/d/     ID     /edit?gid=0#gid=0
-                                           ^^^^^^^^^^^
+         https://docs.google.com/spreadsheets/d/     ID     /edit?gid=0#gid=0
+                                                 ^^^^^^^^^^^
 
 
 ### 4. Iniciar el programa!

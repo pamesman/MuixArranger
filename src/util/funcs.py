@@ -121,12 +121,14 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
     taula_pack[3].lift()
     taula_pack[4].lift()
     taula_pack[5].lift()
-
+    for figura in list(assaig.keys())[:-1]:
+        assaig[figura]["Taula"].pack_forget()
 
     parent[1].bind("<Configure>", lambda event: resize(event, canvas))
     taula = CTkTable.CTkTable(parent[2], column=3, row=2, values= [[]], header_color="#7393B3",
                               font=("Liberation Sans", 12), corner_radius=5)
-
+    taula.update_values(croquis_to_table(croquiss, taula_mestra))
+    taula.pack()
     assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":taula})
 
 
@@ -229,11 +231,13 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
         canvas.tag_lower("rectangle", "etiqueta")
     except:
         pass
-    taula.update_values(croquis_to_table(croquiss, taula_mestra))
+
 
 def assaig_button_press(nom, assaig):
     global croquis_in_use
     global taula_pack
+    if croquis_in_use == assaig[nom]["Croquis"]:
+        return
     croquis_in_use = assaig[nom]["Croquis"]
     for i in list(assaig.keys()):
         assaig[i]["Canvas"].place_forget()   #Amaga tot
@@ -335,19 +339,24 @@ def eliminar_figura(canvas):
                                          option_2="Cancelar")
 
     if alerta.get() == "Cancelar":
+        if online:
+            updater.start()
         return
     if alerta.get() == "Eliminar":
-        assaig[croquis_in_use["Nom"]]["Butó"].destroy()
-        del assaig[croquis_in_use["Nom"]]
+        trash = croquis_in_use["Nom"]
+        assaig_button_press(list(assaig.keys())[0], assaig= assaig)
+        assaig[trash]["Butó"].destroy()
+        assaig[trash]["Canvas"].destroy()
+        assaig[trash]["Taula"].destroy()
 
-        assaig[croquis_in_use["Nom"]]["Canvas"].destroy()
-        assaig[croquis_in_use["Nom"]]["Taula"].destroy()
+        del assaig[trash]
+
+
         taula_pack[2].configure(text="Figura: ")
         taula_pack[1].configure(text="Id: ")
         if online:
-            sheet.del_worksheet(sheet.worksheet(croquis_in_use["Nom"]))
+            sheet.del_worksheet(sheet.worksheet(trash))
             updater.start()
-        canvas.delete("all")
 
 def actualitzar_nom_figura():
     global taula_pack
@@ -430,7 +439,7 @@ def up_to_date(combobox_to_reset, parents):
             if i not in assaig:
                 print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i) + 1).get_all_records()[0]
-                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, parents, downloading=True, online = True)
+                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, parents, downloading = False, online = True)
 
     for i in range(len(figures)):
         canvas = assaig[croquis_in_use["Nom"]]["Canvas"]

@@ -2,14 +2,11 @@ import os
 import sys
 import platform
 import tkinter
-from time import sleep
 import customtkinter
-from PIL import Image, ImageTk
+from PIL import ImageTk
 from customtkinter import CTkButton
 import CTkMessagebox
 from screeninfo import get_monitors
-from src.util.classes import CTkTable
-
 
 from src.util import repertori as rep
 import src.util.funcs as f
@@ -63,8 +60,15 @@ root.wm_attributes("-fullscreen",False)
 tabview = customtkinter.CTkTabview(master=root)
 tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
 croquis = tabview.add("Croquis")  # add tab at the end
-#assaig = tabview.add("Assaig")  # add tab at the end
+assaig_tab = tabview.add("Assaig")  # add tab at the end
+###
+assaig_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Assaig"), fg_color="#AAAAAA")
+assaig_frame.place(relx = 0.01, rely = 0.01, relwidth = 0.98, relheight = 0.98, anchor = "nw")
+uppdate_assaig = customtkinter.CTkButton(assaig_frame, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame))
 
+uppdate_assaig2 = customtkinter.CTkButton(assaig_frame, text="Act", width = 30, height= 10,command=lambda x=3: f.funcion(x, assaig_frame))
+uppdate_assaig2.pack(pady = 10)
+uppdate_assaig.pack(pady = 10)
 ### CROQUIS TAB ###
 frame = customtkinter.CTkFrame(master=tabview.tab("Croquis"))
 frame.place(relx=0.5,rely=0.5,anchor="c",relheight=1, relwidth=1)
@@ -75,7 +79,8 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 repertori_label = customtkinter.CTkComboBox(frame,
                                             fg_color=rep.main_color, button_color=rep.main_color, button_hover_color=rep.inv_color, corner_radius=5, font=("Liberation Sans",16, "bold"), border_width= 0,
                                             values = [i.nom for i in rep.repertori.values()],
-                                            command = lambda x : f.inicialitzar_figura(x, repertori_label, repertori_frame, canvas2, online= online))
+                                            command = lambda x : f.inicialitzar_figura(x, repertori_label, frame_catalog, online= online),
+                                            state = "readonly")
 repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
@@ -86,7 +91,8 @@ croquis_frame.update()
 croquis_frame.bind("<Configure>", lambda event : f.resize(event, canvas2))
 canvas2 = tkinter.Canvas(croquis_frame, width=croquis_frame.winfo_width() - croquis_frame.cget("corner_radius") * 4,
                          height=croquis_frame.winfo_height() - croquis_frame.cget("corner_radius") * 2,
-                         bg=croquis_frame._apply_appearance_mode(("black", "#333333")), highlightthickness=0)
+                         bg=croquis_frame._apply_appearance_mode(("black", "#333333")), highlightthickness=0,
+                         )
 canvas2.place(relx=0.5, rely=0.5, anchor="center")
 
 #NOM FIGURA
@@ -101,14 +107,17 @@ deleter.place(relx = 0.88,rely = 0.01,  anchor= "nw")
 #TAULA
 taula_frame = customtkinter.CTkScrollableFrame(frame)
 taula_frame.place(relx = .79, rely = .5, anchor = "w", relheight = .98, relwidth = 0.2)
-taula = CTkTable.CTkTable(taula_frame, column = 3, row = 2, values = [[]], header_color = "#7393B3", font = ("Liberation Sans", 12), corner_radius = 5)
+
 taula_name = customtkinter.CTkLabel(taula_frame, text = "")
 taula_namefig = customtkinter.CTkLabel(taula_frame, text = "")
 taula_name.pack()
 taula_namefig.pack()
-taula.pack(expand = True,  pady = 20)
+# taula.pack(expand = True,  pady = 20)
+taula = 0
 taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter]
 f.pass_variable(taula_pack)
+
+frame_catalog = [repertori_frame, croquis_frame, taula_frame]
 
 #Darkmode Button
 CTkButton(frame,text = "☀ / ☾",
@@ -122,9 +131,9 @@ connection = CTkMessagebox.CTkMessagebox(title="Connectivitat",
                                option_2 = "Offline" )
 if connection.get() == "Online":
     online = True
-    f.connect(repertori_label, repertori_frame, canvas2, splash)
+    f.connect(repertori_label, frame_catalog, splash)
 else:
-    splash.after(1000, splash.destroy)
+    splash.after(500, splash.destroy)
 #botó per expandir croquis zone
 button_expand = customtkinter.CTkButton(croquis_frame,
                                         text = "<",

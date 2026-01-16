@@ -23,23 +23,22 @@ def carregar_assistencia(id_membres, id_assistents):
         id_assistents = resource_path("asistentes.ods")
         database = pd.read_excel(id_membres)
         assistents= pd.read_excel(id_assistents)
-    taula_mestra = pd.DataFrame([],columns=["Nom","Muscle","Alçada","Braç","Posició"])
-    for i in assistents["Nom"]:
-        if i in list(database["Nom"]):
-            entrada = database.loc[database["Nom"] == i]
+    taula_mestra = pd.DataFrame([],columns=["Nom","Àlies","Alçada espatlles","Muscle","Alçada","Braç","Posició"])
+    for i in assistents["Àlies"]:
+        if i in list(database["Àlies"]):
+            entrada = database.loc[database["Àlies"] == i]
         else:
-            entrada = pd.DataFrame([[i,0,0,0,"Nou"]],columns=["Nom","Muscle","Alçada","Braç","Posició"])
+            entrada = pd.DataFrame([[i,i,0,0,0,"Nou"]],columns=["Nom","Àlies","Alçada espatlles","Muscle","Alçada","Braç","Posició"])
         taula_mestra = pd.concat([taula_mestra,entrada])
 
-    taula_mestra = taula_mestra.sort_values(by=["Muscle"], ascending=False)
+    taula_mestra = taula_mestra.sort_values(by=["Alçada espatlles"], ascending=False)
 
-    taula_mestra = taula_mestra[taula_mestra["Nom"].str.contains("Z-") == False]
+    taula_mestra = taula_mestra[taula_mestra["Àlies"].str.contains("Z-") == False]
+    working_list = taula_mestra[["Àlies", "Alçada espatlles"]]
 
-    working_list = taula_mestra[["Nom", "Muscle"]]
 
-
-    list_nom = list(working_list["Nom"])
-    list_muscle = list(working_list["Muscle"])
+    list_nom = list(working_list["Àlies"])
+    list_muscle = list(working_list["Alçada espatlles"])
 
     #working_list = [str((list_nom[i]+" "+str(list_muscle[i]))) for i in range(len(list_nom))]
     working_list = list_nom

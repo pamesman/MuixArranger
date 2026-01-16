@@ -6,10 +6,7 @@ import customtkinter
 from PIL import ImageTk
 from customtkinter import CTkButton
 import CTkMessagebox
-
 from screeninfo import get_monitors
-from src.util.classes import CTkTable
-
 
 from src.util import repertori as rep
 import src.util.funcs as f
@@ -82,7 +79,8 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 repertori_label = customtkinter.CTkComboBox(frame,
                                             fg_color=rep.main_color, button_color=rep.main_color, button_hover_color=rep.inv_color, corner_radius=5, font=("Liberation Sans",16, "bold"), border_width= 0,
                                             values = [i.nom for i in rep.repertori.values()],
-                                            command = lambda x : f.inicialitzar_figura(x, repertori_label, frame_catalog, online= online))
+                                            command = lambda x : f.inicialitzar_figura(x, repertori_label, frame_catalog, online= online),
+                                            state = "readonly")
 repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
 
@@ -135,7 +133,7 @@ if connection.get() == "Online":
     online = True
     f.connect(repertori_label, frame_catalog, splash)
 else:
-    splash.after(1000, splash.destroy)
+    splash.after(500, splash.destroy)
 #botó per expandir croquis zone
 button_expand = customtkinter.CTkButton(croquis_frame,
                                         text = "<",

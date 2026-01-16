@@ -47,7 +47,8 @@ def round_rectangle_AA(parent, x,y,width=50,height=20,radius=5, angle = 0,outlin
         return parent.create_polygon(points, **kwargs, smooth=True, tags = tags)
 
 
-    my_rectangle0 = round_rectangle(parent, x1, y1, x2, y2, radius=radius, outline=outline2, fill=fill, width=border_width+0.5)
-    my_rectangle = round_rectangle(parent, x1, y1, x2, y2, radius=radius, outline=outline, fill="", width=border_width)
+    my_rectangle0 = round_rectangle(parent, x1, y1, x2, y2, radius=radius, outline=outline, fill=fill, width=border_width)
+    # my_rectangle = round_rectangle(parent, x1, y1, x2, y2, radius=radius, outline=outline, fill="", width=border_width)
 
-    return my_rectangle,my_rectangle0
+
+    return my_rectangle0

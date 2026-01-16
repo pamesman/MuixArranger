@@ -1,6 +1,7 @@
 import io
 import math
 import tkinter
+from tkinter import ttk
 import customtkinter
 import pandas as pd
 import CTkMessagebox
@@ -78,6 +79,9 @@ def connect(combobox, parents, splash):
             inicialitzar_figura(croquis_loading["Figura"],combobox, parents, online = True,downloading = True)
         except:
             sheet.del_worksheet(i)
+    taula_pack[3].configure(state="normal")
+    taula_pack[4].configure(state="normal")
+    taula_pack[5].configure(state="normal")
     splash.destroy()
     # if not config_changed:
     #     nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
@@ -116,7 +120,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
     global taula_pack
     global taula_mestra
     global assaig
-    canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#AAAAAA", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
+    canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#FFFFFF", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
     canvas.place(relx = 0.5, rely = 0.5, anchor = "center")
     taula_pack[3].lift()
     taula_pack[4].lift()
@@ -125,11 +129,53 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
         assaig[figura]["Taula"].pack_forget()
 
     parent[1].bind("<Configure>", lambda event: resize(event, canvas))
-    taula = CTkTable.CTkTable(parent[2], column=3, row=2, values= [[]], header_color="#7393B3",
-                              font=("Liberation Sans", 12), corner_radius=5)
-    taula.update_values(croquis_to_table(croquiss, taula_mestra))
-    taula.pack()
-    assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":taula})
+    ttk.Style().configure("Treeview",
+                          rowheight=30,
+                          background = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
+                          foreground = parent[1]._apply_appearance_mode(("black","white")),
+                          fieldbackground = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
+                          borderwidth = 0,
+                          highlightthickness = 0,
+                          relief = "flat"
+                          )
+    ttk.Style().configure("Treeview.Heading",
+                          background = "#F1B300",
+                          borderwidth=0,
+                          highlightthickness=0,
+                          relief="flat",
+
+                          )
+
+    treeview = ttk.Treeview(parent[2] , height = len(croquiss.keys())-2,show = "headings", selectmode="none",style="Treeview")
+    treeview.tag_configure('impar', background=parent[1]._apply_appearance_mode(("#D6D6D6", "#3F3F3F")))
+    treeview['columns'] = ("Posició", "Nom", "Alçada espatlles")
+    treeview.bind('<Motion>', 'break')
+
+    treeview.column("#0",width = 0, stretch = False)
+    treeview.column("Posició", width = 100)
+    treeview.column("Nom", width = 100, anchor="w")
+    treeview.column("Alçada espatlles", width = 100, anchor = "center")
+
+    treeview.heading("Posició", text = "Posició")
+    treeview.heading("Nom", text = "Nom")
+    treeview.heading("Alçada espatlles",text = "Espatlles")
+
+    treeview.pack(pady = 20)
+    treeview_counter = 0
+
+    for valuelist in croquis_to_table(croquiss, taula_mestra):
+        if treeview_counter == 0:
+            treeview_counter = 1
+            continue
+        if treeview_counter % 2 == 1:
+            tag = "impar"
+        else:
+            tag = "par"
+        treeview.insert('', 'end', treeview_counter, values=valuelist, tags=tag)
+        treeview_counter += 1
+    assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":treeview})
+    taula_pack[2].configure(text="Figura: " + croquis_in_use["Figura"])
+    taula_pack[1].configure(text="Id: " + croquis_in_use["Nom"])
 
 
 
@@ -243,7 +289,7 @@ def assaig_button_press(nom, assaig):
         assaig[i]["Canvas"].place_forget()   #Amaga tot
         assaig[i]["Taula"].pack_forget()
     assaig[nom]["Canvas"].place(relx = 0.5, rely = 0.5, anchor="center" ) #Mostra this one
-    assaig[nom]["Taula"].pack()
+    assaig[nom]["Taula"].pack(pady = 20)
 
     taula_pack[3].lift()
     taula_pack[4].lift()
@@ -321,7 +367,9 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, parents, online = False
     """"""
     fer_dibuix(parents, figura.coordenades, croquis_in_use, figura.centraor())
     if not downloading:
-        assaig_button_press(croquis_in_use["Nom"], assaig= assaig)
+        croquis = croquis_in_use["Nom"]
+        croquis_in_use = None
+        assaig_button_press(croquis, assaig= assaig)
 
     return croquis_in_use
 
@@ -439,7 +487,7 @@ def up_to_date(combobox_to_reset, parents):
             if i not in assaig:
                 print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i) + 1).get_all_records()[0]
-                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, parents, downloading = False, online = True)
+                inicialitzar_figura(croquis_cloud["Figura"],combobox_to_reset, parents, downloading = True, online = True)
 
     for i in range(len(figures)):
         canvas = assaig[croquis_in_use["Nom"]]["Canvas"]
@@ -462,10 +510,19 @@ def up_to_date(combobox_to_reset, parents):
                     canvas.itemconfig(target_drawing[-1], text = target_data[1].upper()[:len(target_data[1].upper().split(" ")[0])+2], fill = "black")
 
                     canvas.itemconfig(target_drawing[0], fill = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(list(croquis_in_use.keys())[target_ID].split(" ")[0])]) )
-                    assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 1, target_data[1])
+                    # assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 1, target_data[1])
+
+                    current_values = assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1).get("values")
+                    current_values[1] = target_data[1]
+                    assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1, values=current_values)
                     try:
-                        assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 2,
-                                      taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2])
+                        current_values = assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1).get("values")
+                        current_values[2] = taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2]
+                        assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1, values=current_values)
+
+                    # try:
+                    #     assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 2,
+                    #                   taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2])
                     except:
                         pass
                 assaig[croquis_in_use["Nom"]].update({"Croquis": croquis_in_use})

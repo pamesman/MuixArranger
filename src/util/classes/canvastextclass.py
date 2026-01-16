@@ -10,12 +10,14 @@ class CanvasText(CTkBaseClass):
         super().__init__(master = parent)
         self.window = window
         self.parent = parent
-        self.position = text    #Base, Mans, etc.
+        self.position = text    #Base 1, Mans 13, etc.
+        self.color2 = color
+
         # Tractament diferencial si hi ha o no algú seleccionat:
         if croquis_en_us[text].strip() == "N. A.":
             self.text = text.split(" ")[0]  #El text es "Base, Mans etc.
             self.color = "" #Rectangle sense fill
-            self.outline = self._apply_appearance_mode(color)
+            self.outline = self._apply_appearance_mode(self.color2)
             self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
         else:
             self.text = croquis_en_us[text] #El text es la persona
@@ -24,7 +26,6 @@ class CanvasText(CTkBaseClass):
             self.text_color = "black"
 
 
-        self.color2 = color
 
         self.location = location #Coordenades
         self.corrector = corrector  #Centra la figura
@@ -87,7 +88,7 @@ class CanvasText(CTkBaseClass):
                                         border_width = 1,
                                         tags = ("rectangle", self.position, self.text.split(" ")[0]),
                                         radius = 10
-                                        )[0]
+                                        )
 
         self.entry = customtkinter.CTkEntry(self.parent, width=self.entry_width)
         self.textvar = tkinter.StringVar()
@@ -96,28 +97,24 @@ class CanvasText(CTkBaseClass):
 
         self.lb.bind("<Button-1>", self.insertar_membre)
         self.entry.bind("<KeyRelease>", self.search_items)
+        self.entry.bind("<Escape>", self.forget)
         self.parent.tag_bind(self.txt, "<Enter>", self.on_focus)
         self.parent.tag_bind(self.txt, "<Leave>", self.on_defocus)
         self.parent.tag_bind(self.txt, "<Button-1>", self.on_click)
         self.parent.tag_bind(self.txt, "<Button-3>", self.on_right_click)
 
+
         self.toggle = False
         if self.croquis_en_us[self.position] == "+":
-            print("hi")
-            self.on_right_click(None, downloading = True)
-            self.toggle = True
             self.parent.itemconfig(self.shape, fill="", outline="")
-            self.parent.itemconfig(self.txt, font=("Arial", 14), text="+")
-            self.croquis_en_us[self.position] = "+"
-            self.text = self.position
-        else:
-            self.toggle = False
+            self.parent.itemconfig(self.txt, font=( "Arial", 14), text="+", fill=self._apply_appearance_mode(("#333333","#AAAAAA")))
+            self.toggle = True
+
 
     def insertar_membre(self, value):
         value = self.lb.get(self.lb.nearest(value.y))
 
         if self.interval != None:
-            print("we're online")
             self.interval.stop()
         self.text= value
         for name in self.croquis_en_us.values():
@@ -126,9 +123,16 @@ class CanvasText(CTkBaseClass):
 
         if self.text not in self.croquis_en_us.keys():
             self.croquis_en_us.update({list(self.croquis_en_us.keys())[list(self.croquis_en_us.keys()).index(self.position)]: self.text})
-            self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, self.text)
+            # self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, self.text)
+            current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get("values")
+            current_values[1] = self.text
+            self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values = current_values)
             try:
-                self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2, self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2])
+                current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get(
+                    "values")
+                current_values[2] = self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2]
+                self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values=current_values)
+                # self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2, self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2])
             except:
                 pass
 
@@ -137,7 +141,7 @@ class CanvasText(CTkBaseClass):
 
         self.parent.itemconfig(self.txt, text=value)
         self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
-        self.parent.itemconfig(self.shape, outline="", fill="")
+
         self.parent.itemconfig(self.txt, fill = "black")
         print(self.croquis_en_us["Nom"], "\n", self.position, ": ", self.text)
         if self.interval != None:
@@ -212,7 +216,6 @@ class CanvasText(CTkBaseClass):
             self.entry.focus_set()
 
             def forget(_event):
-                self.focus_get()
                 self.entry.place_forget()
                 self.lb.place_forget()
 
@@ -230,10 +233,11 @@ class CanvasText(CTkBaseClass):
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
             else:
                 self.parent.itemconfig(self.shape, fill="")
-                self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
+        else:
+                self.parent.itemconfig(self.shape, fill="")
+
 
     def on_right_click(self, _event, downloading = False):
-        print("im happening")
         if self.position.split(" ")[0] not in ["Base", "Segona", "Tercera", "Alsadora", "Xicalla", "Quarta"]:
             if not self.toggle:
                 self.toggle = True
@@ -241,14 +245,17 @@ class CanvasText(CTkBaseClass):
                 self.parent.itemconfig(self.shape, fill = "", outline = "")
                 self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+")
                 self.croquis_en_us[self.position] = self.text
-                self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, "+")
+                current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get("values")
+                current_values[1] = "+"
+                self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values = current_values)
                 if self.interval != None and not downloading:
                     self.interval.stop()
                     self.drive_callback()
                     self.interval.start()
             else:
                 self.parent.itemconfig(self.shape, fill="", outline=self._apply_appearance_mode(self.color2))
-                self.parent.itemconfig(self.txt, font=("Arial", self.text_size), text=self.position.split(" ")[0], fill = "#AAAAAA")
+                self.text = self.position.split(" ")[0]
                 self.croquis_en_us[self.position] = "N. A."
+
                 self.toggle = False
 

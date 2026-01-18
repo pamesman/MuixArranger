@@ -111,7 +111,7 @@ paleta_oficial_oscura = Esquema("PaletaD","#D09CB4","#C87800","#F39533","#F39533
 
 palette_l = list(vars(paleta_oficial).values())
 palette_d = list(vars(paleta_oficial_oscura).values())
-palette = [(palette_l[i],palette_d[i]) for i in range(1,len(palette_l))]
+palette = [(palette_l[i],palette_d[i]) for i in range(1,len(palette_l)-1)]
 main_color = (palette[2][1],palette[1][1])
 inv_color = (main_color[1],main_color[0])
 

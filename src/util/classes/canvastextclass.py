@@ -126,15 +126,11 @@ class CanvasText(CTkBaseClass):
             # self.taula.insert((list(self.croquis_en_us.keys()).index(self.position)) - 1, 1, self.text)
             current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get("values")
             current_values[1] = self.text
-            self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values = current_values)
             try:
-                current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get(
-                    "values")
                 current_values[2] = self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2]
-                self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values=current_values)
-                # self.taula.insert(list(self.croquis_en_us.keys()).index(self.position) - 1, 2, self.dataframe.loc[self.dataframe["Àlies"] == self.text].iloc[0, 2])
             except:
                 pass
+            self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values=current_values)
 
 
         value = value[:len(value.split(" ")[0])+2]
@@ -231,6 +227,8 @@ class CanvasText(CTkBaseClass):
             if self.text.split(" ")[0] != self.position.split(" ")[0]:
                 self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.color2))
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
+            elif self.text.split(" ")[0] == "+":
+                self.parent.itemconfig(self.shape, fill="")
             else:
                 self.parent.itemconfig(self.shape, fill="")
         else:
@@ -243,19 +241,26 @@ class CanvasText(CTkBaseClass):
                 self.toggle = True
                 self.text = "'+"
                 self.parent.itemconfig(self.shape, fill = "", outline = "")
-                self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+")
+                self.parent.itemconfig(self.txt, font=("Arial", 14), text = "+", fill =self._apply_appearance_mode(("#333333","#AAAAAA") ))
                 self.croquis_en_us[self.position] = self.text
                 current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get("values")
                 current_values[1] = "+"
                 self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values = current_values)
-                if self.interval != None and not downloading:
-                    self.interval.stop()
-                    self.drive_callback()
-                    self.interval.start()
             else:
                 self.parent.itemconfig(self.shape, fill="", outline=self._apply_appearance_mode(self.color2))
+
                 self.text = self.position.split(" ")[0]
+                self.parent.itemconfig(self.txt, text = self.text,font = ("Arial", self.text_size,"bold"), fill = self._apply_appearance_mode(("#333333","#AAAAAA")))
                 self.croquis_en_us[self.position] = "N. A."
 
+                current_values = self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1).get("values")
+                current_values[1] = self.text
+                self.taula.item((list(self.croquis_en_us.keys()).index(self.position)) - 1, values = current_values)
+
                 self.toggle = False
+
+            if self.interval != None and not downloading:
+                self.interval.stop()
+                self.drive_callback()
+                self.interval.start()
 

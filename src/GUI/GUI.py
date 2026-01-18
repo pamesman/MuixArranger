@@ -79,7 +79,7 @@ repertori_frame.place(relx=.01,rely=.07, relheight=0.92,relwidth=0.1,anchor="nw"
 repertori_label = customtkinter.CTkComboBox(frame,
                                             fg_color=rep.main_color, button_color=rep.main_color, button_hover_color=rep.inv_color, corner_radius=5, font=("Liberation Sans",16, "bold"), border_width= 0,
                                             values = [i.nom for i in rep.repertori.values()],
-                                            command = lambda x : f.inicialitzar_figura(x, repertori_label, frame_catalog, online= online),
+                                            command = lambda x : f.inicialitzar_figura({"Figura":x}, repertori_label, frame_catalog, online= online),
                                             state = "readonly")
 repertori_label.set("Afegir figura")
 repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=0.1*0.99)
@@ -88,12 +88,7 @@ repertori_label.place(relx=0.01,rely=0.01,anchor="nw", relheight=0.05, relwidth=
 croquis_frame = customtkinter.CTkFrame(frame, fg_color = ("#FFFFFF", "#333333"))
 croquis_frame.place(relx = 0.12, rely = 0.5, anchor ="w", relheight = 0.98, relwidth = .66)
 croquis_frame.update()
-croquis_frame.bind("<Configure>", lambda event : f.resize(event, canvas2))
-canvas2 = tkinter.Canvas(croquis_frame, width=croquis_frame.winfo_width() - croquis_frame.cget("corner_radius") * 4,
-                         height=croquis_frame.winfo_height() - croquis_frame.cget("corner_radius") * 2,
-                         bg=croquis_frame._apply_appearance_mode(("black", "#333333")), highlightthickness=0,
-                         )
-canvas2.place(relx=0.5, rely=0.5, anchor="center")
+
 
 #NOM FIGURA
 namer = customtkinter.CTkEntry(croquis_frame, placeholder_text="Nom de Figura-X", font=("Liberation Sans", 16, "bold"), state="disabled")
@@ -101,7 +96,7 @@ namer_button = customtkinter.CTkButton(croquis_frame, text="Actualitzar nom", fo
 namer_button.place(relx = 0.42,rely = 0.01,  anchor= "nw")
 namer.place(relx=0.01, rely=0.01, relwidth=0.4)
 
-deleter = customtkinter.CTkButton(croquis_frame, text="Eliminar figura", font=("Liberation Sans", 14, "bold"), height= 28, command= lambda x=canvas2 : f.eliminar_figura(x), state="disabled", fg_color = rep.main_color, hover_color=rep.inv_color)
+deleter = customtkinter.CTkButton(croquis_frame, text="Eliminar figura", font=("Liberation Sans", 14, "bold"), height= 28, command= lambda x=0 : f.eliminar_figura(x), state="disabled", fg_color = rep.main_color, hover_color=rep.inv_color)
 deleter.place(relx = 0.88,rely = 0.01,  anchor= "nw")
 
 #Taula tècnica
@@ -127,7 +122,7 @@ frame_catalog = [repertori_frame, croquis_frame, taula_frame]
 
 #Darkmode Button
 CTkButton(frame,text = "☀ / ☾",
-          command=lambda x = canvas2: f.canviar_apariencia(x),
+          command = f.canviar_apariencia,
           width = 20,fg_color =rep.main_color, hover_color=rep.inv_color).place(relx=1, rely=1, anchor="se")
 
 #Popup Connectivitat

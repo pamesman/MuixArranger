@@ -64,11 +64,11 @@ assaig_tab = tabview.add("Assaig")  # add tab at the end
 ###
 assaig_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Assaig"), fg_color="#AAAAAA")
 assaig_frame.place(relx = 0.01, rely = 0.01, relwidth = 0.98, relheight = 0.98, anchor = "nw")
-uppdate_assaig = customtkinter.CTkButton(assaig_frame, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame))
-
-uppdate_assaig2 = customtkinter.CTkButton(assaig_frame, text="Act", width = 30, height= 10,command=lambda x=3: f.funcion(x, assaig_frame))
-uppdate_assaig2.pack(pady = 10)
-uppdate_assaig.pack(pady = 10)
+uppdate_assaig = customtkinter.CTkButton(assaig_tab, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame))
+assaig_frame.update()
+uppdate_assaig2 = customtkinter.CTkButton(assaig_tab, text="Act", width = 30, height= 10,command=lambda x=3: f.funcion(x, assaig_frame))
+uppdate_assaig2.place(x = 150, y = 20)
+uppdate_assaig.place(x = 20, y = 20)
 ### CROQUIS TAB ###
 frame = customtkinter.CTkFrame(master=tabview.tab("Croquis"))
 frame.place(relx=0.5,rely=0.5,anchor="c",relheight=1, relwidth=1)

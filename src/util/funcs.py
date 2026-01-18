@@ -40,7 +40,7 @@ unchanged_nagger = []
 working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
 tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
-
+tecnica_fora = set(tecnica["Àlies"])
 
 if assistents_id == "1nMrNL_sKmcuHPmbOImELO9qfEAAmiFVmukd3PQ3xjNg":
     config_changed = False
@@ -54,6 +54,29 @@ if sheet_id == "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs":
 if sheet_id == "1KJrjm34obf6L2BtFBC8WsB2rVpQMFcusIDVeTMu5MmU":
     config_changed = False
     unchanged_nagger.append("id_assaig")
+
+def update_tecnica():
+    global tecnica_fora
+    global croquis_in_use
+    croquis_ref = croquis_in_use.copy()
+    tecnica_fora_nova = set(set(list(tecnica["Àlies"]))-set(croquis_in_use.values()))
+    if tecnica_fora == tecnica_fora_nova:
+        return
+    excloure = 0
+    for i in taula_pack[6].winfo_children():
+        if excloure == 0:
+            excloure += 1
+            continue
+        i.destroy()
+    tecnica_fora = set(tecnica["Àlies"])-set(croquis_in_use.values())
+    for i in tecnica_fora:
+        customtkinter.CTkLabel(taula_pack[6], text= i).pack()
+
+
+
+    pass
+observer1 = Interval(0.5, update_tecnica)
+
 
 def pass_variable (anything):
     global taula_pack
@@ -121,60 +144,66 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
     global taula_mestra
     global assaig
     canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#FFFFFF", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
-    canvas.place(relx = 0.5, rely = 0.5, anchor = "center")
-    canvas.tk.call("lower", canvas._w, None)
+    if skip:
+        print(parent[1].winfo_width())
+        print(parent[1].winfo_height())
+        canvas.pack(expand = tkinter.YES, fill = tkinter.BOTH)
+    else:
+        canvas.place(relx = 0.5, rely = 0.5, anchor = "center")
+        canvas.tk.call("lower", canvas._w, None)
 
-    for figura in list(assaig.keys())[:-1]:
-        assaig[figura]["Taula"].pack_forget()
+    if not skip:
+        for figura in list(assaig.keys())[:-1]:
+            assaig[figura]["Taula"].pack_forget()
 
-    parent[1].bind("<Configure>", lambda event: resize(event, canvas))
-    ttk.Style().configure("Treeview",
-                          rowheight=30,
-                          background = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
-                          foreground = parent[1]._apply_appearance_mode(("black","white")),
-                          fieldbackground = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
-                          borderwidth = 0,
-                          highlightthickness = 0,
-                          relief = "flat"
-                          )
-    ttk.Style().configure("Treeview.Heading",
-                          background = "#F1B300",
-                          borderwidth=0,
-                          highlightthickness=0,
-                          relief="flat",
+        parent[1].bind("<Configure>", lambda event: resize(event, canvas))
+        ttk.Style().configure("Treeview",
+                              rowheight=30,
+                              background = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
+                              foreground = parent[1]._apply_appearance_mode(("black","white")),
+                              fieldbackground = parent[1]._apply_appearance_mode(("#EEEEEE", "#333333")),
+                              borderwidth = 0,
+                              highlightthickness = 0,
+                              relief = "flat"
+                              )
+        ttk.Style().configure("Treeview.Heading",
+                              background = "#F1B300",
+                              borderwidth=0,
+                              highlightthickness=0,
+                              relief="flat",
 
-                          )
+                              )
 
-    treeview = ttk.Treeview(parent[2] , height = len(croquiss.keys())-2,show = "headings", selectmode="none",style="Treeview")
-    treeview.tag_configure('impar', background=parent[1]._apply_appearance_mode(("#D6D6D6", "#3F3F3F")))
-    treeview['columns'] = ("Posició", "Nom", "Alçada espatlles")
-    treeview.bind('<Motion>', 'break')
+        treeview = ttk.Treeview(parent[2] , height = len(croquiss.keys())-2,show = "headings", selectmode="none",style="Treeview")
+        treeview.tag_configure('impar', background=parent[1]._apply_appearance_mode(("#D6D6D6", "#3F3F3F")))
+        treeview['columns'] = ("Posició", "Nom", "Alçada espatlles")
+        treeview.bind('<Motion>', 'break')
 
-    treeview.column("#0",width = 0, stretch = False)
-    treeview.column("Posició", width = 100)
-    treeview.column("Nom", width = 100, anchor="w")
-    treeview.column("Alçada espatlles", width = 100, anchor = "center")
+        treeview.column("#0",width = 0, stretch = False)
+        treeview.column("Posició", width = 100)
+        treeview.column("Nom", width = 100, anchor="w")
+        treeview.column("Alçada espatlles", width = 100, anchor = "center")
 
-    treeview.heading("Posició", text = "Posició")
-    treeview.heading("Nom", text = "Nom")
-    treeview.heading("Alçada espatlles",text = "Espatlles")
+        treeview.heading("Posició", text = "Posició")
+        treeview.heading("Nom", text = "Nom")
+        treeview.heading("Alçada espatlles",text = "Espatlles")
 
-    treeview.pack(pady = 20)
-    treeview_counter = 0
+        treeview.pack(pady = 20)
+        treeview_counter = 0
 
-    for valuelist in croquis_to_table(croquiss, taula_mestra):
-        if treeview_counter == 0:
-            treeview_counter = 1
-            continue
-        if treeview_counter % 2 == 1:
-            tag = "impar"
-        else:
-            tag = "par"
-        treeview.insert('', 'end', treeview_counter, values=valuelist, tags=tag)
-        treeview_counter += 1
-    assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":treeview})
-    taula_pack[2].configure(text="Figura: " + croquiss["Figura"])
-    taula_pack[1].configure(text="Id: " + croquiss["Nom"])
+        for valuelist in croquis_to_table(croquiss, taula_mestra):
+            if treeview_counter == 0:
+                treeview_counter = 1
+                continue
+            if treeview_counter % 2 == 1:
+                tag = "impar"
+            else:
+                tag = "par"
+            treeview.insert('', 'end', treeview_counter, values=valuelist, tags=tag)
+            treeview_counter += 1
+        assaig[croquiss["Nom"]].update({"Canvas":canvas, "Taula":treeview})
+        taula_pack[2].configure(text="Figura: " + croquiss["Figura"])
+        taula_pack[1].configure(text="Id: " + croquiss["Nom"])
 
 
 
@@ -281,6 +310,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
 def assaig_button_press(nom, assaig):
     global croquis_in_use
     global taula_pack
+    global observer1
 
     if online:
         updater.start()
@@ -315,6 +345,7 @@ def assaig_button_press(nom, assaig):
     tecnica_fora = set(tecnica["Àlies"])-set(croquis_in_use.values())
     for i in tecnica_fora:
         customtkinter.CTkLabel(taula_pack[6], text= i).pack()
+    observer1.start()
 
 def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, downloading = False):
     global assaig
@@ -613,6 +644,8 @@ def minimizar2(button_expand2, croquis_frame, taula_frame):
 
 def actualitzar_assaig_output(_event, frame):
     global assaig
+    print("run")
+    frame.update()
     contador = 0
     for i in frame.winfo_children():
         if contador < 2:
@@ -620,6 +653,8 @@ def actualitzar_assaig_output(_event, frame):
             continue
         i.destroy()
     for i in list(assaig.keys()):
-        canvas = customtkinter.CTkCanvas(frame, bg="white", width=frame.winfo_width(), height=frame.winfo_width())
-        canvas.pack(pady=10)
-        fer_dibuix(canvas,assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)
+        frame.update()
+        frame2 = customtkinter.CTkFrame(frame, height=frame.master.winfo_height(), width= frame.master.winfo_height()*4/3)
+        frame2.pack(pady=20)
+        frame2.update()
+        fer_dibuix([None, frame2],assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)

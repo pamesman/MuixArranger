@@ -104,6 +104,12 @@ namer.place(relx=0.01, rely=0.01, relwidth=0.4)
 deleter = customtkinter.CTkButton(croquis_frame, text="Eliminar figura", font=("Liberation Sans", 14, "bold"), height= 28, command= lambda x=canvas2 : f.eliminar_figura(x), state="disabled", fg_color = rep.main_color, hover_color=rep.inv_color)
 deleter.place(relx = 0.88,rely = 0.01,  anchor= "nw")
 
+#Taula tècnica
+tec_frame = customtkinter.CTkFrame(croquis_frame)
+tec_frame.place(relx = .99, rely = .99, relwidth = 0.1, relheight = 0.25, anchor = "se")
+tec_label = customtkinter.CTkLabel(tec_frame, text= "Fora de figura", font=("Liberation Sans", 14, "bold", "underline"))
+tec_label.pack()
+
 #TAULA
 taula_frame = customtkinter.CTkScrollableFrame(frame)
 taula_frame.place(relx = .79, rely = .5, anchor = "w", relheight = .98, relwidth = 0.2)
@@ -112,9 +118,9 @@ taula_name = customtkinter.CTkLabel(taula_frame, text = "")
 taula_namefig = customtkinter.CTkLabel(taula_frame, text = "")
 taula_name.pack()
 taula_namefig.pack()
-# taula.pack(expand = True,  pady = 20)
+
 taula = 0
-taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter]
+taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter, tec_frame]
 f.pass_variable(taula_pack)
 
 frame_catalog = [repertori_frame, croquis_frame, taula_frame]

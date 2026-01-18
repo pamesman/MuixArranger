@@ -38,6 +38,7 @@ config_changed = True
 unchanged_nagger = []
 working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
+tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
 
 
 if assistents_id == "1nMrNL_sKmcuHPmbOImELO9qfEAAmiFVmukd3PQ3xjNg":
@@ -125,6 +126,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
     taula_pack[3].lift()
     taula_pack[4].lift()
     taula_pack[5].lift()
+    taula_pack[6].lift()
     for figura in list(assaig.keys())[:-1]:
         assaig[figura]["Taula"].pack_forget()
 
@@ -294,6 +296,7 @@ def assaig_button_press(nom, assaig):
     taula_pack[3].lift()
     taula_pack[4].lift()
     taula_pack[5].lift()
+    taula_pack[6].lift()
 
 
     #Activa "namer"
@@ -305,6 +308,18 @@ def assaig_button_press(nom, assaig):
     taula_pack[3].configure(placeholder_text=croquis_in_use["Nom"])
     taula_pack[2].configure(text="Figura: " + croquis_in_use["Figura"])
     taula_pack[1].configure(text="Id: " + croquis_in_use["Nom"])
+
+    #taula tècnica
+    excloure = 0
+    for i in taula_pack[6].winfo_children():
+        if excloure == 0:
+            excloure += 1
+            continue
+        i.destroy()
+
+    tecnica_fora = set(tecnica["Àlies"])-set(croquis_in_use.values())
+    for i in tecnica_fora:
+        customtkinter.CTkLabel(taula_pack[6], text= i).pack()
 
 def inicialitzar_figura(selected_fig, combobox_to_reset, parents, online = False, downloading = False):
     global assaig
@@ -366,6 +381,7 @@ def inicialitzar_figura(selected_fig, combobox_to_reset, parents, online = False
     assaig.update({croquis_in_use["Nom"]: {"Figura": figura, "Croquis": croquis_in_use, "Butó": button}})
     """"""
     fer_dibuix(parents, figura.coordenades, croquis_in_use, figura.centraor())
+    assaig[croquis_in_use["Nom"]]["Canvas"].place_forget()
     if not downloading:
         croquis = croquis_in_use["Nom"]
         croquis_in_use = None

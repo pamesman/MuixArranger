@@ -139,19 +139,19 @@ class CanvasText(CTkBaseClass):
         self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
 
         self.parent.itemconfig(self.txt, fill = "black")
-        print(self.croquis_en_us["Nom"], "\n", self.position, ": ", self.text)
-        if self.interval != None:
-            self.drive_callback()
-            self.interval.start()
+        # print(self.croquis_en_us["Nom"], "\n", self.position, ": ", self.text)
+        # if self.interval != None:
+            # self.drive_callback()
+            # self.interval.start()
         self.forget()
 
-    def drive_callback(self):
-        print(self.text)
-        try:
-            self.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
-            print("exito")
-        except:
-            print("mistake was sucedido")
+    # def drive_callback(self):
+    #     print(self.text)
+    #     try:
+    #         self.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
+    #         print("exito")
+    #     except:
+    #         print("mistake was sucedido")
 
     def search_items(self, _event):
         search_value = self.entry.get()
@@ -183,6 +183,8 @@ class CanvasText(CTkBaseClass):
 
     def on_click(self, _event):
         self.entry.delete(0, "end")
+
+
         if not self.toggle:
             self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
             if "N. A." in list(self.working_values):
@@ -203,9 +205,9 @@ class CanvasText(CTkBaseClass):
             self.sb.config(command=self.lb.yview)
 
             #Debugging per a windows laptops
-            print(_event.x, ",", _event.y)
-            print(self.parent.coords(self.txt)[0], ",", self.parent.coords(self.txt)[1])
-            print(self.parent.coords(self.txt)[0]- self.entry_width/2+2, ",", self.parent.coords(self.txt)[1]+ self.entry_height-5)
+            # print(_event.x, ",", _event.y)
+            # print(self.parent.coords(self.txt)[0], ",", self.parent.coords(self.txt)[1])
+            # print(self.parent.coords(self.txt)[0]- self.entry_width/2+2, ",", self.parent.coords(self.txt)[1]+ self.entry_height-5)
 
             self.entry.place(x=self.parent.coords(self.txt)[0], y=self.parent.coords(self.txt)[1], anchor="center")
 
@@ -261,6 +263,6 @@ class CanvasText(CTkBaseClass):
 
             if self.interval != None and not downloading:
                 self.interval.stop()
-                self.drive_callback()
+                #self.drive_callback()
                 self.interval.start()
 

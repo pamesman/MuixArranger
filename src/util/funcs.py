@@ -5,6 +5,7 @@ from tkinter import ttk
 import customtkinter
 import pandas as pd
 import CTkMessagebox
+from time import sleep, time
 
 from src.util.classes.esquema import Esquema
 from src.util.classes.canvastextclass import CanvasText
@@ -33,6 +34,7 @@ expand_is_on2 = False
 updater = None
 sheet = None
 online = False
+donotupdate = False
 
 assistents_id, membres_id, sheet_id  = config_reader.get_config()
 config_changed = True
@@ -41,6 +43,10 @@ working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
 tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
 tecnica_fora = set(tecnica["Àlies"])
+
+update_batch = {}
+countdown = 0
+
 
 if assistents_id == "1nMrNL_sKmcuHPmbOImELO9qfEAAmiFVmukd3PQ3xjNg":
     config_changed = False
@@ -55,10 +61,13 @@ if sheet_id == "1KJrjm34obf6L2BtFBC8WsB2rVpQMFcusIDVeTMu5MmU":
     config_changed = False
     unchanged_nagger.append("id_assaig")
 
+
+
 def update_tecnica():
     global tecnica_fora
     global croquis_in_use
-    croquis_ref = croquis_in_use.copy()
+    global taula_pack
+
     tecnica_fora_nova = set(set(list(tecnica["Àlies"]))-set(croquis_in_use.values()))
     if tecnica_fora == tecnica_fora_nova:
         return
@@ -72,11 +81,54 @@ def update_tecnica():
     for i in tecnica_fora:
         customtkinter.CTkLabel(taula_pack[6], text= i).pack()
 
-
-
     pass
-observer1 = Interval(0.5, update_tecnica)
 
+
+update_batch = {}
+def batch_creator():
+    global croquis_ref
+    global croquis_in_use
+
+
+    global updater
+    global update_batch
+
+
+    for entry in list(croquis_ref.keys()):
+        update_batch.update({croquis_in_use["Nom"]: {}})
+        if croquis_ref[entry] != croquis_in_use[entry]:
+
+
+
+            print("change")
+            update_batch[croquis_in_use["Nom"]].update({entry:croquis_in_use[entry]})
+            drive_update2(update_batch)
+            if croquis_in_use[entry] == "'+":
+                croquis_in_use[entry] = "+"
+            croquis_ref = croquis_in_use.copy()
+
+
+        else:
+
+            pass
+
+
+observer1 = Interval(0.2, update_tecnica)
+observer2 = Interval(1, batch_creator)
+
+def drive_update2(update):
+    global sheet
+    for i in list(update.keys()):
+        for k in list(update[i].keys()):
+            print("Figura,Posicio, Data")
+            print(i,k, update[i][k])
+            print("updating excel...")
+            sheet.worksheet(i).update_cell(2, list(assaig[i]["Croquis"].keys()).index(k)+1,  value=update[i][k])
+            print("exito")
+
+
+            # except:
+            #     print("mistake was sucedido")
 
 def pass_variable (anything):
     global taula_pack
@@ -207,6 +259,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
 
 
     counter = 0
+    counter = 0
     for i in croquiss.keys():
 
         if i == "Nom" or i == "Figura":
@@ -274,12 +327,18 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
 
 
 
-        CanvasText(canvas.master.master.master, canvas,
-                              i, coord,corrector,
-                              working_list, assaig[croquiss["Nom"]]["Taula"], croquiss, taula_mestra,
-                              interval = updater, sheet = sheet,
-                              orientation = -orientation,
-                              color =rep.palette[rep.rols.index(i.split(" ")[0])],list_len=10)
+        CanvasText(canvas.master.master.master,
+                   canvas,
+                   i, coord,corrector,
+                   working_list,
+                   assaig[croquiss["Nom"]]["Taula"],
+                   croquiss,
+                   taula_mestra,
+                   interval = updater,
+                   sheet = sheet,
+                   orientation = -orientation,
+                   color =rep.palette[rep.rols.index(i.split(" ")[0])],
+                   list_len=10)
 
 
 
@@ -309,12 +368,16 @@ def assaig_button_press(nom, assaig):
     global croquis_in_use
     global taula_pack
     global observer1
+    # global observer2
+    global croquis_ref
+
 
     if online:
         updater.start()
     if croquis_in_use == assaig[nom]["Croquis"] and croquis_in_use != None:
         return
     croquis_in_use = assaig[nom]["Croquis"]
+    croquis_ref = croquis_in_use.copy()
     for figura in list(assaig.keys()):
         assaig[figura]["Taula"].pack_forget()
 
@@ -338,12 +401,17 @@ def assaig_button_press(nom, assaig):
         if excloure == 0:
             excloure += 1
             continue
-        i.destroy()
+        try:
+            i.destroy()
+        except:
+            pass
 
     tecnica_fora = set(tecnica["Àlies"])-set(croquis_in_use.values())
     for i in tecnica_fora:
         customtkinter.CTkLabel(taula_pack[6], text= i).pack()
     observer1.start()
+    if online:
+        observer2.start()
 
 def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, downloading = False):
     global assaig
@@ -351,7 +419,6 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
     selected_fig = croquis["Figura"]
 
     if online:
-        print("Parant updater")
         try:
             updater.stop()
         except:
@@ -371,9 +438,9 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
         #Comprovació: noms repetits
         if answer in assaig.keys():
             alerta = CTkMessagebox.CTkMessagebox(title="Alerta",
-                                   message="Ja hi ha una figura en aquest nom, estàs segur que vols sobreescriure-la?",
-                                   option_1= "Sobreescriu",
-                                   option_2 = "Cancelar" )
+                                                 message="Ja hi ha una figura en aquest nom, estàs segur que vols sobreescriure-la?",
+                                                 option_1= "Sobreescriu",
+                                                 option_2 = "Cancelar" )
             if alerta.get() == "Sobreescriu":
                 assaig[answer]["Butó"].destroy()
                 del assaig[answer]
@@ -397,9 +464,12 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
             sheet.worksheet(croquis["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis.keys()))), values=[list(croquis.keys()),list(croquis.values())])
         except:
             pass
-    button = customtkinter.CTkButton(parents[0], text=croquis["Nom"],
+    button = customtkinter.CTkButton(parents[0],
+                                     text=croquis["Nom"],
                                      command=lambda nom=croquis["Nom"]: assaig_button_press(nom, assaig),
-                                     fg_color=rep.main_color, hover_color=rep.inv_color, font=("Arial", 14, "bold"))
+                                     fg_color=rep.main_color,
+                                     hover_color=rep.inv_color,
+                                     font=("Arial", 14, "bold"))
     button.pack(pady=5)
     """"""
     figura = rep.repertori2[croquis["Figura"]]
@@ -460,6 +530,12 @@ def actualitzar_nom_figura():
     taula_pack[1].configure(text="Id: " + taula_pack[3].get())
 
 def croquis_to_table(croquis_generat:dict,dt = None):
+    """
+
+    :param croquis_generat:
+    :param dt:
+    :return:
+    """
     listah = [["Posició", "Nom","Muscle"]]
     croquis_intern = croquis_generat.copy()
     del croquis_intern["Nom"]
@@ -525,6 +601,9 @@ def up_to_date(combobox_to_reset, parents):
     global assaig
     global croquis_in_use
     global taula_pack
+    global updater
+    start = time()
+    updater.stop()
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
     figures = list(result.keys())[1:]
     if len(figures) != len(assaig):
@@ -553,28 +632,41 @@ def up_to_date(combobox_to_reset, parents):
             for j in precroquis:
                 croquis_cloud.update({j:precroquis[j][0]})
             if croquis_in_use != croquis_cloud:
+
                 print("canvió la figura")
+                print(donotupdate)
+                print(croquis_in_use)
+                print(croquis_cloud)
                 diferencia = set(croquis_cloud.values()) - set(croquis_in_use.values())
+                print("diferencia")
                 print(diferencia)
-                croquis_in_use = croquis_cloud
+
                 for change in diferencia:
-                    target_ID = list(croquis_in_use.values()).index(change)
-                    target_data = [list(croquis_in_use.keys())[target_ID],list(croquis_in_use.values())[target_ID]]
+                    target_ID = list(croquis_cloud.values()).index(change)
+                    target_data = [list(croquis_cloud.keys())[target_ID],list(croquis_cloud.values())[target_ID]]
                     target_drawing =canvas.find_withtag(target_data[0])
-                    print(target_data)
+
                     canvas.itemconfig(target_drawing[-1], text = target_data[1].upper()[:len(target_data[1].upper().split(" ")[0])+2], fill = "black")
 
-                    canvas.itemconfig(target_drawing[0], fill = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(list(croquis_in_use.keys())[target_ID].split(" ")[0])]) )
-                    # assaig[croquis_in_use["Nom"]]["Taula"].insert(target_ID -1, 1, target_data[1])
+                    canvas.itemconfig(target_drawing[0], fill = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(list(croquis_cloud.keys())[target_ID].split(" ")[0])]) )
 
-                    current_values = assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1).get("values")
+                    current_values = assaig[croquis_cloud["Nom"]]["Taula"].item(target_ID - 1).get("values")
                     current_values[1] = target_data[1]
+                    croquis_in_use.update({target_data[0]:target_data[1]})
+                    print("target data")
+                    print(target_data[1])
                     try:
                         current_values[2] = taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2]
                     except:
                         pass
                     assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1, values=current_values)
                 assaig[croquis_in_use["Nom"]].update({"Croquis": croquis_in_use})
+
+    up_to_date_running = False
+    end = time()
+    print(end-start)
+    updater.start()
+
 
 def minimizar(button_expand, croquis_frame, repertori_frame, repertori_label):
     global expand_is_on

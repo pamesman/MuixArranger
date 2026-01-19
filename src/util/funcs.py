@@ -145,8 +145,6 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
     global assaig
     canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#FFFFFF", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
     if skip:
-        print(parent[1].winfo_width())
-        print(parent[1].winfo_height())
         canvas.pack(expand = tkinter.YES, fill = tkinter.BOTH)
     else:
         canvas.place(relx = 0.5, rely = 0.5, anchor = "center")
@@ -543,7 +541,6 @@ def up_to_date(combobox_to_reset, parents):
             if i not in assaig:
                 print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i)+1).get_all_records()[0]
-                print(croquis_cloud)
                 global croquis_loading
                 croquis_loading = croquis_cloud.copy()
                 inicialitzar_figura(croquis_loading,combobox_to_reset, parents, downloading = True, online = True)
@@ -556,7 +553,6 @@ def up_to_date(combobox_to_reset, parents):
             for j in precroquis:
                 croquis_cloud.update({j:precroquis[j][0]})
             if croquis_in_use != croquis_cloud:
-                print(croquis_in_use, croquis_cloud)
                 print("canvió la figura")
                 diferencia = set(croquis_cloud.values()) - set(croquis_in_use.values())
                 print(diferencia)
@@ -657,4 +653,4 @@ def actualitzar_assaig_output(_event, frame):
         frame2 = customtkinter.CTkFrame(frame, height=frame.master.winfo_height(), width= frame.master.winfo_height()*4/3)
         frame2.pack(pady=20)
         frame2.update()
-        fer_dibuix([None, frame2],assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)
+        fer_dibuix([None, frame2], assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)

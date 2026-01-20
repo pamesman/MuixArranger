@@ -735,10 +735,16 @@ def minimizar2(button_expand2, croquis_frame, taula_frame):
 
 def actualitzar_assaig_output(_event, frame, parents):
     global assaig
-    canvas_list_to_print = []
+    try:
+        for canvas in frame.winfo_children():
+            canvas.destroy()
+    except:
+        pass
+
     print("run")
     frame.update()
     contador = 0
+    canvas_list_to_print = []
     for i in frame.winfo_children():
         if contador < 2:
             contador = +1
@@ -747,9 +753,16 @@ def actualitzar_assaig_output(_event, frame, parents):
     for i in list(assaig.keys()):
         frame.update()
         frame2 = customtkinter.CTkFrame(frame, height=frame.master.winfo_height()*3/3, width= frame.master.winfo_height()*4/3)
-        frame2.pack(pady=20)
+        frame2.pack(pady = 20)
         frame2.update()
         canvas_list_to_print.append(fer_dibuix([None, frame2], assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True))
+        canvas_list_to_print[-1].create_text(frame.master.winfo_height()*2/3,
+                                           70,
+                                           angle = 0,
+                                           text = assaig[i]["Croquis"]["Figura"],
+                                           font = ("Arial", 25,"bold"),
+                                           fill = "black"
+                                           )
 
-    print_assaig = customtkinter.CTkButton(frame.master, text="Guardar assaig en pdf", width=30, height=10,command=lambda x = canvas_list_to_print: ie.prompt(x))
-    print_assaig.pack(pady=20)
+    print_assaig = customtkinter.CTkButton(frame.master.master.master, text="Guardar assaig en pdf", width=30, height=10,command=lambda x = canvas_list_to_print: ie.prompt(x))
+    print_assaig.place(relx = 0.00, rely = 0.05)

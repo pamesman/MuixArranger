@@ -151,9 +151,11 @@ button_expand.place(rely = 0.5, relx = .005, anchor="w")
 button_expand2.place(rely = 0.5, relx = .995, anchor="e")
 ###ASSAIG TAB
 ###
-assaig_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Assaig"), fg_color="#AAAAAA")
-assaig_frame.place(relx = 0.01, rely = 0.01, relwidth = 0.98, relheight = 0.98, anchor = "nw")
-uppdate_assaig = customtkinter.CTkButton(assaig_tab, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame, frame_catalog))
+assaig_frame = customtkinter.CTkFrame(master=tabview.tab("Assaig"))
+assaig_frame.place(relx = 0.5, rely = 0.5, relwidth = 0.99, relheight = 0.99, anchor = "center")
+assaig_frame2 = customtkinter.CTkScrollableFrame(master=assaig_frame, fg_color=("#AAAAAA", "#333333"))
+assaig_frame2.place(relx = .99, rely = 0.5, relheight = 0.99, relwidth = 2/3, anchor = "e")
+uppdate_assaig = customtkinter.CTkButton(assaig_tab, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame2, frame_catalog))
 assaig_frame.update()
 
 uppdate_assaig.place(x = 20, y = 20)

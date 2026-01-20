@@ -10,6 +10,7 @@ from screeninfo import get_monitors
 
 from src.util import repertori as rep
 import src.util.funcs as f
+import src.util.image_export as ie
 
 online = False
 
@@ -60,14 +61,8 @@ tabview = customtkinter.CTkTabview(master=root)
 tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
 croquis = tabview.add("Croquis")  # add tab at the end
 assaig_tab = tabview.add("Assaig")  # add tab at the end
-###
-assaig_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Assaig"), fg_color="#AAAAAA")
-assaig_frame.place(relx = 0.01, rely = 0.01, relwidth = 0.98, relheight = 0.98, anchor = "nw")
-uppdate_assaig = customtkinter.CTkButton(assaig_tab, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame))
-assaig_frame.update()
-uppdate_assaig2 = customtkinter.CTkButton(assaig_tab, text="Act", width = 30, height= 10,command=lambda x=3: f.funcion(x, assaig_frame))
-uppdate_assaig2.place(x = 150, y = 20)
-uppdate_assaig.place(x = 20, y = 20)
+
+
 ### CROQUIS TAB ###
 frame = customtkinter.CTkFrame(master=tabview.tab("Croquis"))
 frame.place(relx=0.5,rely=0.5,anchor="c",relheight=1, relwidth=1)
@@ -154,6 +149,16 @@ button_expand2 = customtkinter.CTkButton(croquis_frame,
 button_expand2.configure(command = lambda x = button_expand2: f.minimizar2(x, croquis_frame, taula_frame))
 button_expand.place(rely = 0.5, relx = .005, anchor="w")
 button_expand2.place(rely = 0.5, relx = .995, anchor="e")
+###ASSAIG TAB
+###
+assaig_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Assaig"), fg_color="#AAAAAA")
+assaig_frame.place(relx = 0.01, rely = 0.01, relwidth = 0.98, relheight = 0.98, anchor = "nw")
+uppdate_assaig = customtkinter.CTkButton(assaig_tab, text="Actualitzar assaig", width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame, frame_catalog))
+assaig_frame.update()
+
+uppdate_assaig.place(x = 20, y = 20)
+
+
 root.mainloop()
 
 

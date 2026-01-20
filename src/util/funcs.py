@@ -7,12 +7,14 @@ import pandas as pd
 import CTkMessagebox
 from time import sleep, time
 
+
 from src.util.classes.esquema import Esquema
 from src.util.classes.canvastextclass import CanvasText
 from src.util.classes.interval import Interval
 from src.util.classes import CTkTable
 from src.util import repertori as rep
 import src.membre as mem
+import src.util.image_export as ie
 from src.API.drive import download_file
 from src.API.credential_managing import spreadsheet_connection
 import config_reader
@@ -362,6 +364,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
         canvas.tag_lower("rectangle", "etiqueta")
     except:
         pass
+    return canvas
 
 
 def assaig_button_press(nom, assaig):
@@ -730,8 +733,9 @@ def minimizar2(button_expand2, croquis_frame, taula_frame):
             croquis_frame.place(relx=0.07, rely=0.5, anchor="w", relheight=0.98, relwidth=0.71)
             expand_is_on2 = False
 
-def actualitzar_assaig_output(_event, frame):
+def actualitzar_assaig_output(_event, frame, parents):
     global assaig
+    canvas_list_to_print = []
     print("run")
     frame.update()
     contador = 0
@@ -742,7 +746,10 @@ def actualitzar_assaig_output(_event, frame):
         i.destroy()
     for i in list(assaig.keys()):
         frame.update()
-        frame2 = customtkinter.CTkFrame(frame, height=frame.master.winfo_height(), width= frame.master.winfo_height()*4/3)
+        frame2 = customtkinter.CTkFrame(frame, height=frame.master.winfo_height()*3/3, width= frame.master.winfo_height()*4/3)
         frame2.pack(pady=20)
         frame2.update()
-        fer_dibuix([None, frame2], assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True)
+        canvas_list_to_print.append(fer_dibuix([None, frame2], assaig[i]["Figura"].coordenades, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True))
+
+    print_assaig = customtkinter.CTkButton(frame.master, text="Guardar assaig en pdf", width=30, height=10,command=lambda x = canvas_list_to_print: ie.prompt(x))
+    print_assaig.pack(pady=20)

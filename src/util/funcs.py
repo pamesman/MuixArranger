@@ -764,5 +764,23 @@ def actualitzar_assaig_output(_event, frame, parents):
                                            fill = "black"
                                            )
 
-    print_assaig = customtkinter.CTkButton(frame.master.master.master, text="Guardar assaig en pdf", width=30, height=10,command=lambda x = canvas_list_to_print: ie.prompt(x))
-    print_assaig.place(relx = 0.00, rely = 0.05)
+    print_assaig = customtkinter.CTkButton(frame.master.master.master, fg_color = rep.main_color ,text="Guardar assaig en pdf", width=30, height=10,command=lambda x = canvas_list_to_print: ie.prompt(x))
+    print_assaig.place(relx = 1/3-0.05, rely = 0.1, anchor = "e")
+
+def close_app(_event, main):
+    global observer1
+    global observer2
+    global updater
+    try:
+        observer1.stop()
+    except:
+        pass
+    try:
+        observer2.stop()
+    except:
+        pass
+    try:
+        updater.stop()
+    except:
+        pass
+    main.destroy()

@@ -8,7 +8,6 @@ import pymupdf
 from time import sleep
 def save1(canvas, pathname):
     canvas.update()
-    canvas.configure(bg="black")
     ps = canvas.postscript(colormode='color', pagewidth=5000)
     img = Image.open(io.BytesIO(ps.encode('utf-8')))
     img.save(pathname)

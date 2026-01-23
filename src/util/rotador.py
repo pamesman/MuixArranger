@@ -1,13 +1,15 @@
 def rotator (list_of_tuples):
     a = []
     for point in list_of_tuples:
+        point = (point[1],point[0])
         a.append(point)
-        a.append((point[0],point[1]+6))
-        # a.append((-point[0],-point[1]))
-        #a.append((-point[0],point[1]))
+        a.append((point[0],-point[1]))
+        a.append((-point[0],-point[1]))
+        a.append((-point[0],point[1]))
+        # a.append((point[1],point[0]))
     return a
 
-print(rotator([(-3, -3), (-1, -3), (1, -3), (3, -3), (5, -3), (7, -3), (9, -3), (11, -3), (13, -3), (15, -3), (-3, -2.5), (-1, -2.5), (1, -2.5), (3, -2.5), (5, -2.5), (7, -2.5), (9, -2.5), (11, -2.5), (13, -2.5), (15, -2.5)]))
+print(rotator([(3,1.5),(3.5,1.75), (4,2)]))
 b = "Base 1"
 print(b.split("\n")[0])
 b.split("\n")[0]

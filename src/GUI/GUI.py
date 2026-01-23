@@ -26,6 +26,7 @@ def resource_path(relative_path):
 
 #estableix parent window
 root = customtkinter.CTk()
+m= str
 for monitor in get_monitors():
    m = monitor
 root.geometry(str(m.width) + "x" + str(m.height))
@@ -49,7 +50,7 @@ if "Win" in platform.system():
 else:
     splash.geometry('%dx%d+%d+%d' % (205,277,m.width/2-100,m.height/3-150))
 banner = tkinter.Label(splash,bg="#333333", image= pic,  highlightthickness = 0)
-banner.pack(fill="both", expand="yes")
+banner.pack(fill="both", expand=True)
 
 
 
@@ -61,6 +62,10 @@ tabview = customtkinter.CTkTabview(master=root,  segmented_button_selected_color
 tabview.place(relx = 0.5, rely = 0.5, anchor="c", relheight=.99, relwidth=.99)
 croquis = tabview.add("Croquis")  # add tab at the end
 assaig_tab = tabview.add("Assaig")  # add tab at the end
+seguiment_tab = tabview.add("Seguiment")
+
+butto_seguiment = customtkinter.CTkButton(seguiment_tab, text = "pressme", command = lambda x= seguiment_tab : f.seguiment_actualitzar(x))
+butto_seguiment.pack()
 
 
 ### CROQUIS TAB ###

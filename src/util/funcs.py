@@ -41,7 +41,7 @@ donotupdate = False
 assistents_id, membres_id, sheet_id  = config_reader.get_config()
 config_changed = True
 unchanged_nagger = []
-working_list, taula_mestra = mem.carregar_assistencia(membres_id,assistents_id)
+working_list, taula_mestra, assistents = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
 tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
 tecnica_fora = set(tecnica["Àlies"])
@@ -74,10 +74,7 @@ def update_tecnica():
     if tecnica_fora == tecnica_fora_nova:
         return
     excloure = 0
-    for i in taula_pack[6].winfo_children():
-        if excloure == 0:
-            excloure += 1
-            continue
+    for i in taula_pack[6].winfo_children()[1:]:
         i.destroy()
     tecnica_fora = set(tecnica["Àlies"])-set(croquis_in_use.values())
     for i in tecnica_fora:
@@ -274,7 +271,7 @@ def fer_dibuix(parent, listadecoordenades:list, croquiss:dict, corrector: tuple,
             continue
 
         sc = 0
-        if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó","Marieta", "Volantinera", "Figuereta"]:
+        if croquiss["Figura"] in ["Alta de 5", "Xopera", "Torreta", "Pilotó","Marieta", "Maria Alta","Volantinera", "Figuereta", "Roscana"]:
             sc = 1
 
         try:
@@ -400,10 +397,7 @@ def assaig_button_press(nom, assaig):
 
     #taula tècnica
     excloure = 0
-    for i in taula_pack[6].winfo_children():
-        if excloure == 0:
-            excloure += 1
-            continue
+    for i in taula_pack[6].winfo_children()[1:]:
         try:
             i.destroy()
         except:
@@ -745,10 +739,7 @@ def actualitzar_assaig_output(_event, frame, parents):
     frame.update()
     contador = 0
     canvas_list_to_print = []
-    for i in frame.winfo_children():
-        if contador < 2:
-            contador = +1
-            continue
+    for i in frame.winfo_children()[2:]:
         i.destroy()
     for i in list(assaig.keys()):
         frame.update()
@@ -784,3 +775,43 @@ def close_app(_event, main):
     except:
         pass
     main.destroy()
+
+def seguiment_actualitzar (pare):
+    global assaig
+    global assistents
+    children_counter = 0
+    for child in pare.winfo_children()[1:]:
+        child.destroy()
+    seguiment = [[i for i in assaig]]
+    seguiment[0].insert(0,"/")
+
+    for persona in assistents:
+        seguiment_individual = [persona]
+        for figura in assaig:
+            if persona not in list(assaig[figura]["Croquis"].values()):
+                seguiment_individual.append("")
+            else:
+                indexx = list(assaig[figura]["Croquis"].values()).index(persona)
+                posició = list(assaig[figura]["Croquis"].keys())[indexx]
+                seguiment_individual.append(posició)
+        seguiment.append(seguiment_individual)
+    seguimentTV = ttk.Treeview(pare, height= len(seguiment))
+
+    seguimentTV.tag_configure('impar', background=pare._apply_appearance_mode(("#D6D6D6", "#3F3F3F")))
+    seguimentTV['columns'] = seguiment[0]
+    seguimentTV.bind('<Motion>', 'break')
+    seguimentTV.column("#0", width=0, stretch=False)
+    for i in seguiment[0]:
+
+        seguimentTV.column(i, width=100, anchor = "center")
+        seguimentTV.heading(i, text=i, )
+
+    treeview_counter = 1
+    for valor in seguiment[1:]:
+        if treeview_counter % 2 == 1:
+            tag = "impar"
+        else:
+            tag = "par"
+        seguimentTV.insert('', 'end', treeview_counter, values=valor, tags=tag)
+        treeview_counter += 1
+    seguimentTV.pack()

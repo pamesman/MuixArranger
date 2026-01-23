@@ -31,6 +31,7 @@ def carregar_assistencia(id_membres, id_assistents):
             entrada = pd.DataFrame([[i,i,0,0,0,"Nou"]],columns=["Nom","Àlies","Alçada espatlles","Muscle","Alçada","Braç","Posició"])
         taula_mestra = pd.concat([taula_mestra,entrada])
 
+
     taula_mestra = taula_mestra.sort_values(by=["Alçada espatlles"], ascending=False)
 
     taula_mestra = taula_mestra[taula_mestra["Àlies"].str.contains("Z-") == False]
@@ -42,7 +43,7 @@ def carregar_assistencia(id_membres, id_assistents):
 
     #working_list = [str((list_nom[i]+" "+str(list_muscle[i]))) for i in range(len(list_nom))]
     working_list = list_nom
-    return working_list, taula_mestra
+    return working_list, taula_mestra, list_nom
 
 
 

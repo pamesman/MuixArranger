@@ -54,7 +54,7 @@ banner.pack(fill="both", expand=True)
 
 
 
-root.wm_attributes("-fullscreen",True)
+root.wm_attributes("-fullscreen",False)
 
 
 
@@ -164,11 +164,16 @@ assaig_frame.place(relx = 0.5, rely = 0.5, relwidth = 1, relheight = 1, anchor =
 assaig_frame2 = customtkinter.CTkScrollableFrame(master=assaig_frame, fg_color=("#AAAAAA", "#333333"), corner_radius = 0, border_color="black", border_width=0)
 assaig_frame2.place(relx = .99, rely = 0.5, relheight = .99, relwidth = 2/3, anchor = "e")
 assaig_frame3 = customtkinter.CTkScrollableFrame(master=assaig_frame, fg_color=("#AAAAAA", "#333333"), corner_radius = 5, border_color="black", border_width=0)
-assaig_frame3.place(relx = .005, rely = 0.99, relheight = 0.5, relwidth = 1-2/3-0.02, anchor = "sw")
-uppdate_assaig = customtkinter.CTkButton(assaig_frame, text="Actualitzar assaig",  fg_color = rep.main_color, width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame2, frame_catalog))
+assaig_frame3.place(relx = .005, rely = 0.995, relheight = 0.49, relwidth = 1-2/3-0.02, anchor = "sw")
+
+print_assaig = customtkinter.CTkButton(assaig_frame, fg_color=rep.main_color,text="Guardar assaig en pdf", width=30, height=10, font=("Liberation Sans",50, "bold"))
+uppdate_assaig = customtkinter.CTkButton(assaig_frame, text="Actualitzar assaig",  fg_color = rep.main_color, width = 30, height= 10,command=lambda x=3: f.actualitzar_assaig_output(x, assaig_frame2, assaig_frame3,frame_catalog, print_assaig), font=("Liberation Sans",50, "bold"))
 assaig_frame.update()
 
-uppdate_assaig.place(relx = 1/3-0.05, rely = 0.05, anchor = "e")
+
+
+uppdate_assaig.place(relx = 0.005, rely = 0.01, relheight = .24,relwidth = 1/3-0.02,anchor = "nw")
+print_assaig.place(relx=0.005, rely=0.26, relheight=.24, relwidth=1 / 3 - 0.02, anchor="nw")
 
 
 root.mainloop()

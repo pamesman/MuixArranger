@@ -1,6 +1,6 @@
 class Esquema:
     figures_rep = 0
-    def __init__(self, nom, base, segona, tercera, quarta, alsadora, xicalla, mans, vents, laterals, tap, agulla, peu, puntal, crossa, genoll, contrafort, guia, passadora, recollidora, colze = 0,coordenades = None):
+    def __init__(self, nom, base, segona, tercera, quarta, alsadora, xicalla, mans, vents = 0, laterals = 0, tap = 0, agulla = 0, peu = 0, puntal = 0, crossa = 0, genoll = 0, contrafort = 0, guia = 0, passadora = 0, recollidora = 0, colze = 0,coordenades = None, orientacio = None):
         self.nom = nom
         self.base = base
         self.segona = segona
@@ -22,7 +22,10 @@ class Esquema:
         self.puntal = puntal
         self.crossa = crossa
         self.colze = colze
+        # self.responsable_xicalla = 1
         self.coordenades = coordenades
+        self.orientacio = orientacio
+
         type(self).figures_rep += 1
 
     def afegir_xicalla(self):   #TO-DO TRASLLADAR A CROQUIS
@@ -32,7 +35,7 @@ class Esquema:
         maxx = 0
         miny = 0
         minx = 0
-        for i in self.coordenades:
+        for i in self.coordenades[:-3]:
             if i[1] > maxy:
                 maxy = i[1]
             if i[1] < miny:

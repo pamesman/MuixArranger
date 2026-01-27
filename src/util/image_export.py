@@ -24,8 +24,9 @@ def save2(pathname):
     doc = pymupdf.open()  # PDF with the pictures
     imgdir = pathname[:-4]  # where the pics are
     imglist = os.listdir(imgdir)  # list of them
-
+    imglist.sort(key= lambda x: x[-5])
     for i, f in enumerate(imglist):
+        print(i,f)
         img = pymupdf.open(os.path.join(imgdir, f), filetype="txt")  # open pic as document
         rect = img[0].rect  # pic dimension
         pdfbytes = img.convert_to_pdf()  # make a PDF stream

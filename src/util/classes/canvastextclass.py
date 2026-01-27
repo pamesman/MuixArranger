@@ -14,18 +14,19 @@ class CanvasText(CTkBaseClass):
         self.color2 = color
         self.text = text
         self.text_color = ""
-        if self.text in list(croquis_en_us.keys()):
-            # Tractament diferencial si hi ha o no algú seleccionat:
-            if croquis_en_us[text].strip() == "N. A.":
-                self.text = text.split(" ")[0]  #El text es "Base, Mans etc.
-                self.color = "" #Rectangle sense fill
-                self.outline = self._apply_appearance_mode(self.color2)
-                self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
-            else:
-                self.text = croquis_en_us[text] #El text es la persona
-                self.color = self._apply_appearance_mode(color)
-                self.outline = self._apply_appearance_mode(("#333333", "#000000"))
-                self.text_color = "black"
+        self.color = ""
+        self.outline = ""
+        # Tractament diferencial si hi ha o no algú seleccionat:
+        if croquis_en_us[text].strip() == "N. A.":
+            self.text = text.split(" ")[0]  #El text es "Base, Mans etc.
+            self.color = "" #Rectangle sense fill
+            self.outline = self._apply_appearance_mode(self.color2)
+            self.text_color = self._apply_appearance_mode(("#333333","#AAAAAA"))
+        else:
+            self.text = croquis_en_us[text] #El text es la persona
+            self.color = self._apply_appearance_mode(color)
+            self.outline = self._apply_appearance_mode(("#333333", "#000000"))
+            self.text_color = "black"
 
 
 
@@ -145,7 +146,6 @@ class CanvasText(CTkBaseClass):
             y = (event.y/self.parent.winfo_height()-0.5)*(self.span_x*1.1)-self.center[1]
             print(x, y)
         self.parent.bind("<Button-1>", locate)
-
     def insertar_membre(self, value):
         value = self.lb.get(self.lb.nearest(value.y))
 
@@ -174,19 +174,7 @@ class CanvasText(CTkBaseClass):
         self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
 
         self.parent.itemconfig(self.txt, fill = "black")
-        # print(self.croquis_en_us["Nom"], "\n", self.position, ": ", self.text)
-        # if self.interval != None:
-            # self.drive_callback()
-            # self.interval.start()
         self.forget()
-
-    # def drive_callback(self):
-    #     print(self.text)
-    #     try:
-    #         self.sheet.worksheet(self.croquis_en_us["Nom"]).update_cell(2, list(self.croquis_en_us.keys()).index(self.position)+1,  value=self.text)
-    #         print("exito")
-    #     except:
-    #         print("mistake was sucedido")
 
     def search_items(self, _event):
         search_value = self.entry.get()
@@ -239,12 +227,6 @@ class CanvasText(CTkBaseClass):
                 self.lb.insert("end", i)
             self.lb.config(yscrollcommand=self.sb.set)
             self.sb.config(command=self.lb.yview)
-
-            #Debugging per a windows laptops
-            # print(_event.x, ",", _event.y)
-            # print(self.parent.coords(self.txt)[0], ",", self.parent.coords(self.txt)[1])
-            # print(self.parent.coords(self.txt)[0]- self.entry_width/2+2, ",", self.parent.coords(self.txt)[1]+ self.entry_height-5)
-
             self.entry.place(x=self.parent.coords(self.txt)[0], y=self.parent.coords(self.txt)[1], anchor="center")
 
             self.entry.focus_set()

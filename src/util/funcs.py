@@ -192,7 +192,7 @@ def fer_croquis(figura: Esquema,nom: str):
     producte.update({"Figura":nombre[0]})
     stringoutput = str()
     print(posicions)
-    for i in range (1,len(posicions)):
+    for i in range (1,len(posicions)-3):
         if nombre[i] == 0:
             continue
         if posicions[i] == "coordenades":
@@ -717,31 +717,32 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
         subframe.update()
         canvas_list_to_print.append(fer_dibuix([None, subframe], assaig[i]["Figura"].coordenades,  assaig[i]["Figura"].orientacio,assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True))
         canvas = canvas_list_to_print[-1]
-        canvas.create_text(250,
+        canvas.create_text(25,
                                            25,
                                            angle = 0,
                                            text = assaig[i]["Croquis"]["Figura"].upper(),
-                                           font = ("Arial", 25,"bold"),
-                                           fill = "black"
+                                           font = ("Liberation Sans", 25,"bold"),
+                                           fill = "black",
+                                           anchor = "nw",
                                            )
         img = ImageTk.PhotoImage(file=resource_path("arrow.png"))
         canvas.update()
         canvas.create_image(canvas.winfo_width(), canvas.winfo_height()/2-10, anchor="ne", image=img, tags="banner")
-        CanvasText(canvas.master.master.master,
-                   canvas,
-                   "Responsable Xicalla", (0,0), ((0,0),(0,0)),
-                   working_list,
-                   assaig[i]["Taula"],
-                   assaig[i]["Croquis"],
-                   taula_mestra,
-                   interval = None,
-                   sheet = None,
-                   orientation = 0,
-                   color =("",""),
-                   list_len=10,
-                   tag_width = 0,
-                   mini = False
-                   )
+        # CanvasText(canvas.master.master.master,
+        #            canvas,
+        #            "Responsable Xicalla", (0,0), ((0,0),(0,0)),
+        #            working_list,
+        #            assaig[i]["Taula"],
+        #            assaig[i]["Croquis"],
+        #            taula_mestra,
+        #            interval = None,
+        #            sheet = None,
+        #            orientation = 0,
+        #            color =("",""),
+        #            list_len=10,
+        #            tag_width = 0,
+        #            mini = False
+        #            )
         canvas.create_rectangle(0,canvas.winfo_height(),canvas.winfo_width(),canvas.winfo_height()-30, fill="orange", outline = "")
         canvas.create_rectangle(10, canvas.winfo_height()-40, canvas.winfo_width()/10, canvas.winfo_height()*9/10 - 40, outline = "black", width=2)
         tecnicalist = "Fora de la figura: "

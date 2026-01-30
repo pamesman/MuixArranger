@@ -756,7 +756,6 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
             tecnicalist = tecnicalist + i + ", "
         canvas.create_text(10, canvas.winfo_height()-15, text = tecnicalist[:-2],anchor = "w",
                                 fill="black", tags = "not_banner")
-        canvas.tag_raise("banner", "etiqueta")
 
 
 

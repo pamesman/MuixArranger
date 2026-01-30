@@ -118,7 +118,7 @@ class CanvasText(CTkBaseClass):
                                         outline = self.outline,
                                         border_width = 1,
                                         tags = ("rectangle", self.position, self.text.split(" ")[0]),
-                                        radius = 5
+                                        radius = 2
                                         )
 
         self.entry = customtkinter.CTkEntry(self.parent, width=self.entry_width)

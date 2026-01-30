@@ -191,7 +191,6 @@ def fer_croquis(figura: Esquema,nom: str):
     nombre = list(vars(figura).values())
     producte.update({"Figura":nombre[0]})
     stringoutput = str()
-    print(posicions)
     for i in range (1,len(posicions)-3):
         if nombre[i] == 0:
             continue
@@ -212,9 +211,13 @@ def fer_dibuix(parent, listadecoordenades:list, listadeorientacions,croquiss:dic
     global taula_pack
     global taula_mestra
     global assaig
-
-    canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#FFFFFF", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30)#, highlightthickness = 0)
     if skip:
+        palette = [(i[1],i[0]) for i in rep.palette]
+    else:
+        palette = rep.palette
+    canvas = tkinter.Canvas(parent[1], bg=parent[1]._apply_appearance_mode(("#FFFFFF", "#333333")), width= parent[1].winfo_width()- parent[1].cget("corner_radius") * 4 - 25, height= parent[1].winfo_height()- parent[1].cget("corner_radius") * 2 - 30, highlightthickness = 0)
+    if skip:
+        canvas.configure(highlightthickness = 1, bg="white")
         canvas.pack(expand = tkinter.YES, fill = tkinter.BOTH)
     else:
         canvas.place(relx = 0.5, rely = 0.51, anchor = "center")
@@ -303,7 +306,7 @@ def fer_dibuix(parent, listadecoordenades:list, listadeorientacions,croquiss:dic
                    interval = updater,
                    sheet = sheet,
                    orientation = -orientation,
-                   color =rep.palette[rep.rols.index(i.split(" ")[0])],
+                   color = palette[rep.rols.index(i.split(" ")[0])],
                    list_len=10,
                    tag_width = tag_width,
                    mini = mini
@@ -716,7 +719,9 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
         subframe.pack(pady = 20)
         subframe.update()
         canvas_list_to_print.append(fer_dibuix([None, subframe], assaig[i]["Figura"].coordenades,  assaig[i]["Figura"].orientacio,assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True))
+
         canvas = canvas_list_to_print[-1]
+
         canvas.create_text(25,
                                            25,
                                            angle = 0,
@@ -726,8 +731,8 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
                                            anchor = "nw",
                                            )
         img = ImageTk.PhotoImage(file=resource_path("arrow.png"))
-        canvas.update()
-        canvas.create_image(canvas.winfo_width(), canvas.winfo_height()/2-10, anchor="ne", image=img, tags="banner")
+
+        arrow = canvas.create_image(canvas.winfo_width(), canvas.winfo_height()/2-10, anchor="ne", image=img, tags="banner")
         # CanvasText(canvas.master.master.master,
         #            canvas,
         #            "Responsable Xicalla", (0,0), ((0,0),(0,0)),
@@ -743,32 +748,35 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
         #            tag_width = 0,
         #            mini = False
         #            )
+        canvas.create_line(canvas.winfo_width() - 20, canvas.winfo_height() - 40,canvas.winfo_width() - 20,canvas.winfo_height()/2, width = 2, arrow = tkinter.FIRST, arrowshape = (14,15,4))
         canvas.create_rectangle(0,canvas.winfo_height(),canvas.winfo_width(),canvas.winfo_height()-30, fill="orange", outline = "")
         canvas.create_rectangle(10, canvas.winfo_height()-40, canvas.winfo_width()/10, canvas.winfo_height()*9/10 - 40, outline = "black", width=2)
         tecnicalist = "Fora de la figura: "
         for i in set(tecnica["Àlies"])-set(assaig[i]["Croquis"].values()):
             tecnicalist = tecnicalist + i + ", "
-        print(tecnicalist)
         canvas.create_text(10, canvas.winfo_height()-15, text = tecnicalist[:-2],anchor = "w",
                                 fill="black", tags = "not_banner")
-        canvas.tag_raise("banner", "not_banner")
+        canvas.tag_raise("banner", "etiqueta")
 
 
 
     button.configure(command = lambda x = canvas_list_to_print: ie.prompt(x))
     counter_rows = 0
 
-    for i in list(assaig.keys()):
-        column = counter_rows % 3
-        rows = counter_rows // 3
-
-        label = customtkinter.CTkFrame(frame2, fg_color="#CCCCCC")
-        label.configure(width = label.master.winfo_width()/3)
-        label.grid(column=column, row=rows, sticky="nsew", pady=5, padx=5)
-        customtkinter.CTkLabel(label, text = i).pack()
-        fer_dibuix([None, label], assaig[i]["Figura"].coordenades, assaig[i]["Figura"].orientacio, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True, mini = True)
-
-        counter_rows += 1
+    # for i in list(assaig.keys()):
+    #     column = counter_rows % 3
+    #     rows = counter_rows // 3
+    #
+    #     label = customtkinter.CTkFrame(frame2, fg_color="#CCCCCC", width=1000, height=1000)
+    #     frame2.update()
+    #     print(frame2.winfo_height(), frame2.winfo_width())
+    #     label.configure(width = label.master.winfo_width()*3, height = label.master.master.winfo_height()*3)
+    #     label.grid(column=column, row=rows, sticky="nsew", pady=5, padx=5)
+    #     customtkinter.CTkLabel(label, text = i).pack(fill="both", expand=True, pady=5)
+    #     subcanvas = fer_dibuix([None, label], assaig[i]["Figura"].coordenades, assaig[i]["Figura"].orientacio, assaig[i]["Croquis"], assaig[i]["Figura"].centraor(),skip = True, mini = True)
+    #     subcanvas.update()
+    #     subcanvas.pack(fill="both", expand=True)
+    #     counter_rows += 1
 
 def close_app(_event, main):
     global observer1

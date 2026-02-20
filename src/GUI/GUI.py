@@ -10,6 +10,7 @@ from screeninfo import get_monitors
 
 from src.util import repertori as rep
 import src.util.funcs as f
+from src.util.classes import searchbox
 
 
 online = False
@@ -104,6 +105,17 @@ tec_frame.place(relx = .99, rely = .99, relwidth = 0.1, relheight = 0.25, anchor
 tec_label = customtkinter.CTkLabel(tec_frame, text= "Fora de figura", font=("Liberation Sans", 14, "bold", "underline"))
 tec_label.pack()
 
+#Taula responsable xicalla
+axic_frame = customtkinter.CTkFrame(croquis_frame)
+axic_frame.place(relx = .99, rely = .73, relwidth = 0.1, relheight = 0.1, anchor = "se")
+axic_label = customtkinter.CTkLabel(axic_frame, text= "Acompanyant xicalla", font=("Liberation Sans", 12, "bold", "underline"))
+axis_entry = f.entrada_xicalla(axic_frame)
+axis_entry.configure(state="disabled")
+axic_label.pack()
+axis_entry.pack()
+
+
+
 #TAULA
 taula_frame = customtkinter.CTkScrollableFrame(frame)
 taula_frame.place(relx = .79, rely = .99, anchor = "sw", relheight = .93, relwidth = 0.2)
@@ -114,7 +126,7 @@ taula_name.pack()
 taula_namefig.pack()
 
 taula = 0
-taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter, tec_frame]
+taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter, tec_frame, axis_entry]
 f.pass_variable(taula_pack)
 
 frame_catalog = [repertori_frame, croquis_frame, taula_frame]

@@ -12,6 +12,7 @@ from PIL import Image, ImageTk
 
 
 from src.util.classes.esquema import Esquema
+from src.util.classes.searchbox import crear_searchbox
 from src.util.classes.canvastextclass import CanvasText
 from src.util.classes.interval import Interval
 from src.util.classes import CTkTable
@@ -361,6 +362,8 @@ def assaig_button_press(nom, assaig):
     taula_pack[3].configure(state="normal")
     taula_pack[4].configure(state="normal")
     taula_pack[5].configure(state="normal")
+    taula_pack[6].configure(state="normal")
+
 
     taula_pack[3].delete(0, "end")
     taula_pack[3].configure(placeholder_text=croquis_in_use["Nom"])
@@ -725,7 +728,7 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
         canvas.create_text(25,
                                            25,
                                            angle = 0,
-                                           text = assaig[i]["Croquis"]["Figura"].upper(),
+                                           text = assaig[i]["Croquis"]["Nom"].upper(),
                                            font = ("Liberation Sans", 25,"bold"),
                                            fill = "black",
                                            anchor = "nw",
@@ -835,3 +838,10 @@ def seguiment_actualitzar (pare):
         seguimentTV.insert('', 'end', treeview_counter, values=valor, tags=tag)
         treeview_counter += 1
     seguimentTV.pack()
+
+def entrada_xicalla(parent):
+    global working_list
+    global taula_mestra
+    global croquis_in_use
+    entry = crear_searchbox(parent, working_list, taula_mestra, croquis = croquis_in_use)
+    return entry

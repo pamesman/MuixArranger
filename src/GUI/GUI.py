@@ -107,7 +107,7 @@ tec_label.pack()
 
 #Taula responsable xicalla
 axic_frame = customtkinter.CTkFrame(croquis_frame)
-axic_frame.place(relx = .99, rely = .73, relwidth = 0.1, relheight = 0.1, anchor = "se")
+axic_frame.place(relx = .88, rely = .99, relwidth = 0.1, relheight = 0.1, anchor = "se")
 axic_label = customtkinter.CTkLabel(axic_frame, text= "Acompanyant xicalla", font=("Liberation Sans", 12, "bold", "underline"))
 axis_entry = f.entrada_xicalla(axic_frame)
 axis_entry.configure(state="disabled")

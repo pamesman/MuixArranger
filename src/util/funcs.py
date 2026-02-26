@@ -172,11 +172,11 @@ def connect(combobox, parents, splash):
     global croquis_in_use
     croquis_in_use = None
     splash.destroy()
-    # if not config_changed:
-    #     nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
-    #                                          message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
-    #                                          option_1="Ok",
-    #                                          option_2="Ok, pesat")
+    if not config_changed:
+        nagger = CTkMessagebox.CTkMessagebox(title="Paràmetres sense configurar",
+                                             message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
+                                             option_1="Ok",
+                                             option_2="Ok, pesat")
 
 
 def fer_croquis(figura: Esquema,nom: str):
@@ -362,7 +362,7 @@ def assaig_button_press(nom, assaig):
     taula_pack[3].configure(state="normal")
     taula_pack[4].configure(state="normal")
     taula_pack[5].configure(state="normal")
-    taula_pack[6].configure(state="normal")
+    # taula_pack[6].configure(state="normal")
 
 
     taula_pack[3].delete(0, "end")

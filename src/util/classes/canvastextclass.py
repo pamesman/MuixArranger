@@ -256,7 +256,7 @@ class CanvasText(CTkBaseClass):
 
 
     def on_right_click(self, _event, downloading = False):
-        if self.position.split(" ")[0] not in ["Base", "Segona", "Tercera", "Alsadora", "Quarta"]:
+        # if self.position.split(" ")[0] not in ["Base", "Segona", "Tercera", "Alsadora", "Quarta"]:
             if not self.toggle:
                 self.toggle = True
                 self.text = "'+"

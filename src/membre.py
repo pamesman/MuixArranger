@@ -28,7 +28,7 @@ def carregar_assistencia(id_membres, id_assistents):
         if i in list(database["Àlies"]):
             entrada = database.loc[database["Àlies"] == i]
         else:
-            entrada = pd.DataFrame([[i,i,0,0,0,"Nou"]],columns=["Nom","Àlies","Alçada espatlles","Muscle","Alçada","Braç","Posició"])
+            entrada = pd.DataFrame([[i,i,0,0,0,0,"Nou"]],columns=["Nom","Àlies","Alçada espatlles","Muscle","Alçada","Braç","Posició"])
         taula_mestra = pd.concat([taula_mestra,entrada])
 
 

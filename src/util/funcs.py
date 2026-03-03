@@ -1,7 +1,6 @@
 import io
 import os
 import sys
-import math
 import tkinter
 from tkinter import ttk
 import customtkinter
@@ -9,6 +8,7 @@ import pandas as pd
 import CTkMessagebox
 from time import sleep, time
 from PIL import Image, ImageTk
+from PIL import EpsImagePlugin
 
 
 from src.util.classes.esquema import Esquema
@@ -47,8 +47,12 @@ config_changed = True
 unchanged_nagger = []
 working_list, taula_mestra, assistents = mem.carregar_assistencia(membres_id,assistents_id)
 # sheet_id = "1k9W_o-bCnOd113so2OqvDfQQPLZiUnD2P29Cnni6yXs"
-tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
-tecnica_fora = set(tecnica["Àlies"])
+try:
+    tecnica = taula_mestra[taula_mestra["Permisos especials APP"].str.contains("TECNICA") == True]
+    tecnica_fora = set(tecnica["Àlies"])
+except:
+    tecnica_fora = []
+    tecnica = []
 
 update_batch = {}
 countdown = 0
@@ -61,8 +65,8 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
-
-
+#noseque del ghostscript
+EpsImagePlugin.gs_windows_binary = resource_path(r"C:\Program Files\gs\gs10.06.0\bin\gswin64c")
 
 if assistents_id == "1nMrNL_sKmcuHPmbOImELO9qfEAAmiFVmukd3PQ3xjNg":
     config_changed = False

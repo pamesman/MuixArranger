@@ -39,15 +39,18 @@ def save2(pathname):
                             height=rect.height)  # pic dimension
         page.show_pdf_page(rect, imgpdf, 0)  # image fills the page
     if "Win" in platform.system():
-        doc.save(pathname)
+        doc.save(f"{pathname}")
     else:
         doc.save(pathname)
     pass
 
 def prompt(canvas_list):
     outputfile = tkinter.filedialog.asksaveasfilename(filetypes=[('PDF files', '*.pdf')])
+    if "Win" in platform.system():
+        outputfile = outputfile+".pdf"
     pathlib.Path(outputfile[:-4]).mkdir(parents=True, exist_ok=True)
     counter = 0
+
     for canvas in canvas_list:
         counter += 1
         nom = f"Figura_{counter}"

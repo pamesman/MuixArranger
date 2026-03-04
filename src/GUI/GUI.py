@@ -109,10 +109,10 @@ tec_label.pack()
 axic_frame = customtkinter.CTkFrame(croquis_frame)
 axic_frame.place(relx = .88, rely = .99, relwidth = 0.1, relheight = 0.1, anchor = "se")
 axic_label = customtkinter.CTkLabel(axic_frame, text= "Acompanyant xicalla", font=("Liberation Sans", 12, "bold", "underline"))
-axis_entry = f.entrada_xicalla(axic_frame)
-axis_entry.configure(state="disabled")
+# axis_entry = f.entrada_xicalla(axic_frame)
+# axis_entry.configure(state="disabled")
 axic_label.pack()
-axis_entry.pack()
+# axis_entry.pack()
 
 
 
@@ -126,7 +126,7 @@ taula_name.pack()
 taula_namefig.pack()
 
 taula = 0
-taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter, tec_frame, axis_entry]
+taula_pack = [taula, taula_name, taula_namefig, namer, namer_button, deleter, tec_frame, 0]
 f.pass_variable(taula_pack)
 
 frame_catalog = [repertori_frame, croquis_frame, taula_frame]

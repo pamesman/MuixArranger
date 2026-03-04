@@ -6,8 +6,8 @@ from tkinter import ttk
 import customtkinter
 import pandas as pd
 import CTkMessagebox
-from time import sleep, time
-from PIL import Image, ImageTk
+from time import time
+from PIL import ImageTk
 from PIL import EpsImagePlugin
 
 
@@ -766,6 +766,7 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
 
 
 
+
     button.configure(command = lambda x = canvas_list_to_print: ie.prompt(x))
     counter_rows = 0
 
@@ -846,5 +847,6 @@ def entrada_xicalla(parent):
     global working_list
     global taula_mestra
     global croquis_in_use
-    entry = crear_searchbox(parent, working_list, taula_mestra, croquis = croquis_in_use)
+    #entry = crear_searchbox(parent, working_list, taula_mestra, croquis = croquis_in_use)
+    entry = 2
     return entry

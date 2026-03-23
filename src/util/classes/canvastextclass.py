@@ -149,8 +149,8 @@ class CanvasText(CTkBaseClass):
     def insertar_membre(self, value):
         value = self.lb.get(self.lb.nearest(value.y))
 
-        if self.interval != None:
-            self.interval.stop()
+        # if self.interval != None:
+        #     self.interval.stop()
         self.text= value
         for name in self.croquis_en_us.values():
             if self.text == name:
@@ -206,9 +206,9 @@ class CanvasText(CTkBaseClass):
 
     def on_click(self, _event):
         self.entry.delete(0, "end")
-        print(self.text)
-        print(self.location)
-        print(self.orientation)
+        # print(self.text)
+        # print(self.location)
+        # print(self.orientation)
         if not self.toggle:
             self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
             if "N. A." in list(self.working_values):

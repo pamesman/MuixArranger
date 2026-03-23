@@ -9,6 +9,8 @@ import CTkMessagebox
 from time import time
 from PIL import ImageTk
 from PIL import EpsImagePlugin
+import copy
+import deepdiff
 
 
 from src.util.classes.esquema import Esquema
@@ -41,6 +43,7 @@ updater = None
 sheet = None
 online = False
 donotupdate = False
+assaig_ref = {}
 
 assistents_id, membres_id, sheet_id  = config_reader.get_config()
 config_changed = True
@@ -102,39 +105,40 @@ def update_tecnica():
 
 
 update_batch = {}
-def batch_creator():
-    global croquis_ref
-    global croquis_in_use
-
-
-    global updater
-    global update_batch
-
-
-    for entry in list(croquis_ref.keys()):
-        update_batch.update({croquis_in_use["Nom"]: {}})
-        if croquis_ref[entry] != croquis_in_use[entry]:
-
-
-
-            print("change")
-            update_batch[croquis_in_use["Nom"]].update({entry:croquis_in_use[entry]})
-            drive_update2(update_batch)
-            if croquis_in_use[entry] == "'+":
-                croquis_in_use[entry] = "+"
-            croquis_ref = croquis_in_use.copy()
-
-
-        else:
-
-            pass
-
-
+# def batch_creator():
+#     global croquis_ref
+#     global croquis_in_use
+#
+#
+#     global updater
+#     global update_batch
+#
+#
+#     for entry in list(croquis_ref.keys()):
+#         update_batch.update({croquis_in_use["Nom"]: {}})
+#         if croquis_ref[entry] != croquis_in_use[entry]:
+#
+#
+#
+#             print("change")
+#             update_batch[croquis_in_use["Nom"]].update({entry:croquis_in_use[entry]})
+#             drive_update2(update_batch)
+#             if croquis_in_use[entry] == "'+":
+#                 croquis_in_use[entry] = "+"
+#             croquis_ref = croquis_in_use.copy()
+#
+#
+#         else:
+#
+#             pass
+#
+#
 observer1 = Interval(0.2, update_tecnica)
-observer2 = Interval(1, batch_creator)
+# observer2 = Interval(1, batch_creator)
 
 def drive_update2(update):
     global sheet
+    return
     for i in list(update.keys()):
         for k in list(update[i].keys()):
             print("Figura,Posicio, Data")
@@ -152,26 +156,36 @@ def pass_variable (anything):
     taula_pack = anything
 
 def connect(combobox, parents, splash):
+    """
+    Quan s'escollix online, es connecta al drive i es baixa les figures que haja fetes al assaig
+    :param combobox:
+    :param parents:
+    :param splash:
+    :return:
+    """
     global updater
     global croquis_loading
     global sheet
     global taula_pack
     global online
+    global assaig_ref
     online = True
     sheet, drive = spreadsheet_connection(sheet_id)
-    updater = Interval(1, lambda x=combobox: up_to_date(combobox, parents))
+    updater = Interval(1, lambda x=combobox: up_to_date(combobox, parents)) #Observer
 
-    result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
+    result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None) #llig el assaig
     figures = list(result.keys())[1:]
-    for i in figures:
+    for i in figures: #Per cada pàgina del assaig, fa un dictionari
         precroquis = result[i].to_dict()
         croquis_loading = {}
         try:
             for j in precroquis:
-                croquis_loading.update({j:precroquis[j][0]})
+                croquis_loading.update({j:precroquis[j][0]}) #transposa el diccionari
             print("Descarregant",croquis_loading["Figura"],":",croquis_loading["Nom"])
             inicialitzar_figura(croquis_loading,combobox, parents, online = True,downloading = True)
+            assaig_ref.update({croquis_loading["Nom"]:croquis_loading.copy()}) # Crea un "snapshot" de com està el assaig quan tel descarregues
         except:
+            print("Error descarregant, borrant pagina")
             sheet.del_worksheet(i)
     global croquis_in_use
     croquis_in_use = None
@@ -181,7 +195,7 @@ def connect(combobox, parents, splash):
                                              message=f"Encara estàs utilitzant els valors per defecte de: \n{unchanged_nagger}\nrecorda editar el axiu 'config.txt' per sincronitzar-te amb la resta de la colla i tècnica",
                                              option_1="Ok",
                                              option_2="Ok, pesat")
-
+    return assaig_ref
 
 def fer_croquis(figura: Esquema,nom: str):
     """
@@ -387,7 +401,8 @@ def assaig_button_press(nom, assaig):
         customtkinter.CTkLabel(taula_pack[6], text= i).pack()
     observer1.start()
     if online:
-        observer2.start()
+        # observer2.start()
+        pass
 
 def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, downloading = False):
     global assaig
@@ -395,10 +410,8 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
     selected_fig = croquis["Figura"]
 
     if online:
-        try:
-            updater.stop()
-        except:
-            pass
+        updater.stop()
+
     combobox_to_reset.set("Afegir figura")    #Restaura combobox
     counter = 1    #contador per a numerar el nom genèric de la figura creada
     for figura in assaig.keys():
@@ -426,10 +439,10 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
         for figura in rep.repertori.values():
             if selected_fig == figura.nom:
                 if answer != "" :
-                    croquis = fer_croquis(figura, answer)
+                    nom = answer
                 else:
-                    croquis = fer_croquis(figura, str(selected_fig) +" "+ str(counter))
-
+                    nom = str(selected_fig) +" "+ str(counter)
+                croquis = fer_croquis(figura, nom)
                 break
     else:
         croquis = croquis_loading
@@ -438,6 +451,7 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
         try: #crea nova pagina per a la figura nova
             sheet.add_worksheet(title = croquis["Nom"], cols = 150 ,rows=5)
             sheet.worksheet(croquis["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis.keys()))), values=[list(croquis.keys()),list(croquis.values())])
+
         except:
             pass
     button = customtkinter.CTkButton(parents[0],
@@ -453,10 +467,10 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
     """"""
     fer_dibuix(parents, figura.coordenades, figura.orientacio,croquis, figura.centraor())
     if not downloading:
-        croquis_nom = croquis["Nom"]
-        croquis = None
-        assaig_button_press(croquis_nom, assaig= assaig)
-
+        assaig_button_press(croquis["Nom"], assaig= assaig)
+    if online:
+        assaig_ref.update({croquis["Nom"]:  croquis})
+        updater.start()
     return croquis
 
 def eliminar_figura(canvas):
@@ -575,73 +589,132 @@ def canviar_apariencia():
 
 def up_to_date(combobox_to_reset, parents):
     global assaig
+    global assaig_ref
     global croquis_in_use
     global taula_pack
     global updater
+
+    assaig_copy = {}
+    canvases = {}
+    for key in assaig:
+        assaig_copy[key] = assaig[key]["Croquis"].copy()
+        canvases[key] = assaig[key]["Canvas"]
     start = time()
-    updater.stop()
-    result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None)
-    figures = list(result.keys())[1:]
-    if len(figures) != len(assaig):
+    updater.stop() # Se detiene el observer mientras se ejecuta para no pillarse los dedos
+    result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None) # Se descarrega el excel
+    figures = list(result.keys())[1:] #lsita en les figures online
+    print(figures)
+    ### 1: crea o borra figures
+    if len(figures) != len(assaig_copy): #compara nombre de figures online i offline
         print("ha canviat el nombre d figures")
         assaig_to_remove = []
-        for i in assaig:
-            if i not in figures:
+        for i in assaig_copy:
+            if i not in figures: #borrar les que desapareguen del drive
                 print(f"borrant {i}")
                 assaig_to_remove.append(i)
         for i in assaig_to_remove:
             assaig[i]["Butó"].destroy()
+            assaig[i]["Taula"].destroy()
             del assaig[i]
-        for i in figures:
-            if i not in assaig:
+
+        for i in figures: #crea nova figura local si apareix en el drive
+            if i not in assaig_copy:
                 print(f"figura nova {i}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i)+1).get_all_records()[0]
                 global croquis_loading
                 croquis_loading = croquis_cloud.copy()
+                assaig_ref.update(croquis_loading)
                 inicialitzar_figura(croquis_loading,combobox_to_reset, parents, downloading = True, online = True)
 
-    for i in range(len(figures)):
-        canvas = assaig[croquis_in_use["Nom"]]["Canvas"]
-        if croquis_in_use["Nom"] == figures[i]:
-            precroquis = result[figures[i]]
-            croquis_cloud = {}
-            for j in precroquis:
-                croquis_cloud.update({j:precroquis[j][0]})
-            if croquis_in_use != croquis_cloud:
 
-                print("canvió la figura")
-                print(donotupdate)
-                print(croquis_in_use)
-                print(croquis_cloud)
-                diferencia = set(croquis_cloud.values()) - set(croquis_in_use.values())
-                print("diferencia")
-                print(diferencia)
+    ### Va figura per figura mirant canvis
+    for i in range(len(figures)): #por cada figura online
+        try:
+            canvas =canvases[figures[i]]
+        except:
+            pass
+        #carregue el croquis local, el que hi ha guardat com a ref i el online
+        croquis_ref = assaig_ref[figures[i]]
+        croquis_local = assaig_copy[figures[i]]
+        croquis_online = {}
+        precroquis = result[figures[i]]
+        for j in precroquis:
+            croquis_online.update({j: precroquis[j][0]})
+        local_changes = False
+        online_changes = False
 
-                for change in diferencia:
-                    target_ID = list(croquis_cloud.values()).index(change)
-                    target_data = [list(croquis_cloud.keys())[target_ID],list(croquis_cloud.values())[target_ID]]
-                    target_drawing =canvas.find_withtag(target_data[0])
+        if croquis_online != croquis_ref:
+            canvis_online = {}
+            for key in croquis_ref.keys():
+                if croquis_ref[key] == croquis_online[key]:
+                    continue
+                if croquis_ref[key][-1] == croquis_online[key][-1] and croquis_ref[key][-1] == "+": #descarta casos de '+ y +
+                    continue
+                canvis_online.update({key: croquis_online[key]})  #guarda els canvis en canvis_online
+                if canvis_online[key] == "'+": #corregix el caràcter extra de la posicio deshabilitada
+                    canvis_online[key] = "+"
+                online_changes = True
+                print("canvis online")
+                print(canvis_online)
 
-                    canvas.itemconfig(target_drawing[-1], text = target_data[1].upper()[:len(target_data[1].upper().split(" ")[0])+2], fill = "black")
+        if croquis_local != croquis_ref:
+            canvis_locals = {}
+            for key in croquis_ref.keys():
+                if croquis_ref[key] == croquis_local[key]:
+                    continue
+                if croquis_ref[key][-1] == croquis_local[key][-1] and croquis_ref[key][-1] == "+": #descarta casos de '+ y +
+                    continue
+                canvis_locals.update({key: croquis_local[key]})  # guarda els canvis en canvis_online
+                if canvis_locals[key] == "+": #corregix el caràcter extra de la posicio deshabilitada
+                    canvis_locals[key] = "'+"
+                local_changes = True
+                print("canvis local")
+                print(canvis_locals)
 
-                    canvas.itemconfig(target_drawing[0], fill = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(list(croquis_cloud.keys())[target_ID].split(" ")[0])]) )
+        #1. Cambiar etiquetas en los canvases y editar croquis locales
+        if online_changes:
+            for key in canvis_online.keys():
+                croquis_local.update({key: canvis_online[key]})
+                assaig_ref[figures[i]][key] = canvis_online[key]
+                text_tag = canvas.find_withtag(key)[-1]
+                rectangle_tag = canvas.find_withtag(key)[0]
 
-                    current_values = assaig[croquis_cloud["Nom"]]["Taula"].item(target_ID - 1).get("values")
-                    current_values[1] = target_data[1]
-                    croquis_in_use.update({target_data[0]:target_data[1]})
-                    print("target data")
-                    print(target_data[1])
-                    try:
-                        current_values[2] = taula_mestra.loc[taula_mestra["Àlies"] == target_data[1]].iloc[0, 2]
-                    except:
-                        pass
-                    assaig[croquis_in_use["Nom"]]["Taula"].item(target_ID - 1, values=current_values)
-                assaig[croquis_in_use["Nom"]].update({"Croquis": croquis_in_use})
+                if canvis_online[key][-1] == "+":
+                    background_color  = ""
+                    text_color = "gray"
+                    outline = ""
+                else:
+                    background_color = canvas.master._apply_appearance_mode(rep.palette[rep.rols.index(key.split(" ")[0])])
+                    text_color = "black"
+                    outline = "black"
+                canvas.itemconfig(text_tag,
+                                  text=canvis_online[key],
+                                  fill=text_color)
+                canvas.itemconfig(rectangle_tag,
+                                  fill = background_color, outline = outline)
 
-    up_to_date_running = False
+                noves_dades = [key,canvis_online[key]]
+                #afegir lalçada si es posible
+                try:
+                    noves_dades.append(taula_mestra.loc[taula_mestra["Àlies"] == noves_dades[1]].iloc[0,2])
+                except:
+                    pass
+                assaig[croquis_in_use["Nom"]]["Taula"].item(list(croquis_online.keys()).index(key) - 1, values=noves_dades)
+        #2 lo mateix en els online
+        if local_changes:
+            for key in canvis_locals.keys():
+                croquis_local.update({key: canvis_locals[key]})
+                column_number = list(croquis_ref.keys()).index(key)+1
+                sheet.worksheet(figures[i]).update_cell(2, column_number , value = canvis_locals[key])
+                croquis_ref[key] = canvis_locals[key]
+        if online_changes:
+            for key in canvis_online.keys():
+                assaig[figures[i]]["Croquis"][key] = canvis_online[key] # Incorporem el canvi al croquis que usem per a no revertir el canvi
+                croquis_ref[key] = canvis_online[key] #Corregim la referència
     end = time()
-    print(end-start)
+    print(end - start)
     updater.start()
+
 
 
 def minimizar(button_expand, croquis_frame, repertori_frame, repertori_label):
@@ -787,16 +860,16 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
 
 def close_app(_event, main):
     global observer1
-    global observer2
+    # global observer2
     global updater
     try:
         observer1.stop()
     except:
         pass
-    try:
-        observer2.stop()
-    except:
-        pass
+    # try:
+    #     observer2.stop()
+    # except:
+    #     pass
     try:
         updater.stop()
     except:

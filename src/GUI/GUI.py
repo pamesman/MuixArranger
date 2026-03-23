@@ -146,7 +146,7 @@ connection = CTkMessagebox.CTkMessagebox(title="Connectivitat",
                                option_2 = "Offline" )
 if connection.get() == "Online":
     online = True
-    f.connect(repertori_label, frame_catalog, splash)
+    assaig_ref = f.connect(repertori_label, frame_catalog, splash)
 else:
     splash.after(500, splash.destroy)
 #botó per expandir croquis zone

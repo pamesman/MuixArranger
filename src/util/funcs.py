@@ -307,7 +307,7 @@ def fer_dibuix(parent, listadecoordenades:list, listadeorientacions,croquiss:dic
         counter += 1
         if croquiss[i] == "N. A." and skip == True:
             continue
-        if croquiss[i] == "+" and skip == True:
+        if croquiss[i][-1] == "+" and skip == True:
             continue
 
 

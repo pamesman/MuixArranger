@@ -244,10 +244,12 @@ class CanvasText(CTkBaseClass):
 
     def on_defocus(self, _event):
         if not self.toggle:
-            if self.text.split(" ")[0] != self.position.split(" ")[0]:
+            if self.parent.itemcget(self.txt, "text") != self.position.split(" ")[0]:
+                print(self.parent.itemcget(self.txt, "text"))
+                print(self.position.split(" ")[0])
                 self.parent.itemconfig(self.shape, fill=self._apply_appearance_mode(self.color2))
                 self.parent.itemconfig(self.txt, font=("Arial", self.text_size,"bold"))
-            elif self.text.split(" ")[0] == "+":
+            elif self.parent.itemcget(self.txt, "text")[-1] == "+":
                 self.parent.itemconfig(self.shape, fill="")
             else:
                 self.parent.itemconfig(self.shape, fill="")

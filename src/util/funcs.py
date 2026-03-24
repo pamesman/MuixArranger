@@ -9,8 +9,7 @@ import CTkMessagebox
 from time import time
 from PIL import ImageTk
 from PIL import EpsImagePlugin
-import copy
-import deepdiff
+
 
 
 from src.util.classes.esquema import Esquema
@@ -185,7 +184,7 @@ def connect(combobox, parents, splash):
             inicialitzar_figura(croquis_loading,combobox, parents, online = True,downloading = True)
             assaig_ref.update({croquis_loading["Nom"]:croquis_loading.copy()}) # Crea un "snapshot" de com està el assaig quan tel descarregues
         except:
-            print("Error descarregant, borrant pagina")
+            print(f"Error descarregant, borrant pagina: {i}")
             sheet.del_worksheet(i)
     global croquis_in_use
     croquis_in_use = None
@@ -244,6 +243,7 @@ def fer_dibuix(parent, listadecoordenades:list, listadeorientacions,croquiss:dic
 
     if not skip:
         for figura in list(assaig.keys())[:-1]:
+
             assaig[figura]["Taula"].pack_forget()
 
         parent[1].bind("<Configure>", lambda event: resize(event, canvas))
@@ -442,6 +442,8 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
                     nom = answer
                 else:
                     nom = str(selected_fig) +" "+ str(counter)
+                    while nom in assaig.keys():
+                        nom += " bis"
                 croquis = fer_croquis(figura, nom)
                 break
     else:
@@ -449,6 +451,7 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
 
     if online:
         try: #crea nova pagina per a la figura nova
+            assaig_ref.update({croquis["Nom"]: croquis.copy()})
             sheet.add_worksheet(title = croquis["Nom"], cols = 150 ,rows=5)
             sheet.worksheet(croquis["Nom"]).update(range_name=str("R1C1:R5C"+str(len(croquis.keys()))), values=[list(croquis.keys()),list(croquis.values())])
 
@@ -469,7 +472,6 @@ def inicialitzar_figura(croquis, combobox_to_reset, parents, online = False, dow
     if not downloading:
         assaig_button_press(croquis["Nom"], assaig= assaig)
     if online:
-        assaig_ref.update({croquis["Nom"]:  croquis})
         updater.start()
     return croquis
 
@@ -603,12 +605,12 @@ def up_to_date(combobox_to_reset, parents):
     updater.stop() # Se detiene el observer mientras se ejecuta para no pillarse los dedos
     result = pd.read_excel(io.BytesIO(download_file(real_file_id=sheet_id)), sheet_name=None) # Se descarrega el excel
     figures = list(result.keys())[1:] #lsita en les figures online
-    print(figures)
+    #print(figures)
     ### 1: crea o borra figures
-    if len(figures) != len(assaig_copy): #compara nombre de figures online i offline
-        print("ha canviat el nombre d figures")
+    if len(figures) != len(assaig): #compara nombre de figures online i offline
+        print("Ha canviat el nombre d figures")
         assaig_to_remove = []
-        for i in assaig_copy:
+        for i in assaig:
             if i not in figures: #borrar les que desapareguen del drive
                 print(f"borrant {i}")
                 assaig_to_remove.append(i)
@@ -618,12 +620,18 @@ def up_to_date(combobox_to_reset, parents):
             del assaig[i]
 
         for i in figures: #crea nova figura local si apareix en el drive
-            if i not in assaig_copy:
-                print(f"figura nova {i}")
+            if i not in assaig:
+
+                print(f"figura nova {i}, not in assaig {list(assaig.keys())}")
                 croquis_cloud = sheet.get_worksheet(figures.index(i)+1).get_all_records()[0]
                 global croquis_loading
                 croquis_loading = croquis_cloud.copy()
                 assaig_ref.update(croquis_loading)
+                try: #a vegades es crea una doble figura
+                    assaig[i]["Butó"].destroy()
+                    assaig[i]["Taula"].destroy()
+                except:
+                    pass
                 inicialitzar_figura(croquis_loading,combobox_to_reset, parents, downloading = True, online = True)
 
 
@@ -635,7 +643,7 @@ def up_to_date(combobox_to_reset, parents):
             pass
         #carregue el croquis local, el que hi ha guardat com a ref i el online
         croquis_ref = assaig_ref[figures[i]]
-        croquis_local = assaig_copy[figures[i]]
+        croquis_local = assaig[figures[i]]["Croquis"].copy()
         croquis_online = {}
         precroquis = result[figures[i]]
         for j in precroquis:
@@ -673,6 +681,7 @@ def up_to_date(combobox_to_reset, parents):
 
         #1. Cambiar etiquetas en los canvases y editar croquis locales
         if online_changes:
+            print(f"{croquis_local} \n  {croquis_ref}  \n  {croquis_online}")
             for key in canvis_online.keys():
                 croquis_local.update({key: canvis_online[key]})
                 assaig_ref[figures[i]][key] = canvis_online[key]
@@ -711,8 +720,8 @@ def up_to_date(combobox_to_reset, parents):
             for key in canvis_online.keys():
                 assaig[figures[i]]["Croquis"][key] = canvis_online[key] # Incorporem el canvi al croquis que usem per a no revertir el canvi
                 croquis_ref[key] = canvis_online[key] #Corregim la referència
-    end = time()
-    print(end - start)
+    # end = time()
+    # print(end - start)
     updater.start()
 
 

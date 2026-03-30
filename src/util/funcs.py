@@ -819,9 +819,7 @@ def actualitzar_assaig_output(_event, frame, frame2, parents, button):
                                            fill = "black",
                                            anchor = "nw",
                                            )
-        img = ImageTk.PhotoImage(file=resource_path("arrow.png"))
 
-        arrow = canvas.create_image(canvas.winfo_width(), canvas.winfo_height()/2-10, anchor="ne", image=img, tags="banner")
         # CanvasText(canvas.master.master.master,
         #            canvas,
         #            "Responsable Xicalla", (0,0), ((0,0),(0,0)),

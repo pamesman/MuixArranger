@@ -179,7 +179,7 @@ class CanvasText(CTkBaseClass):
     def search_items(self, _event):
         search_value = self.entry.get()
         self.entry.focus_force()
-        self.working_values = list(set(self.values) ^ set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
+        self.working_values = list(set([i.upper() for i in list(self.values)]) ^ set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
         if search_value == "" or search_value == " ":
             self.lb.delete(0, "end")
             try:
@@ -210,7 +210,7 @@ class CanvasText(CTkBaseClass):
         # print(self.location)
         # print(self.orientation)
         if not self.toggle:
-            self.working_values = list(set(self.values)^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
+            self.working_values = list(set([i.upper() for i in list(self.values)])^set([i.upper() for i in list(self.croquis_en_us.values())[2:]]))
             if "N. A." in list(self.working_values):
                 self.working_values.remove("N. A.")
 

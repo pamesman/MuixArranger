@@ -188,6 +188,15 @@ uppdate_assaig.place(relx = 0.005, rely = 0.01, relheight = .24,relwidth = 1/3-0
 print_assaig.place(relx=0.005, rely=0.26, relheight=.24, relwidth=1 / 3 - 0.02, anchor="nw")
 
 
+def app_shutdown():
+    f.updater.stop()
+    f.observer1.stop()
+    root.quit()
+    root.destroy()
+
+
+root.protocol("WM_DELETE_WINDOW", app_shutdown)
+
 root.mainloop()
 
 

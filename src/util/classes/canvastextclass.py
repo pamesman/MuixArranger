@@ -145,6 +145,7 @@ class CanvasText(CTkBaseClass):
             x = (event.x/self.parent.winfo_width()-0.5)*(self.span_x*1.1)+self.center[0]
             y = (event.y/self.parent.winfo_height()-0.5)*(self.span_x*1.1)-self.center[1]
             print(x, y)
+
         self.parent.bind("<Button-1>", locate)
     def insertar_membre(self, value):
         value = self.lb.get(self.lb.nearest(value.y))
@@ -174,7 +175,7 @@ class CanvasText(CTkBaseClass):
         self.parent.itemconfig(self.shape, outline = self._apply_appearance_mode(("#333333","#000000")), fill = self._apply_appearance_mode(self.color2))
 
         self.parent.itemconfig(self.txt, fill = "black")
-        self.forget()
+
 
     def search_items(self, _event):
         search_value = self.entry.get()
@@ -235,8 +236,12 @@ class CanvasText(CTkBaseClass):
                 self.entry.place_forget()
                 self.lb.place_forget()
 
-
+            def prepare_to_forget(_event):
+                self.parent.bind("<Button-1>", forget)
             self.entry.bind("<FocusOut>", forget)
+            self.entry.bind("<Escape>", forget)
+            self.parent.bind("<Button-3>", forget)
+            self.parent.bind("<Button-1>", prepare_to_forget)
 
     def on_focus(self, _event):
         if not self.toggle:
